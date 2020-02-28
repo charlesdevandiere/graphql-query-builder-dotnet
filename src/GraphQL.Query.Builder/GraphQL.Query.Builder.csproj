@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>8.0</LangVersion>
+    <Version>0.0.0</Version>
+    <Authors>Charles de Vandière</Authors>
+    <Description>A tool to build GraphQL query from a C# model.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/charlesdevandiere/graphql-query-builder-dotnet</RepositoryUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/charlesdevandiere/graphql-query-builder-dotnet/master/logo.png</PackageIconUrl>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dawn.Guard" Version="1.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
+  </ItemGroup>
+</Project>

@@ -1,8 +1,8 @@
-# GraphQL Client Extensions
+# GraphQL Query Builder .NET
 
 ![logo](https://raw.githubusercontent.com/charlesdevandiere/graphql-client-extensions/master/logo.png)
 
-Extensions for [GraphQL.Client](https://github.com/graphql-dotnet/graphql-client) to build graphQL queries from a C# model.
+A tool to build GraphQL query from a C# model.
 
 [![Build Status](https://dev.azure.com/charlesdevandiere/charlesdevandiere/_apis/build/status/charlesdevandiere.graphql-client-extensions?branchName=master)](https://dev.azure.com/charlesdevandiere/charlesdevandiere/_build/latest?definitionId=1&branchName=master)
 ![Azure DevOps coverage (branch)](https://img.shields.io/azure-devops/coverage/charlesdevandiere/charlesdevandiere/1/master)

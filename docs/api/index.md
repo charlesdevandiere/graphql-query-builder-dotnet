@@ -2,8 +2,6 @@
 
 ## `GraphQL.Query.Builder`
 
-- [`GraphQLClientException`](GraphQL.Query.Builder/GraphQLClientException)
-- [`GraphQLClientExtensions`](GraphQL.Query.Builder/GraphQLClientExtensions)
 - [`IQuery`](GraphQL.Query.Builder/IQuery)
 - [`IQuery<TSource>`](GraphQL.Query.Builder/IQuery{TSource})
 - [`IQueryStringBuilder`](GraphQL.Query.Builder/IQueryStringBuilder)

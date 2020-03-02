@@ -23,13 +23,6 @@ steps:
   - script: GitVersion /output buildserver
     displayName: GitVersion
 
-  - task: UseDotNet@2
-    displayName: 'use dotnet core sdk 3.1'
-    inputs:
-      packageType: sdk
-      version: 3.1.100
-      installationPath: $(Agent.ToolsDirectory)/dotnet
-
   - script: dotnet tool restore
     displayName: 'dotnet tool restore'
 

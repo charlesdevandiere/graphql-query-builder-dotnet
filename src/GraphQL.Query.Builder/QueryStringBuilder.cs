@@ -4,41 +4,38 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using Dawn;
 
 namespace GraphQL.Query.Builder
 {
-    /// <summary>
-    /// Builds a GraphQL query from the Query Object. For parameters it
-    /// support simple parameters, ENUMs, Lists, and Objects.
-    /// For selections fields it supports sub-selects with params as above.
-    ///
-    /// Most all structures can be recursive, and are unwound as needed
-    /// </summary>
+    /// <summary>The GraphQL query builder class.</summary>
     public class QueryStringBuilder : IQueryStringBuilder
     {
-        /// <summary>
-        /// The query string builder.
-        /// </summary>
+        /// <summary>The query string builder.</summary>
         public StringBuilder QueryString { get; } = new StringBuilder();
 
-        /// <summary>
-        /// Clear the QueryStringBuilder and all that entails
-        /// </summary>
+        /// <summary>Clears the string builder.</summary>
         public void Clear()
         {
             QueryString.Clear();
         }
 
         /// <summary>
-        /// Recurse an object which could be a primitive or more
-        /// complex structure. This will return a string of the value
-        /// at the current level. Recursion terminates when at a terminal
-        /// (primitive).
+        /// Formats query param.
+        /// 
+        /// Returns:
+        /// - String: `"value"`
+        /// - Number: `10`
+        /// - Boolean: `true` / `false`
+        /// - Enum: `EnumValue`
+        /// - Key value pair: `key:"value"` / `key:10`
+        /// - List: `["value1","value2"]` / `[1,2]`
+        /// - Dictionary: `{a:"value",b:10}`
         /// </summary>
         /// <param name="value"></param>
-        /// <returns>string</returns>
+        /// <returns>The formatted query param.</returns>
         /// <exception cref="InvalidDataException">Invalid Object Type in Param List</exception>
-        internal protected string BuildQueryParam(object value)
+        internal protected string FormatQueryParam(object value)
         {
             switch (value)
             {
@@ -61,27 +58,20 @@ namespace GraphQL.Query.Builder
                     return enumValue.ToString();
 
                 case KeyValuePair<string, object> kvValue:
-                    StringBuilder keyValueStr = new StringBuilder();
-
-                    keyValueStr.Append($"{kvValue.Key}:{BuildQueryParam(kvValue.Value)}");
-                    return keyValueStr.ToString();
+                    return $"{kvValue.Key}:{FormatQueryParam(kvValue.Value)}";
 
                 case IList listValue:
                     StringBuilder listStr = new StringBuilder();
 
                     listStr.Append("[");
-                    bool hasList = false;
                     foreach (var obj in listValue)
                     {
-                        listStr.Append(BuildQueryParam(obj) + ", ");
-                        hasList = true;
+                        listStr.Append(FormatQueryParam(obj) + ",");
                     }
 
-                    // strip comma-space from local list if not empty
-
-                    if (hasList)
+                    if (listValue.Count > 0)
                     {
-                        listStr.Length -= 2;
+                        listStr.Length -= 1;
                     }
 
                     listStr.Append("]");
@@ -92,21 +82,14 @@ namespace GraphQL.Query.Builder
                     StringBuilder dictStr = new StringBuilder();
 
                     dictStr.Append("{");
-                    bool hasType = false;
                     foreach (var dictObj in (Dictionary<string, object>)dictValue)
                     {
-                        dictStr.Append(BuildQueryParam(dictObj) + ", ");
-                        hasType = true;
+                        dictStr.Append(FormatQueryParam(dictObj) + ",");
                     }
 
-                    // strip comma-space from type if not empty.
-                    // Not sure if this should generate code
-                    // or Toss, depends on if in GQL `name:{}` is valid in
-                    // any circumstance
-
-                    if (hasType)
+                    if (dictValue.Count > 0)
                     {
-                        dictStr.Length -= 2;
+                        dictStr.Length -= 1;
                     }
 
                     dictStr.Append("}");
@@ -118,50 +101,25 @@ namespace GraphQL.Query.Builder
             }
         }
 
-        /// <summary>
-        /// This take all parameter data
-        /// and builds the string. This will look in the query and
-        /// use the WhereMap for the list of data. The data can be
-        /// most any type as long as it's one that we support. Will
-        /// resolve nested structures
-        /// </summary>
-        /// <param name="query">The Query</param>
+        /// <summary>Adds query params to the query string.</summary>
+        /// <param name="query">The query.</param>
         internal protected void AddParams<TSource>(IQuery<TSource> query) where TSource : class
         {
-            // safe-tee check
+            Guard.Argument(query, nameof(query)).NotNull();
 
-            if (query == null)
+            foreach (var param in query.Arguments)
             {
-                return;
+                QueryString.Append($"{param.Key}:{FormatQueryParam(param.Value)},");
             }
 
-            // Build the param list from the name value pairs.
-            // All entries have a `name`:`value` looking format. The
-            // BuildQueryParam's will recurse any nested data elements
-
-            bool hasParams = false;
-            foreach (var param in query.ArgumentsMap)
-            {
-                QueryString.Append($"{param.Key}:");
-                QueryString.Append(BuildQueryParam(param.Value) + ",");
-                hasParams = true;
-            }
-
-            // Remove the last comma and space that always trails if we have params!
-
-            if (hasParams)
+            if (query.Arguments.Count > 0)
             {
                 QueryString.Length--;
             }
         }
 
-        /// <summary>
-        /// Adds fields to the query sting. This will use the SelectList
-        /// structure from the query to build the graphql select list. This
-        /// will recurse as needed to pick up sub-selects that can contain
-        /// parameter lists.
-        /// </summary>
-        /// <param name="query">The Query</param>
+        /// <summary>Adds fields to the query sting.</summary>
+        /// <param name="query">The query.</param>
         /// <exception cref="ArgumentException">Invalid Object in Field List</exception>
         internal protected void AddFields<TSource>(IQuery<TSource> query) where TSource : class
         {
@@ -188,14 +146,9 @@ namespace GraphQL.Query.Builder
             }
         }
 
-        /// <summary>
-        /// Build the entire query into a string. This will take
-        /// the query object and build a graphql query from it. This
-        /// returns the query, but not the outer block. This is done so
-        /// you can use the output to batch the queries
-        /// </summary>
-        /// <param name="query">The Query</param>
-        /// <returns>GraphQL query string without outer block</returns>
+        /// <summary>Builds the query.</summary>
+        /// <param name="query">The query.</param>
+        /// <returns>The GraphQL query as string, without outer enclosing block.</returns>
         public string Build<TSource>(IQuery<TSource> query) where TSource : class
         {
             if (!String.IsNullOrWhiteSpace(query.AliasName))
@@ -205,7 +158,7 @@ namespace GraphQL.Query.Builder
 
             QueryString.Append(query.Name);
 
-            if (query.ArgumentsMap.Count > 0)
+            if (query.Arguments.Count > 0)
             {
                 QueryString.Append("(");
                 AddParams(query);

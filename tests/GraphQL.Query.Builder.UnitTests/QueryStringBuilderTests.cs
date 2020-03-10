@@ -21,13 +21,6 @@ namespace GraphQL.Query.Builder.UnitTests
             CultureInfo.CurrentCulture = new CultureInfo("en-us", false);
         }
 
-        private static string RemoveWhitespace(string input)
-        {
-            return new string(input.ToCharArray()
-                .Where(c => !Char.IsWhiteSpace(c))
-                .ToArray());
-        }
-
         [Fact]
         public void BuildQueryParam_IntType_ParseInt()
         {
@@ -35,7 +28,7 @@ namespace GraphQL.Query.Builder.UnitTests
             QueryStringBuilder queryString = new QueryStringBuilder();
 
             // Act
-            string intStr = queryString.BuildQueryParam(123);
+            string intStr = queryString.FormatQueryParam(123);
 
             // Assert
             Assert.Equal("123", intStr);
@@ -48,7 +41,7 @@ namespace GraphQL.Query.Builder.UnitTests
             QueryStringBuilder queryString = new QueryStringBuilder();
 
             // Act
-            string strStr = queryString.BuildQueryParam("Haystack");
+            string strStr = queryString.FormatQueryParam("Haystack");
 
             // Assert
             Assert.Equal("\"Haystack\"", strStr);
@@ -61,7 +54,7 @@ namespace GraphQL.Query.Builder.UnitTests
             QueryStringBuilder queryString = new QueryStringBuilder();
 
             // Act
-            string doubleStr = queryString.BuildQueryParam(1234.5678);
+            string doubleStr = queryString.FormatQueryParam(1234.5678);
 
             // Assert
             Assert.Equal("1234.5678", doubleStr);
@@ -74,7 +67,7 @@ namespace GraphQL.Query.Builder.UnitTests
             QueryStringBuilder queryString = new QueryStringBuilder();
 
             // Act
-            string enumStr = queryString.BuildQueryParam(TestEnum.DISABLED);
+            string enumStr = queryString.FormatQueryParam(TestEnum.DISABLED);
 
             // Assert
             Assert.Equal("DISABLED", enumStr);
@@ -92,10 +85,10 @@ namespace GraphQL.Query.Builder.UnitTests
             };
 
             // Act
-            string fromToMapStr = queryString.BuildQueryParam(fromToMap);
+            string fromToMapStr = queryString.FormatQueryParam(fromToMap);
 
             // Assert
-            Assert.Equal("{from:444.45, to:555.45}", fromToMapStr);
+            Assert.Equal("{from:444.45,to:555.45}", fromToMapStr);
         }
 
         [Fact]
@@ -106,10 +99,10 @@ namespace GraphQL.Query.Builder.UnitTests
 
             // Act
             List<int> intList = new List<int>(new[] { 43783, 43784, 43145 });
-            string intListStr = queryString.BuildQueryParam(intList);
+            string intListStr = queryString.FormatQueryParam(intList);
 
             // Assert
-            Assert.Equal("[43783, 43784, 43145]", intListStr);
+            Assert.Equal("[43783,43784,43145]", intListStr);
         }
 
         [Fact]
@@ -120,10 +113,10 @@ namespace GraphQL.Query.Builder.UnitTests
 
             // Act
             List<string> strList = new List<string>(new[] { "DB7", "DB9", "Vantage" });
-            string strListStr = queryString.BuildQueryParam(strList);
+            string strListStr = queryString.FormatQueryParam(strList);
 
             // Assert
-            Assert.Equal("[\"DB7\", \"DB9\", \"Vantage\"]", strListStr);
+            Assert.Equal("[\"DB7\",\"DB9\",\"Vantage\"]", strListStr);
         }
 
         [Fact]
@@ -134,10 +127,10 @@ namespace GraphQL.Query.Builder.UnitTests
 
             // Act
             List<double> doubleList = new List<double>(new[] { 123.456, 456, 78.901 });
-            string doubleListStr = queryString.BuildQueryParam(doubleList);
+            string doubleListStr = queryString.FormatQueryParam(doubleList);
 
             // Assert
-            Assert.Equal("[123.456, 456, 78.901]", doubleListStr);
+            Assert.Equal("[123.456,456,78.901]", doubleListStr);
         }
 
         [Fact]
@@ -148,10 +141,10 @@ namespace GraphQL.Query.Builder.UnitTests
 
             // Act
             List<TestEnum> enumList = new List<TestEnum>(new[] { TestEnum.ENABLED, TestEnum.DISABLED, TestEnum.HAYstack });
-            string enumListStr = queryString.BuildQueryParam(enumList);
+            string enumListStr = queryString.FormatQueryParam(enumList);
 
             // Assert
-            Assert.Equal("[ENABLED, DISABLED, HAYstack]", enumListStr);
+            Assert.Equal("[ENABLED,DISABLED,HAYstack]", enumListStr);
         }
 
         [Fact]
@@ -177,10 +170,10 @@ namespace GraphQL.Query.Builder.UnitTests
             };
 
             // Act
-            string nestedListMapStr = queryString.BuildQueryParam(nestedListMap);
+            string nestedListMapStr = queryString.FormatQueryParam(nestedListMap);
 
             // Assert
-            Assert.Equal("{from:123, to:454, recurse:[\"aa\", \"bb\", \"cc\"], map:{from:444.45, to:555.45}, name:HAYstack}", nestedListMapStr);
+            Assert.Equal("{from:123,to:454,recurse:[\"aa\",\"bb\",\"cc\"],map:{from:444.45,to:555.45},name:HAYstack}", nestedListMapStr);
         }
 
         [Fact]
@@ -215,10 +208,10 @@ namespace GraphQL.Query.Builder.UnitTests
             // Act
             queryString.AddParams(query);
 
-            string addParamStr = RemoveWhitespace(queryString.QueryString.ToString());
+            string addParamStr = queryString.QueryString.ToString();
 
             // Assert
-            Assert.Equal(RemoveWhitespace("from:123,to:454,recurse:[\"aa\",\"bb\",\"cc\"],map:{from:444.45,to:555.45},name:HAYstack"), addParamStr);
+            Assert.Equal("from:123,to:454,recurse:[\"aa\",\"bb\",\"cc\"],map:{from:444.45,to:555.45},name:HAYstack", addParamStr);
         }
 
         [Fact]
@@ -288,10 +281,10 @@ namespace GraphQL.Query.Builder.UnitTests
             // Act
             var builder = new QueryStringBuilder();
             builder.AddFields(query);
-            string addParamStr = RemoveWhitespace(builder.QueryString.ToString());
+            string addParamStr = builder.QueryString.ToString();
 
             // Assert
-            Assert.Equal(RemoveWhitespace("morethingsin_a_selectsubSelect(subMake:\"aston martin\",subState:\"ca\",subLimit:1,__debug:DISABLED,SuperQuerySpeed:ENABLED){subNamesubMakesubModel}"), addParamStr);
+            Assert.Equal("more things in_a_select subSelect(subMake:\"aston martin\",subState:\"ca\",subLimit:1,__debug:DISABLED,SuperQuerySpeed:ENABLED){subName subMake subModel}", addParamStr);
         }
 
         [Fact]
@@ -319,10 +312,10 @@ namespace GraphQL.Query.Builder.UnitTests
                     .AddArguments(mySubDict));
 
             // Act
-            string buildStr = RemoveWhitespace(query.Build());
+            string buildStr = query.Build();
 
             // Assert
-            Assert.Equal(RemoveWhitespace("test1Alias:test1{morethingsin_a_selectsubSelect(subMake:\"aston martin\",subState:\"ca\",subLimit:1,__debug:DISABLED,SuperQuerySpeed:ENABLED){subNamesubMakesubModel}}"), buildStr);
+            Assert.Equal("test1Alias:test1{more things in_a_select subSelect(subMake:\"aston martin\",subState:\"ca\",subLimit:1,__debug:DISABLED,SuperQuerySpeed:ENABLED){subName subMake subModel}}", buildStr);
         }
 
         [Fact]
@@ -335,7 +328,7 @@ namespace GraphQL.Query.Builder.UnitTests
             string buildStr = query.Build();
 
             // Assert
-            Assert.Equal(RemoveWhitespace("test"), buildStr);
+            Assert.Equal("test", buildStr);
         }
     }
 }

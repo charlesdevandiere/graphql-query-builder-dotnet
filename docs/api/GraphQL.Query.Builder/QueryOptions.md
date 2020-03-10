@@ -2,7 +2,7 @@
 
 `Namespace: GraphQL.Query.Builder`
 
-Query options class
+The query options class.
 
 ```csharp
 public class QueryOptions
@@ -12,8 +12,8 @@ public class QueryOptions
 
 | Type | Name | Summary |
 | --- | --- | --- |
-| `Func<String, String>` | Formater | Gets or sets the formater |
-| `Func<IQueryStringBuilder>` | QueryStringBuilderFactory | Gets or sets the query string builder factory |
+| `Func<String, String>` | Formatter | Gets or sets the formatter. |
+| `Func<IQueryStringBuilder>` | QueryStringBuilderFactory | Gets or sets the query string builder factory. |
 
 ---
 

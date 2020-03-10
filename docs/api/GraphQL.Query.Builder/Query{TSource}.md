@@ -2,7 +2,7 @@
 
 `Namespace: GraphQL.Query.Builder`
 
-The Query Class is a simple class to build out graphQL  style queries. It will build the parameters and field lists  similar in a way you would use a SQL query builder to assemble  a query. This will maintain the response for the query
+The query class.
 
 ```csharp
 public class Query<TSource>

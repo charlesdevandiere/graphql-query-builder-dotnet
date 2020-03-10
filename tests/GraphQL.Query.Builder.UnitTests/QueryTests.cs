@@ -158,7 +158,7 @@ namespace GraphQL.Query.Builder.UnitTests
             query.AddArgument("id", 1);
 
             // Assert
-            Assert.Equal(1, query.ArgumentsMap["id"]);
+            Assert.Equal(1, query.Arguments["id"]);
         }
 
         [Fact]
@@ -171,7 +171,7 @@ namespace GraphQL.Query.Builder.UnitTests
             query.AddArgument("name", "danny");
 
             // Assert
-            Assert.Equal("danny", query.ArgumentsMap["name"]);
+            Assert.Equal("danny", query.Arguments["name"]);
         }
 
         [Fact]
@@ -190,10 +190,10 @@ namespace GraphQL.Query.Builder.UnitTests
             query.AddArgument("price", dict);
 
             // Assert
-            Dictionary<string, int> queryWhere = (Dictionary<string, int>) query.ArgumentsMap["price"];
+            Dictionary<string, int> queryWhere = (Dictionary<string, int>) query.Arguments["price"];
             Assert.Equal(1, queryWhere["from"]);
             Assert.Equal(100, queryWhere["to"]);
-            Assert.Equal(dict, (ICollection) query.ArgumentsMap["price"]);
+            Assert.Equal(dict, (ICollection) query.Arguments["price"]);
         }
 
         [Fact]
@@ -221,7 +221,7 @@ namespace GraphQL.Query.Builder.UnitTests
                 {"name", "danny"},
                 {"price", dict}
             };
-            Assert.Equal(shouldPass, query.ArgumentsMap);
+            Assert.Equal(shouldPass, query.Arguments);
         }
 
         [Fact]

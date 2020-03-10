@@ -1,6 +1,6 @@
 {
   "recommendations": [
-    "ms-vscode.csharp",
+    "ms-dotnettools.csharp",
     "editorconfig.editorconfig",
     "k--kato.docomment",
     "formulahendry.dotnet-test-explorer",

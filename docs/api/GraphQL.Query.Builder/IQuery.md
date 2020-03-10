@@ -2,7 +2,7 @@
 
 `Namespace: GraphQL.Query.Builder`
 
-Query interface
+The query interface.
 
 ```csharp
 public interface IQuery
@@ -12,7 +12,7 @@ public interface IQuery
 
 | Type | Name | Summary |
 | --- | --- | --- |
-| `String` | AliasName | Gets the query alias name. |
+| `String` | AliasName | Gets the alias name. |
 | `String` | Name | Gets the query name. |
 
 ## Methods

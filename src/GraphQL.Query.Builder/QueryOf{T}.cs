@@ -9,44 +9,27 @@ using Newtonsoft.Json;
 [assembly: InternalsVisibleTo("GraphQL.Query.Builder.UnitTests")]
 namespace GraphQL.Query.Builder
 {
-    /// <summary>
-    /// The Query Class is a simple class to build out graphQL
-    /// style queries. It will build the parameters and field lists
-    /// similar in a way you would use a SQL query builder to assemble
-    /// a query. This will maintain the response for the query
-    /// </summary>
+    /// <summary>The query class.</summary>
     public class Query<TSource> : IQuery<TSource> where TSource : class
     {
         private readonly QueryOptions options;
 
-        /// <summary>
-        /// Gets the select list.
-        /// </summary>
+        /// <summary>Gets the select list.</summary>
         public List<object> SelectList { get; } = new List<object>();
 
-        /// <summary>
-        /// Gets the arguments map.
-        /// </summary>
-        public Dictionary<string, object> ArgumentsMap { get; } = new Dictionary<string, object>();
+        /// <summary>Gets the arguments.</summary>
+        public Dictionary<string, object> Arguments { get; } = new Dictionary<string, object>();
 
-        /// <summary>
-        /// Gets the query name.
-        /// </summary>
+        /// <summary>Gets the query name.</summary>
         public string Name { get; private set; }
 
-        /// <summary>
-        /// Gets the alias name.
-        /// </summary>
+        /// <summary>Gets the alias name.</summary>
         public string AliasName { get; private set; }
-        
-        /// <summary>
-        /// Gets the query string builder.
-        /// </summary>
+
+        /// <summary>Gets the query string builder.</summary>
         private IQueryStringBuilder QueryStringBuilder { get; set; } = new QueryStringBuilder();
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Query{TSource}" /> class.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="Query{TSource}" /> class.</summary>
         public Query(string name)
         {
             Guard.Argument(name, nameof(name)).NotNull().NotEmpty();
@@ -54,9 +37,7 @@ namespace GraphQL.Query.Builder
             this.Name = name;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Query{TSource}" /> class.
-        /// </summary>
+        /// <summary>Initializes a new instance of the <see cref="Query{TSource}" /> class.</summary>
         public Query(string name, QueryOptions options)
         {
             Guard.Argument(name, nameof(name)).NotNull().NotEmpty();
@@ -69,11 +50,9 @@ namespace GraphQL.Query.Builder
             }
         }
 
-        /// <summary>
-        /// Sets the query alias name.
-        /// </summary>
-        /// <param name="alias">The alias name</param>
-        /// <returns>IQuery{TSource}</returns>
+        /// <summary>Sets the query alias name.</summary>
+        /// <param name="alias">The alias name.</param>
+        /// <returns>The query.</returns>
         public IQuery<TSource> Alias(string alias)
         {
             Guard.Argument(alias, nameof(alias)).NotNull().NotEmpty();
@@ -83,12 +62,10 @@ namespace GraphQL.Query.Builder
             return this;
         }
 
-        /// <summary>
-        /// Adds a field to the query.
-        /// </summary>
-        /// <typeparam name="TProperty">Property type</typeparam>
-        /// <param name="selector">Field selector</param>
-        /// <returns>IQuery{TSource}</returns>
+        /// <summary>Adds a field to the query.</summary>
+        /// <typeparam name="TProperty">The property type.</typeparam>
+        /// <param name="selector">The field selector.</param>
+        /// <returns>The query.</returns>
         public IQuery<TSource> AddField<TProperty>(Expression<Func<TSource, TProperty>> selector)
         {
             Guard.Argument(selector, nameof(selector)).NotNull();
@@ -101,11 +78,9 @@ namespace GraphQL.Query.Builder
             return this;
         }
 
-        /// <summary>
-        /// Adds a field to the query.
-        /// </summary>
-        /// <param name="field">Field name</param>
-        /// <returns>IQuery{TSource}</returns>
+        /// <summary>Adds a field to the query.</summary>
+        /// <param name="field">The field name.</param>
+        /// <returns>The query.</returns>
         public IQuery<TSource> AddField(string field)
         {
             Guard.Argument(field, nameof(field)).NotNull().NotEmpty();
@@ -115,13 +90,11 @@ namespace GraphQL.Query.Builder
             return this;
         }
 
-        /// <summary>
-        /// Adds a sub-object field to the query.
-        /// </summary>
-        /// <typeparam name="TSubSource">Sub-object type</typeparam>
-        /// <param name="selector">Field selector</param>
-        /// <param name="build">Sub-object query building function</param>
-        /// <returns>IQuery{TSource}</returns>
+        /// <summary>Adds a sub-object field to the query.</summary>
+        /// <typeparam name="TSubSource">The sub-object type.</typeparam>
+        /// <param name="selector">The field selector.</param>
+        /// <param name="build">The sub-object query building function.</param>
+        /// <returns>The query.</returns>
         public IQuery<TSource> AddField<TSubSource>(
             Expression<Func<TSource, TSubSource>> selector,
             Func<IQuery<TSubSource>, IQuery<TSubSource>> build)
@@ -136,13 +109,11 @@ namespace GraphQL.Query.Builder
             return AddField(name, build);
         }
 
-        /// <summary>
-        /// Adds a sub-list field to the query.
-        /// </summary>
-        /// <typeparam name="TSubSource">Sub-list object type</typeparam>
-        /// <param name="selector">Field selector</param>
-        /// <param name="build">Sub-object query building function</param>
-        /// <returns>IQuery{TSource}</returns>
+        /// <summary>Adds a sub-list field to the query.</summary>
+        /// <typeparam name="TSubSource">The sub-list object type.</typeparam>
+        /// <param name="selector">The field selector.</param>
+        /// <param name="build">The sub-object query building function.</param>
+        /// <returns>The query.</returns>
         public IQuery<TSource> AddField<TSubSource>(
             Expression<Func<TSource, IEnumerable<TSubSource>>> selector,
             Func<IQuery<TSubSource>, IQuery<TSubSource>> build)
@@ -157,13 +128,11 @@ namespace GraphQL.Query.Builder
             return AddField(name, build);
         }
 
-        /// <summary>
-        /// Adds a sub-object field to the query.
-        /// </summary>
-        /// <typeparam name="TSubSource">Sub-object type</typeparam>
-        /// <param name="field">Field name</param>
-        /// <param name="build">Sub-object query building function</param>
-        /// <returns>IQuery{TSource}</returns>
+        /// <summary>Adds a sub-object field to the query.</summary>
+        /// <typeparam name="TSubSource">The sub-object type.</typeparam>
+        /// <param name="field">The field name.</param>
+        /// <param name="build">The sub-object query building function.</param>
+        /// <returns>The query.</returns>
         public IQuery<TSource> AddField<TSubSource>(
             string field,
             Func<IQuery<TSubSource>, IQuery<TSubSource>> build)
@@ -180,44 +149,38 @@ namespace GraphQL.Query.Builder
             return this;
         }
 
-        /// <summary>
-        /// Adds a new argument to the query.
-        /// </summary>
-        /// <param name="key">Argument name</param>
-        /// <param name="value">Value</param>
-        /// <returns>IQuery{TSource}</returns>
+        /// <summary>Adds a new argument to the query.</summary>
+        /// <param name="key">The argument name.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>The query.</returns>
         public IQuery<TSource> AddArgument(string key, object value)
         {
             Guard.Argument(key, nameof(key)).NotNull().NotEmpty();
 
-            this.ArgumentsMap.Add(key, value);
+            this.Arguments.Add(key, value);
 
             return this;
         }
 
-        /// <summary>
-        /// Adds arguments to the query.
-        /// </summary>
-        /// <param name="arguments">Dictionary argument</param>
-        /// <returns>IQuery{TSource}</returns>
+        /// <summary>Adds arguments to the query.</summary>
+        /// <param name="arguments">the dictionary argument.</param>
+        /// <returns>The query.</returns>
         public IQuery<TSource> AddArguments(Dictionary<string, object> arguments)
         {
             Guard.Argument(arguments, nameof(arguments)).NotNull();
 
             foreach (KeyValuePair<string, object> argument in arguments)
             {
-                this.ArgumentsMap.Add(argument.Key, argument.Value);
+                this.Arguments.Add(argument.Key, argument.Value);
             }
 
             return this;
         }
 
-        /// <summary>
-        /// Adds arguments to the query.
-        /// </summary>
-        /// <typeparam name="TArguments">Arguments object type</typeparam>
-        /// <param name="arguments">Arguments object</param>
-        /// <returns>IQuery{TSource}</returns>
+        /// <summary>Adds arguments to the query.</summary>
+        /// <typeparam name="TArguments">The arguments object type.</typeparam>
+        /// <param name="arguments">The arguments object.</param>
+        /// <returns>The query.</returns>
         public IQuery<TSource> AddArguments<TArguments>(TArguments arguments) where TArguments : class
         {
             Guard.Argument(arguments, nameof(arguments)).NotNull();
@@ -225,16 +188,14 @@ namespace GraphQL.Query.Builder
             PropertyInfo[] properties = typeof(TArguments).GetProperties();
             foreach (PropertyInfo property in properties)
             {
-                this.ArgumentsMap.Add(this.GetPropertyName(property), property.GetValue(arguments));
+                this.Arguments.Add(this.GetPropertyName(property), property.GetValue(arguments));
             }
 
             return this;
         }
 
-        /// <summary>
-        /// Builds the query.
-        /// </summary>
-        /// <returns>The GraphQL Query String, without outer enclosing block</returns>
+        /// <summary>Builds the query.</summary>
+        /// <returns>The GraphQL query as string, without outer enclosing block.</returns>
         /// <exception cref="ArgumentException">Must have a 'Name' specified in the Query</exception>
         /// <exception cref="ArgumentException">Must have a one or more 'Select' fields in the Query</exception>
         public string Build()
@@ -244,6 +205,10 @@ namespace GraphQL.Query.Builder
             return this.QueryStringBuilder.Build(this);
         }
 
+        /// <summary>Gets property infos from lambda.</summary>
+        /// <param name="lambda">The lambda.</param>
+        /// <typeparam name="TProperty">The property.</typeparam>
+        /// <returns>The property infos.</returns>
         private static PropertyInfo GetPropertyInfo<TProperty>(Expression<Func<TSource, TProperty>> lambda)
         {
             Guard.Argument(lambda, nameof(lambda)).NotNull();
@@ -269,11 +234,9 @@ namespace GraphQL.Query.Builder
             return propertyInfo;
         }
 
-        /// <summary>
-        /// Tries to get property name from JSON property attribute or from optional formater.
-        /// </summary>
-        /// <param name="property">Property</param>
-        /// <returns>String</returns>
+        /// <summary>Tries to get property name from JSON property attribute or from optional formater.</summary>
+        /// <param name="property">The property.</param>
+        /// <returns>The property name.</returns>
         private string GetPropertyName(PropertyInfo property)
         {
             Guard.Argument(property, nameof(property)).NotNull();
@@ -288,9 +251,9 @@ namespace GraphQL.Query.Builder
                 }
             }
 
-            if (this.options?.Formater != null)
+            if (this.options?.Formatter != null)
             {
-                return this.options.Formater.Invoke(property.Name);
+                return this.options.Formatter.Invoke(property.Name);
             }
 
             return property.Name;

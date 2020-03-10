@@ -2,7 +2,7 @@
 
 `Namespace: GraphQL.Query.Builder`
 
-Query of TSource interface
+Query of TSource interface.
 
 ```csharp
 public interface IQuery<TSource>

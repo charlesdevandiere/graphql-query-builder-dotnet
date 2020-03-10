@@ -48,7 +48,7 @@ namespace GraphQL.Query.Builder.UnitTests
         {
             var query = new Query<Car>("car", options: new QueryOptions
             {
-                Formater = QueryFormaters.CamelCaseFormater
+                Formatter = QueryFormatters.CamelCaseFormatter
             });
             query.AddField(c => c.Name);
 
@@ -60,7 +60,7 @@ namespace GraphQL.Query.Builder.UnitTests
         {
             var query = new Query<Car>("car", options: new QueryOptions
             {
-                Formater = QueryFormaters.CamelCaseFormater
+                Formatter = QueryFormatters.CamelCaseFormatter
             });
             query.AddField(c => c.Color, sq => sq);
 

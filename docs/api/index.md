@@ -6,6 +6,6 @@
 - [`IQuery<TSource>`](GraphQL.Query.Builder/IQuery{TSource})
 - [`IQueryStringBuilder`](GraphQL.Query.Builder/IQueryStringBuilder)
 - [`Query<TSource>`](GraphQL.Query.Builder/Query{TSource})
-- [`QueryFormaters`](GraphQL.Query.Builder/QueryFormaters)
+- [`QueryFormatters`](GraphQL.Query.Builder/QueryFormatters)
 - [`QueryOptions`](GraphQL.Query.Builder/QueryOptions)
 - [`QueryStringBuilder`](GraphQL.Query.Builder/QueryStringBuilder)

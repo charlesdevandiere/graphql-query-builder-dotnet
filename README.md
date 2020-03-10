@@ -1,15 +1,15 @@
 # GraphQL Query Builder .NET
 
-![logo](https://raw.githubusercontent.com/charlesdevandiere/graphql-client-extensions/master/logo.png)
+![logo](https://raw.githubusercontent.com/charlesdevandiere/graphql-query-builder-dotnet/master/logo.png)
 
 A tool to build GraphQL query from a C# model.
 
-[![Build Status](https://dev.azure.com/charlesdevandiere/charlesdevandiere/_apis/build/status/charlesdevandiere.graphql-query-builder?branchName=master)](https://dev.azure.com/charlesdevandiere/charlesdevandiere/_build/latest?definitionId=3&branchName=master)
+[![Build Status](https://dev.azure.com/charlesdevandiere/charlesdevandiere/_apis/build/status/charlesdevandiere.graphql-query-builder-dotnet?branchName=master)](https://dev.azure.com/charlesdevandiere/charlesdevandiere/_build/latest?definitionId=3&branchName=master)
 ![Coverage](https://img.shields.io/azure-devops/coverage/charlesdevandiere/charlesdevandiere/3/master)
 [![Nuget](https://img.shields.io/nuget/v/GraphQL.Query.Builder.svg?color=blue&logo=nuget)](https://www.nuget.org/packages/GraphQL.Query.Builder)
 [![Downloads](https://img.shields.io/nuget/dt/GraphQL.Query.Builder.svg?logo=nuget)](https://www.nuget.org/packages/GraphQL.Query.Builder)
 
-See complete documentation [here](https://charlesdevandiere.github.io/graphql-query-builder/)
+See complete documentation [here](https://charlesdevandiere.github.io/graphql-query-builder-dotnet/)
 
 See sample [here](sample/Pokedex)
 
@@ -59,7 +59,3 @@ Console.WriteLine("{" + query.Build() + "}");
 
 - [Dawn.Guard](https://www.nuget.org/packages/Dawn.Guard/) (>= 1.0.0)
 - [Newtonsoft.Json](https://www.nuget.org/packages/GraphQL.Client/) (>= 11.0.1)
-
-## Credits
-
-Rocket by Gregor Cresnar from the Noun Project

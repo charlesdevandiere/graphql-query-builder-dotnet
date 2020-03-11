@@ -55,6 +55,7 @@ var query = new Query<Human>("humans") // set the name of the query
         h => h.HomePlanet, // set the name of the field
         sq => sq /// build the sub-query
             .AddField(p => p.Name)
+    )
     .AddField<human>( // add a sub-list field
         h => h.Friends,
         sq => sq

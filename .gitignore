@@ -1,0 +1,54 @@
+# Autosave files
+*~
+
+# build
+[Oo]bj/
+[Bb]in/
+packages/
+TestResults/
+out/
+
+# globs
+Makefile.in
+*.DS_Store
+*.sln.cache
+*.suo
+*.cache
+*.pidb
+*.userprefs
+*.usertasks
+config.log
+config.make
+config.status
+aclocal.m4
+install-sh
+autom4te.cache/
+*.user
+*.tar.gz
+tarballs/
+test-results/
+Thumbs.db
+
+# Mac bundle stuff
+*.dmg
+*.app
+
+# resharper
+*_Resharper.*
+*.Resharper
+
+# dotCover
+*.dotCover
+
+# IDE
+.idea
+/.vs/Getit/v15/Server/sqlite3/db.lock
+/.vs/Getit/v15/Server/sqlite3/storage.ide
+/.vs/Getit/v15/Server/sqlite3/storage.ide-shm
+/.vs/Getit/v15/Server/sqlite3/storage.ide-wal
+/.vs/slnx.sqlite
+/.vs/ProjectSettings.json
+/.vs
+
+# test
+*cobertura.xml

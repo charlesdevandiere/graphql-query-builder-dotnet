@@ -125,6 +125,19 @@ namespace GraphQL.Query.Builder.UnitTests
         }
 
         [Fact]
+        public void TestFormatQueryParam_boolean()
+        {
+            {
+                bool value = true;
+                Assert.Equal("true", new QueryStringBuilder().FormatQueryParam(value));
+            }
+            {
+                bool value = false;
+                Assert.Equal("false", new QueryStringBuilder().FormatQueryParam(value));
+            }
+        }
+
+        [Fact]
         public void TestFormatQueryParam_enum()
         {
             TestEnum value = TestEnum.DISABLED;

@@ -58,5 +58,5 @@ Console.WriteLine("{" + query.Build() + "}");
 
 ## Dependencies
 
-- [Dawn.Guard](https://www.nuget.org/packages/Dawn.Guard/) (>= 1.0.0)
+- [Dawn.Guard](https://www.nuget.org/packages/Dawn.Guard/) (>= 1.12.0)
 - [Newtonsoft.Json](https://www.nuget.org/packages/GraphQL.Client/) (>= 11.0.1)

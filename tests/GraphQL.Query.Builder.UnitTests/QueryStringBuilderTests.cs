@@ -16,135 +16,193 @@ namespace GraphQL.Query.Builder.UnitTests
             HAYstack
         }
 
-        public QueryStringBuilderTests()
+        [Fact]
+        public void TestFormatQueryParam_string()
         {
-            CultureInfo.CurrentCulture = new CultureInfo("en-us", false);
+            string value = "value";
+            Assert.Equal("\"value\"", new QueryStringBuilder().FormatQueryParam(value));
         }
 
         [Fact]
-        public void BuildQueryParam_IntType_ParseInt()
+        public void TestFormatQueryParam_byte()
         {
-            // Arrange
-            QueryStringBuilder queryString = new QueryStringBuilder();
-
-            // Act
-            string intStr = queryString.FormatQueryParam(123);
-
-            // Assert
-            Assert.Equal("123", intStr);
+            byte value = 1;
+            Assert.Equal("1", new QueryStringBuilder().FormatQueryParam(value));
         }
 
         [Fact]
-        public void BuildQueryParam_QuotedStringType_ParseString()
+        public void TestFormatQueryParam_sbyte()
         {
-            // Arrange
-            QueryStringBuilder queryString = new QueryStringBuilder();
-
-            // Act
-            string strStr = queryString.FormatQueryParam("Haystack");
-
-            // Assert
-            Assert.Equal("\"Haystack\"", strStr);
+            {
+                sbyte value = 1;
+                Assert.Equal("1", new QueryStringBuilder().FormatQueryParam(value));
+            }
+            {
+                sbyte value = -1;
+                Assert.Equal("-1", new QueryStringBuilder().FormatQueryParam(value));
+            }
         }
 
         [Fact]
-        public void BuildQueryParam_DoubleType_ParseDouble()
+        public void TestFormatQueryParam_short()
         {
-            // Arrange
-            QueryStringBuilder queryString = new QueryStringBuilder();
-
-            // Act
-            string doubleStr = queryString.FormatQueryParam(1234.5678);
-
-            // Assert
-            Assert.Equal("1234.5678", doubleStr);
+            {
+                short value = 1;
+                Assert.Equal("1", new QueryStringBuilder().FormatQueryParam(value));
+            }
+            {
+                short value = -1;
+                Assert.Equal("-1", new QueryStringBuilder().FormatQueryParam(value));
+            }
         }
 
         [Fact]
-        public void BuildQueryParam_EnumType_ParseEnum()
+        public void TestFormatQueryParam_ushort()
         {
-            // Arrange
-            QueryStringBuilder queryString = new QueryStringBuilder();
-
-            // Act
-            string enumStr = queryString.FormatQueryParam(TestEnum.DISABLED);
-
-            // Assert
-            Assert.Equal("DISABLED", enumStr);
+            ushort value = 1;
+            Assert.Equal("1", new QueryStringBuilder().FormatQueryParam(value));
         }
 
         [Fact]
-        public void BuildQueryParam_CustomType_ParseCustom()
+        public void TestFormatQueryParam_int()
         {
-            // Arrange
-            QueryStringBuilder queryString = new QueryStringBuilder();
-            Dictionary<string, object> fromToMap = new Dictionary<string, object>
+            {
+                int value = 1;
+                Assert.Equal("1", new QueryStringBuilder().FormatQueryParam(value));
+            }
+            {
+                int value = -1;
+                Assert.Equal("-1", new QueryStringBuilder().FormatQueryParam(value));
+            }
+        }
+
+        [Fact]
+        public void TestFormatQueryParam_uint()
+        {
+            uint value = 1;
+            Assert.Equal("1", new QueryStringBuilder().FormatQueryParam(value));
+        }
+
+        [Fact]
+        public void TestFormatQueryParam_long()
+        {
+            {
+                long value = 1L;
+                Assert.Equal("1", new QueryStringBuilder().FormatQueryParam(value));
+            }
+            {
+                long value = -1L;
+                Assert.Equal("-1", new QueryStringBuilder().FormatQueryParam(value));
+            }
+        }
+
+        [Fact]
+        public void TestFormatQueryParam_ulong()
+        {
+            ulong value = 1L;
+            Assert.Equal("1", new QueryStringBuilder().FormatQueryParam(value));
+        }
+
+        [Fact]
+        public void TestFormatQueryParam_float()
+        {
+            float value = 1.2F;
+            Assert.Equal("1.2", new QueryStringBuilder().FormatQueryParam(value));
+        }
+
+        [Fact]
+        public void TestFormatQueryParam_double()
+        {
+            double value = 1.2D;
+            Assert.Equal("1.2", new QueryStringBuilder().FormatQueryParam(value));
+        }
+
+        [Fact]
+        public void TestFormatQueryParam_decimal()
+        {
+            decimal value = 1.2M;
+            Assert.Equal("1.2", new QueryStringBuilder().FormatQueryParam(value));
+        }
+
+        [Fact]
+        public void TestFormatQueryParam_boolean()
+        {
+            {
+                bool value = true;
+                Assert.Equal("true", new QueryStringBuilder().FormatQueryParam(value));
+            }
+            {
+                bool value = false;
+                Assert.Equal("false", new QueryStringBuilder().FormatQueryParam(value));
+            }
+        }
+
+        [Fact]
+        public void TestFormatQueryParam_enum()
+        {
+            TestEnum value = TestEnum.DISABLED;
+            Assert.Equal("DISABLED", new QueryStringBuilder().FormatQueryParam(value));
+        }
+
+        [Fact]
+        public void TestFormatQueryParam_keyvaluepair()
+        {
+            var value = new KeyValuePair<string, object>("from", 444.45);
+            Assert.Equal("from:444.45", new QueryStringBuilder().FormatQueryParam(value));
+        }
+
+        [Fact]
+        public void TestFormatQueryParam_dictionary()
+        {
+            Dictionary<string, object> value = new Dictionary<string, object>
             {
                 {"from", 444.45},
                 {"to", 555.45}
             };
-
-            // Act
-            string fromToMapStr = queryString.FormatQueryParam(fromToMap);
-
-            // Assert
-            Assert.Equal("{from:444.45,to:555.45}", fromToMapStr);
+            Assert.Equal("{from:444.45,to:555.45}", new QueryStringBuilder().FormatQueryParam(value));
         }
 
         [Fact]
-        public void BuildQueryParam_ListType_ParseList()
+        public void TestFormatQueryParam_listNumber()
         {
-            // Arrange
-            QueryStringBuilder queryString = new QueryStringBuilder();
-
-            // Act
-            List<int> intList = new List<int>(new[] { 43783, 43784, 43145 });
-            string intListStr = queryString.FormatQueryParam(intList);
-
-            // Assert
-            Assert.Equal("[43783,43784,43145]", intListStr);
+            {
+                List<int> value = new List<int> { 43783, 43784, 43145 };
+                Assert.Equal("[43783,43784,43145]", new QueryStringBuilder().FormatQueryParam(value));
+            }
+            {
+                int[] value = new[] { 43783, 43784, 43145 };
+                Assert.Equal("[43783,43784,43145]", new QueryStringBuilder().FormatQueryParam(value));
+            }
+            {
+                double[] value = new[] { 43.783, 43.784, 43.145 };
+                Assert.Equal("[43.783,43.784,43.145]", new QueryStringBuilder().FormatQueryParam(value));
+            }
         }
 
         [Fact]
-        public void BuildQueryParam_StringListType_ParseStringList()
+        public void TestFormatQueryParam_listString()
         {
-            // Arrange
-            QueryStringBuilder queryString = new QueryStringBuilder();
-
-            // Act
-            List<string> strList = new List<string>(new[] { "DB7", "DB9", "Vantage" });
-            string strListStr = queryString.FormatQueryParam(strList);
-
-            // Assert
-            Assert.Equal("[\"DB7\",\"DB9\",\"Vantage\"]", strListStr);
+            {
+                List<string> value = new List<string> { "a", "b", "c" };
+                Assert.Equal("[\"a\",\"b\",\"c\"]", new QueryStringBuilder().FormatQueryParam(value));
+            }
+            {
+                string[] value = new[] { "a", "b", "c" };
+                Assert.Equal("[\"a\",\"b\",\"c\"]", new QueryStringBuilder().FormatQueryParam(value));
+            }
         }
 
         [Fact]
-        public void BuildQueryParam_DoubleListType_ParseDoubleList()
+        public void TestFormatQueryParam_listEnum()
         {
-            // Arrange
-            QueryStringBuilder queryString = new QueryStringBuilder();
-
-            // Act
-            List<double> doubleList = new List<double>(new[] { 123.456, 456, 78.901 });
-            string doubleListStr = queryString.FormatQueryParam(doubleList);
-
-            // Assert
-            Assert.Equal("[123.456,456,78.901]", doubleListStr);
-        }
-
-        [Fact]
-        public void BuildQueryParam_EnumListType_ParseEnumList()
-        {
-            // Arrange
-            QueryStringBuilder queryString = new QueryStringBuilder();
-
-            // Act
-            List<TestEnum> enumList = new List<TestEnum>(new[] { TestEnum.ENABLED, TestEnum.DISABLED, TestEnum.HAYstack });
-            string enumListStr = queryString.FormatQueryParam(enumList);
-
-            // Assert
-            Assert.Equal("[ENABLED,DISABLED,HAYstack]", enumListStr);
+            {
+                List<TestEnum> value = new List<TestEnum> { TestEnum.ENABLED, TestEnum.DISABLED, TestEnum.HAYstack };
+                Assert.Equal("[ENABLED,DISABLED,HAYstack]", new QueryStringBuilder().FormatQueryParam(value));
+            }
+            {
+                TestEnum[] value = new[] { TestEnum.ENABLED, TestEnum.DISABLED, TestEnum.HAYstack };
+                Assert.Equal("[ENABLED,DISABLED,HAYstack]", new QueryStringBuilder().FormatQueryParam(value));
+            }
         }
 
         [Fact]
@@ -256,7 +314,7 @@ namespace GraphQL.Query.Builder.UnitTests
         public void Select_QueryString_ParseQueryString()
         {
             // Arrange
-            
+
             var subSelect = new Query<object>("subSelect");
 
             Dictionary<string, object> mySubDict = new Dictionary<string, object>

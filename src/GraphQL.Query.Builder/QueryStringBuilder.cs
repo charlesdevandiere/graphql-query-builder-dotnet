@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Dawn;
 
@@ -42,17 +43,41 @@ namespace GraphQL.Query.Builder
                 case string strValue:
                     return "\"" + strValue + "\"";
 
+                case byte byteValue:
+                    return byteValue.ToString();
+
+                case sbyte sbyteValue:
+                    return sbyteValue.ToString();
+
+                case short shortValue:
+                    return shortValue.ToString();
+
+                case ushort ushortValue:
+                    return ushortValue.ToString();
+
                 case int intValue:
                     return intValue.ToString();
 
+                case uint uintValue:
+                    return uintValue.ToString();
+
+                case long longValue:
+                    return longValue.ToString();
+
+                case ulong ulongValue:
+                    return ulongValue.ToString();
+
                 case float floatValue:
-                    return floatValue.ToString(CultureInfo.CurrentCulture);
+                    return floatValue.ToString(CultureInfo.CreateSpecificCulture("en-us"));
 
                 case double doubleValue:
-                    return doubleValue.ToString(CultureInfo.CurrentCulture);
+                    return doubleValue.ToString(CultureInfo.CreateSpecificCulture("en-us"));
+
+                case decimal decimalValue:
+                    return decimalValue.ToString(CultureInfo.CreateSpecificCulture("en-us"));
 
                 case bool booleanValue:
-                    return booleanValue.ToString(CultureInfo.CurrentCulture).ToLower();
+                    return booleanValue ? "true" : "false";
 
                 case Enum enumValue:
                     return enumValue.ToString();
@@ -60,41 +85,16 @@ namespace GraphQL.Query.Builder
                 case KeyValuePair<string, object> kvValue:
                     return $"{kvValue.Key}:{FormatQueryParam(kvValue.Value)}";
 
-                case IList listValue:
-                    StringBuilder listStr = new StringBuilder();
+                case IDictionary<string, object> dictValue:
+                    return $"{{{string.Join(",", dictValue.Select(e => FormatQueryParam(e)))}}}";
 
-                    listStr.Append("[");
-                    foreach (var obj in listValue)
+                case IEnumerable enumerableValue:
+                    var items = new List<string>();
+                    foreach (var item in enumerableValue)
                     {
-                        listStr.Append(FormatQueryParam(obj) + ",");
+                        items.Add(FormatQueryParam(item));
                     }
-
-                    if (listValue.Count > 0)
-                    {
-                        listStr.Length -= 1;
-                    }
-
-                    listStr.Append("]");
-
-                    return listStr.ToString();
-
-                case IDictionary dictValue:
-                    StringBuilder dictStr = new StringBuilder();
-
-                    dictStr.Append("{");
-                    foreach (var dictObj in (Dictionary<string, object>)dictValue)
-                    {
-                        dictStr.Append(FormatQueryParam(dictObj) + ",");
-                    }
-
-                    if (dictValue.Count > 0)
-                    {
-                        dictStr.Length -= 1;
-                    }
-
-                    dictStr.Append("}");
-
-                    return dictStr.ToString();
+                    return $"[{string.Join(",", items)}]";
 
                 default:
                     throw new InvalidDataException("Unsupported Query Parameter, Type Found : " + value.GetType());

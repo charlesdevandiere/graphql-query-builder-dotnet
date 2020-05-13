@@ -1,6 +1,6 @@
 name: $(GitVersion.FullSemVer)
 pool:
-  vmImage: 'windows-2019'
+  vmImage: 'ubuntu-latest'
 
 variables:
   buildConfiguration: Release
@@ -20,8 +20,10 @@ steps:
     clean: true
     persistCredentials: true
 
-  - script: GitVersion /output buildserver
+  - task: UseGitVersion@5
     displayName: GitVersion
+    inputs:
+      versionSpec: '5.x'
 
   - script: dotnet tool restore
     displayName: 'dotnet tool restore'

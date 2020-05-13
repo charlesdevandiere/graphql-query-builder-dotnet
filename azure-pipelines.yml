@@ -31,7 +31,7 @@ steps:
   - script: dotnet test -c $(buildConfiguration) --logger xunit -p:CollectCoverage=true -p:CoverletOutputFormat=cobertura -p:Exclude="[*]Shared.Models.*"
     displayName: 'dotnet test'
 
-  - script: dotnet pack .\src\GraphQL.Query.Builder\GraphQL.Query.Builder.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)\out -p:Version=$(GitVersion.SemVer) --include-symbols
+  - script: dotnet pack ./src/GraphQL.Query.Builder/GraphQL.Query.Builder.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)/out -p:Version=$(GitVersion.SemVer) --include-symbols
     displayName: 'dotnet pack'
 
   - task: PublishTestResults@2

@@ -1,4 +1,4 @@
-# GraphQL Client Extensions Sample: Pokedex
+# GraphQL Query Builder Sample: Pokedex
 
 This sample is base on the [GraphQL Pokémon](https://github.com/lucasbento/graphql-pokemon) API
 
@@ -27,7 +27,7 @@ This sample is base on the [GraphQL Pokémon](https://github.com/lucasbento/grap
 ## Run
 
 ```console
-> .\bin\Release\netcoreapp2.2\<runtime-identifier>\Pokedex.exe pikachu
+> .\bin\Release\netcoreapp3.1\<runtime-identifier>\Pokedex.exe pikachu
 ```
 
 ```console

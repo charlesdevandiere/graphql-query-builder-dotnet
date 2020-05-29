@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GraphQL.Client;
-using GraphQL.Common.Request;
-using GraphQL.Common.Response;
+using GraphQL;
+using GraphQL.Client.Http;
+using GraphQL.Client.Serializer.Newtonsoft;
 using GraphQL.Query.Builder;
-using Newtonsoft.Json.Linq;
 using Shared.Models;
 
 namespace Pokedex
@@ -13,9 +12,11 @@ namespace Pokedex
     {
         private readonly string graphqlPokemonUrl;
 
-        public PokemonService(string graphqlPokemonUrl)
+        /// <summary>Initializes a new instance of the <see cref="PokemonService" /> class.</summary>
+        /// <param name="apiUrl">The pokemon graphQL API URL</param>
+        public PokemonService(string apiUrl)
         {
-            this.graphqlPokemonUrl = graphqlPokemonUrl;
+            this.graphqlPokemonUrl = apiUrl;
         }
 
         /// <summary>Returns a Pokemon.</summary>
@@ -23,7 +24,6 @@ namespace Pokedex
         public async Task<Pokemon> GetPokemon(string name)
         {
             var query = new Query<Pokemon>("pokemon")
-                .Alias(name)
                 .AddArguments(new { name })
                 .AddField(p => p.Id)
                 .AddField(p => p.Number)
@@ -51,11 +51,10 @@ namespace Pokedex
                 );
             var request = new GraphQLRequest { Query = "{" + query.Build() + "}" };
 
-            using var client = new GraphQLClient(this.graphqlPokemonUrl);
-            GraphQLResponse response = await client.PostAsync(request);
-            JToken jToken = response.Data.GetValue(name);
+            using var client = new GraphQLHttpClient(this.graphqlPokemonUrl, new NewtonsoftJsonSerializer());
+            GraphQLResponse<PokemonResponse> response = await client.SendQueryAsync<PokemonResponse>(request);
 
-            return jToken.ToObject<Pokemon>();
+            return response.Data.Pokemon;
         }
 
         /// <summary>Returns all Pokemons</summary>
@@ -77,11 +76,10 @@ namespace Pokedex
                 .AddField(p => p.Types);
             var request = new GraphQLRequest { Query = "{" + query.Build() + "}" };
 
-            using var client = new GraphQLClient(this.graphqlPokemonUrl);
-            GraphQLResponse response = await client.PostAsync(request);
-            JToken jToken = response.Data.GetValue("pokemons");
+            using var client = new GraphQLHttpClient(this.graphqlPokemonUrl, new NewtonsoftJsonSerializer());
+            GraphQLResponse<PokemonsResponse> response = await client.SendQueryAsync<PokemonsResponse>(request);
 
-            return jToken.ToObject<Pokemon[]>();
+            return response.Data.Pokemons;
         }
     }
 }

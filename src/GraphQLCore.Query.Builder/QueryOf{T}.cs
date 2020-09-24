@@ -104,9 +104,9 @@ namespace GraphQLCore.Query.Builder
             Guard.Argument(build, nameof(build)).NotNull();
 
             PropertyInfo property = GetPropertyInfo(selector);
-            string name = GetPropertyName(property);
+            string name = this.GetPropertyName(property);
 
-            return AddField(name, build);
+            return this.AddField(name, build);
         }
 
         /// <summary>Adds a sub-list field to the query.</summary>
@@ -123,9 +123,9 @@ namespace GraphQLCore.Query.Builder
             Guard.Argument(build, nameof(build)).NotNull();
 
             PropertyInfo property = GetPropertyInfo(selector);
-            string name = GetPropertyName(property);
+            string name = this.GetPropertyName(property);
 
-            return AddField(name, build);
+            return this.AddField(name, build);
         }
 
         /// <summary>Adds a sub-object field to the query.</summary>

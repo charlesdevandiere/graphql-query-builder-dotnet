@@ -225,8 +225,13 @@ namespace GraphQL.Query.Builder
                 throw new ArgumentException($"Expression '{lambda.ToString()}' not refers to a property.");
             }
 
+            if (propertyInfo.ReflectedType == null)
+            {
+                throw new ArgumentException($"Expression '{lambda.ToString()}' not refers to a property.");
+            }
+
             Type type = typeof(TSource);
-            if (type != propertyInfo.ReflectedType && !type.IsSubclassOf(propertyInfo.ReflectedType))
+            if (type != propertyInfo.ReflectedType && !propertyInfo.ReflectedType.IsAssignableFrom(type))
             {
                 throw new ArgumentException($"Expression '{lambda.ToString()}' refers to a property that is not from type {type}.");
             }

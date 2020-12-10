@@ -26,8 +26,10 @@ This sample is base on the [GraphQL Pokémon](https://github.com/lucasbento/grap
 
 ## Run
 
+(Example for Windows)
+
 ```console
-> .\bin\Release\netcoreapp3.1\<runtime-identifier>\Pokedex.exe pikachu
+> .\bin\Release\net5\win-x64\Pokedex.exe pikachu
 ```
 
 ```console

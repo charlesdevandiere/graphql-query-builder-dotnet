@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
+﻿using System.Collections.Generic;
 using GraphQL.Query.Builder.UnitTests.Models;
 using Xunit;
 

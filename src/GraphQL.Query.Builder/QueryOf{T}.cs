@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 namespace GraphQL.Query.Builder
 {
     /// <summary>The query class.</summary>
-    public class Query<TSource> : IQuery<TSource> where TSource : class
+    public class Query<TSource> : IQuery<TSource>
     {
         private readonly QueryOptions options;
 

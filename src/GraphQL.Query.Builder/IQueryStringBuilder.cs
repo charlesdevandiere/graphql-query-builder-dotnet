@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace GraphQL.Query.Builder
 {
@@ -11,6 +11,6 @@ namespace GraphQL.Query.Builder
         /// <summary>Builds the query.</summary>
         /// <param name="query">The query.</param>
         /// <returns>The GraphQL query as string, without outer enclosing block.</returns>
-        string Build<TSource>(IQuery<TSource> query) where TSource : class;
+        string Build<TSource>(IQuery<TSource> query);
     }
 }

@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace GraphQL.Query.Builder
 {
     /// <summary>Query of TSource interface.</summary>
-    public interface IQuery<TSource> : IQuery where TSource : class
+    public interface IQuery<TSource> : IQuery
     {
         /// <summary>Gets the select list.</summary>
         List<object> SelectList { get; }

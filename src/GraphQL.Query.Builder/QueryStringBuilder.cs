@@ -103,7 +103,7 @@ namespace GraphQL.Query.Builder
 
         /// <summary>Adds query params to the query string.</summary>
         /// <param name="query">The query.</param>
-        internal protected void AddParams<TSource>(IQuery<TSource> query) where TSource : class
+        internal protected void AddParams<TSource>(IQuery<TSource> query)
         {
             Guard.Argument(query, nameof(query)).NotNull();
 
@@ -121,7 +121,7 @@ namespace GraphQL.Query.Builder
         /// <summary>Adds fields to the query sting.</summary>
         /// <param name="query">The query.</param>
         /// <exception cref="ArgumentException">Invalid Object in Field List</exception>
-        internal protected void AddFields<TSource>(IQuery<TSource> query) where TSource : class
+        internal protected void AddFields<TSource>(IQuery<TSource> query)
         {
             foreach (object item in query.SelectList)
             {
@@ -149,7 +149,7 @@ namespace GraphQL.Query.Builder
         /// <summary>Builds the query.</summary>
         /// <param name="query">The query.</param>
         /// <returns>The GraphQL query as string, without outer enclosing block.</returns>
-        public string Build<TSource>(IQuery<TSource> query) where TSource : class
+        public string Build<TSource>(IQuery<TSource> query)
         {
             if (!String.IsNullOrWhiteSpace(query.AliasName))
             {

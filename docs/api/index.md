@@ -1,11 +1,17 @@
 # GraphQL.Query.Builder
 
-## `GraphQL.Query.Builder`
+## GraphQL.Query.Builder
 
-- [`IQuery`](GraphQL.Query.Builder/IQuery)
-- [`IQuery<TSource>`](GraphQL.Query.Builder/IQuery{TSource})
-- [`IQueryStringBuilder`](GraphQL.Query.Builder/IQueryStringBuilder)
-- [`Query<TSource>`](GraphQL.Query.Builder/Query{TSource})
-- [`QueryFormatters`](GraphQL.Query.Builder/QueryFormatters)
-- [`QueryOptions`](GraphQL.Query.Builder/QueryOptions)
-- [`QueryStringBuilder`](GraphQL.Query.Builder/QueryStringBuilder)
+[IQuery](./graphql.query.builder.iquery)
+
+[IQuery&lt;TSource&gt;](./graphql.query.builder.iquery-1)
+
+[IQueryStringBuilder](./graphql.query.builder.iquerystringbuilder)
+
+[Query&lt;TSource&gt;](./graphql.query.builder.query-1)
+
+[QueryFormatters](./graphql.query.builder.queryformatters)
+
+[QueryOptions](./graphql.query.builder.queryoptions)
+
+[QueryStringBuilder](./graphql.query.builder.querystringbuilder)

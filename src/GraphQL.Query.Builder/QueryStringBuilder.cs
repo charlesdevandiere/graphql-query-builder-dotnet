@@ -96,6 +96,9 @@ namespace GraphQL.Query.Builder
                     }
                     return $"[{string.Join(",", items)}]";
 
+                case QueryStringParam queryStringParam:
+                    return queryStringParam.SurroundWithQuotes ? $"\"{queryStringParam.Value}\"" : queryStringParam.Value;
+
                 default:
                     throw new InvalidDataException("Unsupported Query Parameter, Type Found : " + value.GetType());
             }

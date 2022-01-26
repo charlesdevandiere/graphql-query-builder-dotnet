@@ -36,7 +36,7 @@ namespace GraphQL.Query.Builder
         /// <param name="value"></param>
         /// <returns>The formatted query param.</returns>
         /// <exception cref="InvalidDataException">Invalid Object Type in Param List</exception>
-        internal protected string FormatQueryParam(object value)
+        internal protected virtual string FormatQueryParam(object value)
         {
             switch (value)
             {

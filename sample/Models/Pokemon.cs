@@ -1,29 +1,29 @@
-using System.Text;
-using Newtonsoft.Json;
+﻿using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Shared.Models
 {
     public class Pokemon
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public string Id { get; set; }
 
-        [JsonProperty("number")]
+        [JsonPropertyName("number")]
         public string Number { get; set; }
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("weight")]
+        [JsonPropertyName("weight")]
         public PokemonDimension Weight { get; set; }
 
-        [JsonProperty("height")]
+        [JsonPropertyName("height")]
         public PokemonDimension Height { get; set; }
 
-        [JsonProperty("types")]
+        [JsonPropertyName("types")]
         public string[] Types { get; set; }
 
-        [JsonProperty("attacks")]
+        [JsonPropertyName("attacks")]
         public PokemonAttack Attacks { get; set; }
 
         public override string ToString()

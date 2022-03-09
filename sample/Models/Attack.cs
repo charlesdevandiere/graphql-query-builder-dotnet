@@ -1,16 +1,16 @@
-using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Shared.Models
 {
     public class Attack
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
-        
-        [JsonProperty("type")]
+
+        [JsonPropertyName("type")]
         public string Type { get; set; }
-        
-        [JsonProperty("damage")]
+
+        [JsonPropertyName("damage")]
         public int Damage { get; set; }
 
         public override string ToString()

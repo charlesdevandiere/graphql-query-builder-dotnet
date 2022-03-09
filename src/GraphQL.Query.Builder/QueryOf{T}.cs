@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using Dawn;
-using Newtonsoft.Json;
 
 [assembly: InternalsVisibleTo("GraphQL.Query.Builder.UnitTests")]
 namespace GraphQL.Query.Builder
@@ -246,14 +246,11 @@ namespace GraphQL.Query.Builder
         {
             Guard.Argument(property, nameof(property)).NotNull();
 
-            Attribute attribute = property.GetCustomAttribute(typeof(JsonPropertyAttribute));
+            JsonPropertyNameAttribute attribute = property.GetCustomAttribute<JsonPropertyNameAttribute>();
 
-            if (attribute != null)
+            if (attribute is not null && !string.IsNullOrEmpty(attribute.Name))
             {
-                if (!string.IsNullOrEmpty((attribute as JsonPropertyAttribute).PropertyName))
-                {
-                    return (attribute as JsonPropertyAttribute).PropertyName;
-                }
+                return attribute.Name;
             }
 
             if (this.options?.Formatter != null)

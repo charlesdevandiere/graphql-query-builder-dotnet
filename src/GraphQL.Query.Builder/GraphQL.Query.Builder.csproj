@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Version>0.0.0</Version>
     <Authors>Charles de Vandière</Authors>
     <Description>A tool to build GraphQL query from a C# model.</Description>

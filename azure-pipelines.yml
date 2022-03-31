@@ -25,11 +25,6 @@ steps:
     inputs:
       versionSpec: '5.x'
 
-  - task: UseDotNet@2
-    displayName: 'Use .NET 5 sdk'
-    inputs:
-      version: '5.0.x'
-
   - script: dotnet tool restore
     displayName: 'dotnet tool restore'
 

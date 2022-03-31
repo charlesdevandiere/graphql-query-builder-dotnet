@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -27,18 +27,19 @@ namespace GraphQL.Query.Builder
         /// Formats query param.
         /// 
         /// Returns:
-        /// - String: `"value"`
+        /// - String: `"foo"`
         /// - Number: `10`
-        /// - Boolean: `true` / `false`
+        /// - Boolean: `true` or `false`
         /// - Enum: `EnumValue`
-        /// - Key value pair: `key:"value"` / `key:10`
-        /// - List: `["value1","value2"]` / `[1,2]`
-        /// - Dictionary: `{a:"value",b:10}`
+        /// - DateTime: `"2022-06-15T13:45:30.0000000Z"`
+        /// - Key value pair: `foo:"bar"` or `foo:10` ...
+        /// - List: `["foo","bar"]` or `[1,2]` ...
+        /// - Dictionary: `{foo:"bar",b:10}`
         /// </summary>
         /// <param name="value"></param>
         /// <returns>The formatted query param.</returns>
         /// <exception cref="InvalidDataException">Invalid Object Type in Param List</exception>
-        internal protected string FormatQueryParam(object value)
+        internal protected virtual string FormatQueryParam(object value)
         {
             switch (value)
             {
@@ -84,6 +85,9 @@ namespace GraphQL.Query.Builder
 
                 case Enum enumValue:
                     return enumValue.ToString();
+
+                case DateTime dateTimeValue:
+                    return FormatQueryParam(dateTimeValue.ToString("o"));
 
                 case KeyValuePair<string, object> kvValue:
                     return $"{kvValue.Key}:{this.FormatQueryParam(kvValue.Value)}";

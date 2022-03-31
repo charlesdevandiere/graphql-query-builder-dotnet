@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using GraphQL.Query.Builder.UnitTests.Models;
 using Xunit;
 
@@ -139,6 +140,13 @@ namespace GraphQL.Query.Builder.UnitTests
         {
             TestEnum value = TestEnum.DISABLED;
             Assert.Equal("DISABLED", new QueryStringBuilder().FormatQueryParam(value));
+        }
+
+        [Fact]
+        public void TestFormatQueryParam_date()
+        {
+            DateTime value = new DateTime(2022, 3, 30);
+            Assert.Equal("\"2022-03-30T00:00:00.0000000\"", new QueryStringBuilder().FormatQueryParam(value));
         }
 
         [Fact]

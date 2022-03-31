@@ -51,4 +51,4 @@ steps:
   - publish: $(Build.ArtifactStagingDirectory)/out
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     artifact: out
-    displayName: Public artifact
+    displayName: Publish artifact

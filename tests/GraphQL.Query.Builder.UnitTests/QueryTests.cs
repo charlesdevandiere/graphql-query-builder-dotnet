@@ -2,23 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
-using GraphQL.Query.Builder.UnitTests.Models;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace GraphQL.Query.Builder.UnitTests
 {
     public class QueryTests
     {
-        private readonly ITestOutputHelper _testOutputHelper;
-
-        public QueryTests(ITestOutputHelper testOutputHelper)
-        {
-            this._testOutputHelper = testOutputHelper;
-        }
-
         [Fact]
         public void Select_StringList_AddsToQuery()
         {
@@ -239,92 +228,6 @@ namespace GraphQL.Query.Builder.UnitTests
         public void Check_Required_Name()
         {
             Assert.Throws<ArgumentNullException>(() => new Query<object>(null));
-        }
-        
-        [Fact]
-        public void When_Anonymous_class_has_inner_objects_then_QueryString_should_be_generated()
-        {
-            var query = new Query<dynamic>("something");
-            query.AddArguments(new
-            {
-                Name = "Test",
-                Age = 10,
-                Addreses = new List<dynamic>
-                {
-                    new
-                    {
-                        Street = "Street",
-                        Number = 123,
-                    },
-                    new
-                    {
-                        Street = "Street 2",
-                        Number = 123,
-                    }
-                },
-                Orders = new 
-                {
-                    Product = "Product 1",
-                    Price = 123
-                }
-            });
-            string queryString = query.Build();
-            this._testOutputHelper.WriteLine(queryString);
-            Assert.NotNull(queryString);
-        }
-        
-        [Fact]
-        public void When_Model_class_has_inner_objects_then_QueryString_should_be_generated()
-        {
-            var query = new Query<dynamic>("something");
-            query.AddArguments(new Customer
-            {
-                Name = "Test",
-                Age = 10,
-                Orders = new List<Order>
-                {
-                    new()
-                    {
-                        Product = new Truck
-                        {
-                            Name = "Truck 1",
-                            WheelsNumber = 6,
-                            Load = new Load
-                            {
-                                Weight = 45
-                            }
-                        }
-                    }
-                }
-            });
-            string queryString = query.Build();
-            this._testOutputHelper.WriteLine(queryString);
-            Assert.NotNull(queryString);
-        }
-        
-        [Fact]
-        public void When_Model_class_has_inner_objects_and_one_property_is_null_should_be_queerystring_generete_without_exception()
-        {
-            var query = new Query<dynamic>("something");
-            query.AddArguments(new Customer
-            {
-                Name = "Test",
-                Age = 10,
-                Orders = new List<Order>
-                {
-                    new()
-                    {
-                        Product = new Truck
-                        {
-                            Name = "Truck 1",
-                            WheelsNumber = 6,
-                        }
-                    }
-                }
-            });
-            string queryString = query.Build();
-            this._testOutputHelper.WriteLine(queryString);
-            Assert.NotNull(queryString);
         }
     }
 }

@@ -69,8 +69,10 @@ namespace GraphQL.Query.Builder
 
                 case ulong ulongValue:
                     return ulongValue.ToString();
+
                 case char charValue :
                     return charValue.ToString();
+
                 case float floatValue:
                     return floatValue.ToString(CultureInfo.CreateSpecificCulture("en-us"));
 
@@ -87,13 +89,14 @@ namespace GraphQL.Query.Builder
                     return enumValue.ToString();
 
                 case DateTime dateTimeValue:
-                    return FormatQueryParam(dateTimeValue.ToString("o"));
+                    return this.FormatQueryParam(dateTimeValue.ToString("o"));
 
                 case KeyValuePair<string, object> kvValue:
                     return $"{kvValue.Key}:{this.FormatQueryParam(kvValue.Value)}";
 
                 case IDictionary<string, object> dictValue:
                     return $"{{{string.Join(",", dictValue.Select(e => this.FormatQueryParam(e)))}}}";
+
                 case IEnumerable enumerableValue:
                     var items = new List<string>();
                     foreach (var item in enumerableValue)
@@ -101,14 +104,28 @@ namespace GraphQL.Query.Builder
                         items.Add(this.FormatQueryParam(item));
                     }
                     return $"[{string.Join(",", items)}]";
-                case {  } objValue:
-                    var innerValue = objValue.GetType().GetProperties().Where(c => c.GetValue(objValue) != null).Select(c => new KeyValuePair<string, object>(c.Name, c.GetValue(objValue))).ToDictionary(c => c.Key, c => c.Value);
-                    return this.FormatQueryParam(innerValue);
+
+                case { } objectValue:
+                    Dictionary<string, object> dictionay = QueryStringBuilder.ObjectToDictionary(objectValue);
+                    return this.FormatQueryParam(dictionay);
+
                 default:
                     throw new InvalidDataException($"Invalid Object Type in Param List: {value.GetType()}");
             }
         }
 
+        /// <summary>Convert object into dictionary.</summary>
+        /// <param name="object">The object.</param>
+        /// <returns>The object as dictionary.</returns>
+        internal static Dictionary<string, object> ObjectToDictionary(object @object) => 
+            @object
+                .GetType()
+                .GetProperties()
+                .Where(property => property.GetValue(@object) != null)
+                .OrderBy(property => property.Name)
+                .Select(property => new KeyValuePair<string, object>(property.Name, property.GetValue(@object)))
+                .ToDictionary(property => property.Key, property => property.Value);
+        
         /// <summary>Adds query params to the query string.</summary>
         /// <param name="query">The query.</param>
         internal protected void AddParams<TSource>(IQuery<TSource> query)

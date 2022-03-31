@@ -6,7 +6,7 @@ variables:
   buildConfiguration: Release
 
 trigger:
-  batch: true
+  batch: 'true'
   branches:
     include:
       - master
@@ -16,42 +16,38 @@ trigger:
       - README.md
 
 steps:
-  - checkout: self
-    clean: true
-    persistCredentials: true
-
   - task: UseGitVersion@5
     displayName: GitVersion
     inputs:
       versionSpec: '5.x'
 
   - script: dotnet tool restore
-    displayName: 'dotnet tool restore'
+    displayName: 'Restore tools'
 
-  - script: dotnet test -c $(buildConfiguration) --logger xunit -p:CollectCoverage=true -p:CoverletOutputFormat=cobertura -p:Exclude="[*]Shared.Models.*"
-    displayName: 'dotnet test'
+  - script: dotnet build -c $(buildConfiguration)
+    displayName: 'Build'
 
-  - script: dotnet pack ./src/GraphQL.Query.Builder/GraphQL.Query.Builder.csproj -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)/out -p:Version=$(GitVersion.SemVer) -p:ContinuousIntegrationBuild=true
-    displayName: 'dotnet pack'
+  - script: dotnet test --no-build -c $(buildConfiguration) --logger xunit -p:CollectCoverage=true -p:CoverletOutputFormat=cobertura -p:Exclude="[*]Shared.Models.*"
+    displayName: 'Test'
+
+  - script: dotnet pack ./src/GraphQL.Query.Builder/GraphQL.Query.Builder.csproj --no-build -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)/out -p:Version=$(GitVersion.SemVer)
+    displayName: 'Pack'
 
   - task: PublishTestResults@2
-    displayName: 'publish test results'
+    displayName: 'Publish test results'
     inputs:
       testRunner: xUnit
       testResultsFiles: '**/TestResults.xml'
 
   - script: dotnet tool run reportgenerator -reports:**/coverage.cobertura.xml -targetdir:tests/coverage -reportTypes:Cobertura
-    displayName: 'generate code coverage report'
+    displayName: 'Generate code coverage report'
 
   - task: PublishCodeCoverageResults@1
-    displayName: 'publish code coverage'
+    displayName: 'Publish code coverage'
     inputs:
       codeCoverageTool: cobertura
       summaryFileLocation: '**/Cobertura.xml'
 
-  - task: PublishBuildArtifacts@1
-    displayName: 'publish artifact'
+  - publish: $(Build.ArtifactStagingDirectory)/out
     # condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-    inputs:
-      PathtoPublish: $(Build.ArtifactStagingDirectory)/out
-      ArtifactName: out
+    artifact: out

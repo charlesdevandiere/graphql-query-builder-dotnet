@@ -26,6 +26,10 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Include="..\..\logo.png" Pack="true" PackagePath="/"/>
     <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />

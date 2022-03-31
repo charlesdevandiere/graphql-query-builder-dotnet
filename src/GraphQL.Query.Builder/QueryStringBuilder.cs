@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Dawn;
+using Newtonsoft.Json;
 
 namespace GraphQL.Query.Builder
 {
@@ -18,7 +20,7 @@ namespace GraphQL.Query.Builder
         /// <summary>Clears the string builder.</summary>
         public void Clear()
         {
-            QueryString.Clear();
+            this.QueryString.Clear();
         }
 
         /// <summary>
@@ -67,7 +69,8 @@ namespace GraphQL.Query.Builder
 
                 case ulong ulongValue:
                     return ulongValue.ToString();
-
+                case char charValue :
+                    return charValue.ToString();
                 case float floatValue:
                     return floatValue.ToString(CultureInfo.CreateSpecificCulture("en-us"));
 
@@ -87,21 +90,22 @@ namespace GraphQL.Query.Builder
                     return FormatQueryParam(dateTimeValue.ToString("o"));
 
                 case KeyValuePair<string, object> kvValue:
-                    return $"{kvValue.Key}:{FormatQueryParam(kvValue.Value)}";
+                    return $"{kvValue.Key}:{this.FormatQueryParam(kvValue.Value)}";
 
                 case IDictionary<string, object> dictValue:
-                    return $"{{{string.Join(",", dictValue.Select(e => FormatQueryParam(e)))}}}";
-
+                    return $"{{{string.Join(",", dictValue.Select(e => this.FormatQueryParam(e)))}}}";
                 case IEnumerable enumerableValue:
                     var items = new List<string>();
                     foreach (var item in enumerableValue)
                     {
-                        items.Add(FormatQueryParam(item));
+                        items.Add(this.FormatQueryParam(item));
                     }
                     return $"[{string.Join(",", items)}]";
-
+                case {  } objValue:
+                    var innerValue = objValue.GetType().GetProperties().Where(c => c.GetValue(objValue) != null).Select(c => new KeyValuePair<string, object>(c.Name, c.GetValue(objValue))).ToDictionary(c => c.Key, c => c.Value);
+                    return this.FormatQueryParam(innerValue);
                 default:
-                    throw new InvalidDataException("Unsupported Query Parameter, Type Found : " + value.GetType());
+                    throw new InvalidDataException($"Invalid Object Type in Param List: {value.GetType()}");
             }
         }
 
@@ -113,12 +117,12 @@ namespace GraphQL.Query.Builder
 
             foreach (var param in query.Arguments)
             {
-                QueryString.Append($"{param.Key}:{FormatQueryParam(param.Value)},");
+                this.QueryString.Append($"{param.Key}:{this.FormatQueryParam(param.Value)},");
             }
 
             if (query.Arguments.Count > 0)
             {
-                QueryString.Length--;
+                this.QueryString.Length--;
             }
         }
 
@@ -132,11 +136,11 @@ namespace GraphQL.Query.Builder
                 switch (item)
                 {
                     case string field:
-                        QueryString.Append($"{field} ");
+                        this.QueryString.Append($"{field} ");
                         break;
 
                     case IQuery subQuery:
-                        QueryString.Append($"{subQuery.Build()} ");
+                        this.QueryString.Append($"{subQuery.Build()} ");
                         break;
 
                     default:
@@ -146,7 +150,7 @@ namespace GraphQL.Query.Builder
 
             if (query.SelectList.Count > 0)
             {
-                QueryString.Length--;
+                this.QueryString.Length--;
             }
         }
 
@@ -157,30 +161,30 @@ namespace GraphQL.Query.Builder
         {
             if (!String.IsNullOrWhiteSpace(query.AliasName))
             {
-                QueryString.Append($"{query.AliasName}:");
+                this.QueryString.Append($"{query.AliasName}:");
             }
 
-            QueryString.Append(query.Name);
+            this.QueryString.Append(query.Name);
 
             if (query.Arguments.Count > 0)
             {
-                QueryString.Append("(");
-                AddParams(query);
-                QueryString.Append(")");
+                this.QueryString.Append("(");
+                this.AddParams(query);
+                this.QueryString.Append(")");
             }
 
             if (query.SelectList.Count > 0)
             {
-                QueryString.Append("{");
-                AddFields(query);
-                QueryString.Append("}");
+                this.QueryString.Append("{");
+                this.AddFields(query);
+                this.QueryString.Append("}");
             }
             else
             {
-                AddFields(query);
+                this.AddFields(query);
             }
 
-            return QueryString.ToString();
+            return this.QueryString.ToString();
         }
     }
 }

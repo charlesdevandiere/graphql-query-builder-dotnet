@@ -11,7 +11,7 @@ A tool to build GraphQL query from a C# model.
 
 See complete documentation [here](https://charlesdevandiere.github.io/graphql-query-builder-dotnet/)
 
-See sample [here](sample/Pokedex)
+See sample [here](https://github.com/charlesdevandiere/graphql-query-builder-dotnet/tree/master/sample/Pokedex)
 
 ## Install
 

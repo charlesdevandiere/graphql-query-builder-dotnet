@@ -264,7 +264,7 @@ namespace GraphQL.Query.Builder.UnitTests
                 }
             };
 
-            Assert.Equal("{Age:10,Name:\"Test\",Orders:[{Product:{Load:{Weight:45},Name:\"Truck 1\",WheelsNumber:6}}]}", new QueryStringBuilder().FormatQueryParam(@object));
+            Assert.Equal("{Age:10,Name:\"Test\",Orders:[{Product:{load:{weight:45},name:\"Truck 1\",wheelsNumber:6}}]}", new QueryStringBuilder().FormatQueryParam(@object));
             
             // with inner object with null property
             @object = new Customer
@@ -285,7 +285,7 @@ namespace GraphQL.Query.Builder.UnitTests
                 }
             };
 
-            Assert.Equal("{Age:10,Name:\"Test\",Orders:[{Product:{Name:\"Truck 1\",WheelsNumber:6}}]}", new QueryStringBuilder().FormatQueryParam(@object));
+            Assert.Equal("{Age:10,Name:\"Test\",Orders:[{Product:{name:\"Truck 1\",wheelsNumber:6}}]}", new QueryStringBuilder().FormatQueryParam(@object));
         }
 
         [Fact]

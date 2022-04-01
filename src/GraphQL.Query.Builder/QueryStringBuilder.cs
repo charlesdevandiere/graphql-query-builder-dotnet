@@ -12,8 +12,20 @@ namespace GraphQL.Query.Builder
     /// <summary>The GraphQL query builder class.</summary>
     public class QueryStringBuilder : IQueryStringBuilder
     {
+        private readonly Func<string, string> formatter;
+
         /// <summary>The query string builder.</summary>
         public StringBuilder QueryString { get; } = new StringBuilder();
+
+        /// <summary>Initializes a new instance of the <see cref="QueryStringBuilder" /> class.</summary>
+        public QueryStringBuilder() { }
+
+        /// <summary>Initializes a new instance of the <see cref="QueryStringBuilder" /> class.</summary>
+        /// <param name="formatter">The query formatter</param>
+        public QueryStringBuilder(Func<string, string> formatter)
+        {
+            this.formatter = formatter;
+        }
 
         /// <summary>Clears the string builder.</summary>
         public void Clear()
@@ -68,7 +80,7 @@ namespace GraphQL.Query.Builder
                 case ulong ulongValue:
                     return ulongValue.ToString();
 
-                case char charValue :
+                case char charValue:
                     return charValue.ToString();
 
                 case float floatValue:
@@ -104,7 +116,7 @@ namespace GraphQL.Query.Builder
                     return $"[{string.Join(",", items)}]";
 
                 case { } objectValue:
-                    Dictionary<string, object> dictionay = QueryStringBuilder.ObjectToDictionary(objectValue);
+                    Dictionary<string, object> dictionay = this.ObjectToDictionary(objectValue);
                     return this.FormatQueryParam(dictionay);
 
                 default:
@@ -115,15 +127,18 @@ namespace GraphQL.Query.Builder
         /// <summary>Convert object into dictionary.</summary>
         /// <param name="object">The object.</param>
         /// <returns>The object as dictionary.</returns>
-        internal static Dictionary<string, object> ObjectToDictionary(object @object) => 
+        internal Dictionary<string, object> ObjectToDictionary(object @object) =>
             @object
                 .GetType()
                 .GetProperties()
                 .Where(property => property.GetValue(@object) != null)
-                .OrderBy(property => property.Name)
-                .Select(property => new KeyValuePair<string, object>(property.Name, property.GetValue(@object)))
+                .Select(property =>
+                    new KeyValuePair<string, object>(
+                        PropertyNameFormatter.GetPropertyName(property, this.formatter),
+                        property.GetValue(@object)))
+                .OrderBy(property => property.Key)
                 .ToDictionary(property => property.Key, property => property.Value);
-        
+
         /// <summary>Adds query params to the query string.</summary>
         /// <param name="query">The query.</param>
         internal protected void AddParams<TSource>(IQuery<TSource> query)

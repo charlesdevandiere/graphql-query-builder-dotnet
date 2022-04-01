@@ -123,7 +123,7 @@ namespace GraphQL.Query.Builder.UnitTests
         public void TestQuery_build()
         {
             var query = new Query<Truck>("truck")
-                .AddArguments(new { id = "yk8h4vn0", km = 2100, imported = true })
+                .AddArguments(new { id = "yk8h4vn0", km = 2100, imported = true, page = new { from = 1, to = 100 } })
                 .AddField(truck => truck.Name)
                 .AddField(truck => truck.WheelsNumber)
                 .AddField(
@@ -133,7 +133,7 @@ namespace GraphQL.Query.Builder.UnitTests
 
             string result = query.Build();
 
-            Assert.Equal("truck(id:\"yk8h4vn0\",imported:true,km:2100){name wheelsNumber load{weight}}", result);
+            Assert.Equal("truck(id:\"yk8h4vn0\",imported:true,km:2100,page:{from:1,to:100}){name wheelsNumber load{weight}}", result);
         }
 
         [Fact]

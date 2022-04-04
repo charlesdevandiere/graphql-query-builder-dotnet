@@ -22,6 +22,15 @@ namespace GraphQL.Query.Builder.UnitTests
         }
 
         [Fact]
+        public void TestFormatQueryParam_string_json()
+        {
+            string value = "{\"foo\":\"bar\",\"array\":[1,2]}";
+            Assert.Equal(
+                "\"{\\\"foo\\\":\\\"bar\\\",\\\"array\\\":[1,2]}\"",
+                new QueryStringBuilder().FormatQueryParam(value));
+        }
+
+        [Fact]
         public void TestFormatQueryParam_byte()
         {
             byte value = 1;
@@ -265,7 +274,7 @@ namespace GraphQL.Query.Builder.UnitTests
             };
 
             Assert.Equal("{Age:10,Name:\"Test\",Orders:[{Product:{load:{weight:45},name:\"Truck 1\",wheelsNumber:6}}]}", new QueryStringBuilder().FormatQueryParam(@object));
-            
+
             // with inner object with null property
             @object = new Customer
             {

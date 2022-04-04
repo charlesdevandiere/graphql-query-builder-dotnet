@@ -45,6 +45,7 @@ namespace GraphQL.Query.Builder
         /// - Key value pair: `foo:"bar"` or `foo:10` ...
         /// - List: `["foo","bar"]` or `[1,2]` ...
         /// - Dictionary: `{foo:"bar",b:10}`
+        /// - Object: `{foo:"bar",b:10}`
         /// </summary>
         /// <param name="value"></param>
         /// <returns>The formatted query param.</returns>
@@ -54,7 +55,8 @@ namespace GraphQL.Query.Builder
             switch (value)
             {
                 case string strValue:
-                    return "\"" + strValue + "\"";
+                    string encoded = strValue.Replace("\"", "\\\"");
+                    return $"\"{encoded}\"";
 
                 case byte byteValue:
                     return byteValue.ToString();

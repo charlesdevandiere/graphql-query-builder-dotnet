@@ -1,15 +1,14 @@
-using System;
-using System.Text;
-using Newtonsoft.Json;
+﻿using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Shared.Models
 {
     public class PokemonAttack
     {
-        [JsonProperty("fast")]
+        [JsonPropertyName("fast")]
         public Attack[] Fast { get; set; }
 
-        [JsonProperty("special")]
+        [JsonPropertyName("special")]
         public Attack[] Special { get; set; }
 
         public override string ToString()

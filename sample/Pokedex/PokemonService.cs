@@ -1,8 +1,8 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
+using GraphQL.Client.Serializer.SystemTextJson;
 using GraphQL.Query.Builder;
 using Shared.Models;
 
@@ -51,7 +51,7 @@ namespace Pokedex
                 );
             var request = new GraphQLRequest { Query = "{" + query.Build() + "}" };
 
-            using var client = new GraphQLHttpClient(this.graphqlPokemonUrl, new NewtonsoftJsonSerializer());
+            using var client = new GraphQLHttpClient(this.graphqlPokemonUrl, new SystemTextJsonSerializer());
             GraphQLResponse<PokemonResponse> response = await client.SendQueryAsync<PokemonResponse>(request);
 
             return response.Data.Pokemon;
@@ -76,7 +76,7 @@ namespace Pokedex
                 .AddField(p => p.Types);
             var request = new GraphQLRequest { Query = "{" + query.Build() + "}" };
 
-            using var client = new GraphQLHttpClient(this.graphqlPokemonUrl, new NewtonsoftJsonSerializer());
+            using var client = new GraphQLHttpClient(this.graphqlPokemonUrl, new SystemTextJsonSerializer());
             GraphQLResponse<PokemonsResponse> response = await client.SendQueryAsync<PokemonsResponse>(request);
 
             return response.Data.Pokemons;

@@ -1,13 +1,13 @@
-using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Shared.Models
 {
     public class PokemonDimension
     {
-        [JsonProperty("minimum")]
+        [JsonPropertyName("minimum")]
         public string Minimum { get; set; }
-        
-        [JsonProperty("maximum")]
+
+        [JsonPropertyName("maximum")]
         public string Maximum { get; set; }
 
         public override string ToString()

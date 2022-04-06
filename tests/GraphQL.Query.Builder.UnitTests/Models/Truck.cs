@@ -1,16 +1,16 @@
-using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace GraphQL.Query.Builder.UnitTests.Models
 {
     public class Truck
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("wheelsNumber")]
+        [JsonPropertyName("wheelsNumber")]
         public int WheelsNumber { get; set; }
 
-        [JsonProperty("load")]
+        [JsonPropertyName("load")]
         public Load Load { get; set; }
     }
 }

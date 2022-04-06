@@ -1,7 +1,8 @@
 using System;
 using System.Reflection;
 using Dawn;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace GraphQL.Query.Builder
 {
@@ -16,14 +17,11 @@ namespace GraphQL.Query.Builder
         {
             Guard.Argument(property, nameof(property)).NotNull();
 
-            Attribute jsonAttribute = property.GetCustomAttribute(typeof(JsonPropertyAttribute));
+            JsonPropertyNameAttribute attribute = property.GetCustomAttribute<JsonPropertyNameAttribute>();
 
-            if (jsonAttribute != null)
+            if (attribute is not null && !string.IsNullOrEmpty(attribute.Name))
             {
-                if (!string.IsNullOrEmpty((jsonAttribute as JsonPropertyAttribute).PropertyName))
-                {
-                    return (jsonAttribute as JsonPropertyAttribute).PropertyName;
-                }
+                return attribute.Name;
             }
 
             if (formatter != null)

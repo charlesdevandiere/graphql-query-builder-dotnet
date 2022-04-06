@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using GraphQL.Query.Builder.UnitTests.Models;
 using Xunit;
 
@@ -18,6 +19,15 @@ namespace GraphQL.Query.Builder.UnitTests
         {
             string value = "value";
             Assert.Equal("\"value\"", new QueryStringBuilder().FormatQueryParam(value));
+        }
+
+        [Fact]
+        public void TestFormatQueryParam_string_json()
+        {
+            string value = "{\"foo\":\"bar\",\"array\":[1,2]}";
+            Assert.Equal(
+                "\"{\\\"foo\\\":\\\"bar\\\",\\\"array\\\":[1,2]}\"",
+                new QueryStringBuilder().FormatQueryParam(value));
         }
 
         [Fact]
@@ -142,6 +152,13 @@ namespace GraphQL.Query.Builder.UnitTests
         }
 
         [Fact]
+        public void TestFormatQueryParam_date()
+        {
+            DateTime value = new DateTime(2022, 3, 30);
+            Assert.Equal("\"2022-03-30T00:00:00.0000000\"", new QueryStringBuilder().FormatQueryParam(value));
+        }
+
+        [Fact]
         public void TestFormatQueryParam_keyvaluepair()
         {
             var value = new KeyValuePair<string, object>("from", 444.45);
@@ -200,6 +217,84 @@ namespace GraphQL.Query.Builder.UnitTests
                 TestEnum[] value = new[] { TestEnum.ENABLED, TestEnum.DISABLED, TestEnum.HAYstack };
                 Assert.Equal("[ENABLED,DISABLED,HAYstack]", new QueryStringBuilder().FormatQueryParam(value));
             }
+        }
+
+        [Fact]
+        public void TestFormatQueryParam_Anonymous()
+        {
+            var anonymous = new
+            {
+                Name = "Test",
+                Age = 10,
+                Addresses = new List<dynamic>
+                {
+                    new
+                    {
+                        Street = "Street",
+                        Number = 123,
+                    },
+                    new
+                    {
+                        Street = "Street 2",
+                        Number = 123,
+                    }
+                },
+                Orders = new
+                {
+                    Product = "Product 1",
+                    Price = 123
+                }
+            };
+
+            Assert.Equal("{Addresses:[{Number:123,Street:\"Street\"},{Number:123,Street:\"Street 2\"}],Age:10,Name:\"Test\",Orders:{Price:123,Product:\"Product 1\"}}", new QueryStringBuilder().FormatQueryParam(anonymous));
+        }
+
+        [Fact]
+        public void TestFormatQueryParam_Object()
+        {
+            var @object = new Customer
+            {
+                Name = "Test",
+                Age = 10,
+                Orders = new List<Order>
+                {
+                    new()
+                    {
+                        Product = new Truck
+                        {
+                            Name = "Truck 1",
+                            WheelsNumber = 6,
+                            Load = new Load
+                            {
+                                Weight = 45
+                            }
+                        }
+                    }
+                }
+            };
+
+            Assert.Equal("{Age:10,Name:\"Test\",Orders:[{Product:{load:{weight:45},name:\"Truck 1\",wheelsNumber:6}}]}", new QueryStringBuilder().FormatQueryParam(@object));
+
+            // with inner object with null property
+            @object = new Customer
+            {
+                Name = "Test",
+                Age = 10,
+                Orders = new List<Order>
+                {
+                    new()
+                    {
+                        Product = new Truck
+                        {
+                            Name = "Truck 1",
+                            WheelsNumber = 6,
+                            Load = null
+                        }
+                    }
+                }
+            };
+
+            Assert.Equal("{Age:10,Name:\"Test\",Orders:[{Product:{name:\"Truck 1\",wheelsNumber:6}}]}", new QueryStringBuilder().FormatQueryParam(@object));
         }
 
         [Fact]

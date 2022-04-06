@@ -8,7 +8,7 @@ namespace GraphQL.Query.Builder.UnitTests
     public class QueryOfTTests
     {
         [Fact]
-        public void TestSelect()
+        public void TestAddField()
         {
             var query = new Query<Car>("car");
             query.AddField(c => c.Name);
@@ -17,7 +17,7 @@ namespace GraphQL.Query.Builder.UnitTests
         }
 
         [Fact]
-        public void TestSubSelect()
+        public void TestAddField_subQuery()
         {
             var query = new Query<Car>("car");
             query.AddField(c => c.Color, sq => sq);
@@ -26,7 +26,7 @@ namespace GraphQL.Query.Builder.UnitTests
         }
 
         [Fact]
-        public void TestSelectWithCustomName()
+        public void TestAddField_customName()
         {
             var query = new Query<Truck>("truck");
             query.AddField(t => t.Name);
@@ -35,7 +35,7 @@ namespace GraphQL.Query.Builder.UnitTests
         }
 
         [Fact]
-        public void TestSubSelectWithCustomName()
+        public void TestAddField_subQuery_customName()
         {
             var query = new Query<Truck>("truck");
             query.AddField(t => t.Load, sq => sq);
@@ -44,7 +44,7 @@ namespace GraphQL.Query.Builder.UnitTests
         }
 
         [Fact]
-        public void TestSelectWithCustomFormater()
+        public void TestAddField_customFormatter()
         {
             var query = new Query<Car>("car", options: new QueryOptions
             {
@@ -56,7 +56,7 @@ namespace GraphQL.Query.Builder.UnitTests
         }
 
         [Fact]
-        public void TestSubSelectWithCustomFormater()
+        public void TestAddField_subQuery_customFormatter()
         {
             var query = new Query<Car>("car", options: new QueryOptions
             {
@@ -96,7 +96,7 @@ namespace GraphQL.Query.Builder.UnitTests
         }
 
         [Fact]
-        public void TestQueryWithCustomName()
+        public void TestQuery_customName()
         {
             var query = new Query<Truck>("truck")
                 .AddField(truck => truck.Name)
@@ -120,10 +120,10 @@ namespace GraphQL.Query.Builder.UnitTests
         }
 
         [Fact]
-        public void TestQueryBuild()
+        public void TestQuery_build()
         {
             var query = new Query<Truck>("truck")
-                .AddArguments(new { id = "yk8h4vn0", km = 2100, imported = true })
+                .AddArguments(new { id = "yk8h4vn0", km = 2100, imported = true, page = new { from = 1, to = 100 } })
                 .AddField(truck => truck.Name)
                 .AddField(truck => truck.WheelsNumber)
                 .AddField(
@@ -133,7 +133,7 @@ namespace GraphQL.Query.Builder.UnitTests
 
             string result = query.Build();
 
-            Assert.Equal("truck(id:\"yk8h4vn0\",km:2100,imported:true){name wheelsNumber load{weight}}", result);
+            Assert.Equal("truck(id:\"yk8h4vn0\",imported:true,km:2100,page:{from:1,to:100}){name wheelsNumber load{weight}}", result);
         }
 
         [Fact]

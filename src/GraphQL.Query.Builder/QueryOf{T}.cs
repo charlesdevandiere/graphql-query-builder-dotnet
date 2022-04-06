@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -71,7 +72,7 @@ namespace GraphQL.Query.Builder
             Guard.Argument(selector, nameof(selector)).NotNull();
 
             PropertyInfo property = GetPropertyInfo(selector);
-            string name = GetPropertyName(property);
+            string name = PropertyNameFormatter.GetPropertyName(property, this.options?.Formatter);
 
             this.SelectList.Add(name);
 
@@ -104,7 +105,7 @@ namespace GraphQL.Query.Builder
             Guard.Argument(build, nameof(build)).NotNull();
 
             PropertyInfo property = GetPropertyInfo(selector);
-            string name = GetPropertyName(property);
+            string name = PropertyNameFormatter.GetPropertyName(property, this.options?.Formatter);
 
             return AddField(name, build);
         }
@@ -123,7 +124,7 @@ namespace GraphQL.Query.Builder
             Guard.Argument(build, nameof(build)).NotNull();
 
             PropertyInfo property = GetPropertyInfo(selector);
-            string name = GetPropertyName(property);
+            string name = PropertyNameFormatter.GetPropertyName(property, this.options?.Formatter);
 
             return AddField(name, build);
         }
@@ -185,10 +186,16 @@ namespace GraphQL.Query.Builder
         {
             Guard.Argument(arguments, nameof(arguments)).NotNull();
 
-            PropertyInfo[] properties = typeof(TArguments).GetProperties();
+            IEnumerable<PropertyInfo> properties = arguments
+                .GetType()
+                .GetProperties()
+                .Where(property => property.GetValue(arguments) != null)
+                .OrderBy(property => property.Name);
             foreach (PropertyInfo property in properties)
             {
-                this.Arguments.Add(this.GetPropertyName(property), property.GetValue(arguments));
+                this.Arguments.Add(
+                    PropertyNameFormatter.GetPropertyName(property, this.options?.Formatter),
+                    property.GetValue(arguments));
             }
 
             return this;
@@ -237,28 +244,6 @@ namespace GraphQL.Query.Builder
             }
 
             return propertyInfo;
-        }
-
-        /// <summary>Tries to get property name from JSON property attribute or from optional formater.</summary>
-        /// <param name="property">The property.</param>
-        /// <returns>The property name.</returns>
-        private string GetPropertyName(PropertyInfo property)
-        {
-            Guard.Argument(property, nameof(property)).NotNull();
-
-            JsonPropertyNameAttribute attribute = property.GetCustomAttribute<JsonPropertyNameAttribute>();
-
-            if (attribute is not null && !string.IsNullOrEmpty(attribute.Name))
-            {
-                return attribute.Name;
-            }
-
-            if (this.options?.Formatter != null)
-            {
-                return this.options.Formatter.Invoke(property.Name);
-            }
-
-            return property.Name;
         }
     }
 }

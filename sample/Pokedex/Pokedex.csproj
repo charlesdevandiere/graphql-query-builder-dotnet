@@ -14,6 +14,7 @@
   <ItemGroup>
     <PackageReference Include="GraphQL.Client" Version="4.0.2" />
     <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="4.0.2" />
+    <PackageReference Include="System.Text.Json" Version="6.0.2" />
   </ItemGroup>
 
 </Project>

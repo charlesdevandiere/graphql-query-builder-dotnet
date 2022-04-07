@@ -1,5 +1,7 @@
 using System;
 
+namespace GraphQL.Query.Builder;
+
 internal static class RequiredArgument
 {
     /// <summary>Verifies argument is not null.</summary>

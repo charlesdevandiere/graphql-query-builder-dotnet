@@ -12,6 +12,8 @@ namespace Pokedex
     {
         private readonly string graphqlPokemonUrl;
 
+        private readonly QueryOptions options = new() { Formatter = CamelCasePropertyNameFormatter.Format };
+
         /// <summary>Initializes a new instance of the <see cref="PokemonService" /> class.</summary>
         /// <param name="apiUrl">The pokemon graphQL API URL</param>
         public PokemonService(string apiUrl)
@@ -23,7 +25,7 @@ namespace Pokedex
         /// <param name="name">The Pokemon name.</param>
         public async Task<Pokemon> GetPokemon(string name)
         {
-            var query = new Query<Pokemon>("pokemon")
+            var query = new Query<Pokemon>("pokemon", this.options)
                 .AddArguments(new { name })
                 .AddField(p => p.Id)
                 .AddField(p => p.Number)
@@ -60,7 +62,7 @@ namespace Pokedex
         /// <summary>Returns all Pokemons</summary>
         public async Task<IEnumerable<Pokemon>> GetAllPokemons()
         {
-            var query = new Query<Pokemon>("pokemons")
+            var query = new Query<Pokemon>("pokemons", this.options)
                 .AddArguments(new { first = 100 })
                 .AddField(p => p.Id)
                 .AddField(p => p.Number)

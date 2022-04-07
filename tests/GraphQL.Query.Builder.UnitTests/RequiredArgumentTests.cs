@@ -1,6 +1,8 @@
 using System;
 using Xunit;
 
+namespace GraphQL.Query.Builder.UnitTests;
+
 public class RequiredArgumentTests
 
 {

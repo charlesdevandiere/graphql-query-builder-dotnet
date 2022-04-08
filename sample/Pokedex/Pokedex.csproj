@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\GraphQL.Query.Builder\GraphQL.Query.Builder.csproj" />
+    <ProjectReference Include="..\..\src\GraphQL.Query.Builder.Formatter.SystemTextJson\GraphQL.Query.Builder.Formatter.SystemTextJson.csproj" />
     <ProjectReference Include="..\Models\Models.csproj" />
   </ItemGroup>
 

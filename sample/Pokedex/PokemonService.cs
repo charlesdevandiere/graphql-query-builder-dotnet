@@ -4,6 +4,7 @@ using GraphQL;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
 using GraphQL.Query.Builder;
+using GraphQL.Query.Builder.Formatter.SystemTextJson;
 using Shared.Models;
 
 namespace Pokedex
@@ -12,7 +13,10 @@ namespace Pokedex
     {
         private readonly string graphqlPokemonUrl;
 
-        private readonly QueryOptions options = new() { Formatter = CamelCasePropertyNameFormatter.Format };
+        private readonly QueryOptions options = new()
+        {
+            Formatter = SystemTextJsonPropertyNameFormatter.Format
+        };
 
         /// <summary>Initializes a new instance of the <see cref="PokemonService" /> class.</summary>
         /// <param name="apiUrl">The pokemon graphQL API URL</param>

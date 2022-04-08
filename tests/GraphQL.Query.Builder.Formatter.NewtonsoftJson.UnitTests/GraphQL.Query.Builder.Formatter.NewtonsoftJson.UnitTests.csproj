@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\GraphQL.Query.Builder\GraphQL.Query.Builder.csproj" />
+    <ProjectReference Include="..\..\src\GraphQL.Query.Builder.Formatter.NewtonsoftJson\GraphQL.Query.Builder.Formatter.NewtonsoftJson.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Version>0.0.0</Version>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <Authors>Charles de Vandière</Authors>
+    <Copyright>© 2022 Charles de Vandière</Copyright>
+    <Product>GraphQL.Query.Builder.Formatter.SystemTextJson</Product>
+    <Title>GraphQL.Query.Builder.Formatter.SystemTextJson</Title>
+    <Description>A property name formatter for GraphQL.Query.Builder.</Description>
+    <Summary>A property name formatter for GraphQL.Query.Builder.</Summary>
+    <PackageIcon>logo.png</PackageIcon>
+    <PackageIconUrl>https://raw.githubusercontent.com/charlesdevandiere/graphql-query-builder-dotnet-systemtextjson/master/logo.png</PackageIconUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://charlesdevandiere.github.io/graphql-query-builder-dotnet-systemtextjson</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>graphql</PackageTags>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/charlesdevandiere/graphql-query-builder-dotnet-systemtextjson</RepositoryUrl>
+    
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\logo.png" Pack="true" PackagePath="/" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+    <PackageReference Include="System.Text.Json" Version="6.0.2" />
+  </ItemGroup>
+
+</Project>

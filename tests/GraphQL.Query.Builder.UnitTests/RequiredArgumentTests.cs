@@ -16,7 +16,7 @@ public class RequiredArgumentTests
     [Fact]
     public void NotNull_ShouldThrowArgumentNullException()
     {
-        string str = null;
+        string? str = null;
         ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => RequiredArgument.NotNull(str, nameof(str)));
         Assert.Equal($"Value cannot be null. (Parameter '{nameof(str)}')", exception.Message);
     }
@@ -24,7 +24,7 @@ public class RequiredArgumentTests
     [Fact]
     public void NotNull_ShouldThrowArgumentNullExceptionWithNoParamName()
     {
-        string str = null;
+        string? str = null;
         ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => RequiredArgument.NotNull(str, null));
         Assert.Equal("Value cannot be null.", exception.Message);
     }
@@ -32,7 +32,7 @@ public class RequiredArgumentTests
     [Fact]
     public void NotNullOrEmpty_ShouldThrowArgumentNullException()
     {
-        string str = null;
+        string? str = null;
         ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => RequiredArgument.NotNullOrEmpty(str, nameof(str)));
         Assert.Equal($"Value cannot be null. (Parameter '{nameof(str)}')", exception.Message);
     }
@@ -40,7 +40,7 @@ public class RequiredArgumentTests
     [Fact]
     public void NotNullOrEmpty_ShouldThrowArgumentNullExceptionWithNoParamName()
     {
-        string str = null;
+        string? str = null;
         ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => RequiredArgument.NotNullOrEmpty(str, null));
         Assert.Equal("Value cannot be null.", exception.Message);
     }

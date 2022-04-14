@@ -1,3 +1,6 @@
 {
+  "omnisharp.enableRoslynAnalyzers": true,
+  "omnisharp.organizeImportsOnFormat": true,
+  "omnisharp.useModernNet": true,
   "yaml.format.singleQuote": true
 }

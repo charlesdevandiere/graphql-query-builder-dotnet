@@ -154,25 +154,25 @@ public class QueryStringBuilderTests
     [Fact]
     public void TestFormatQueryParam_date()
     {
-        DateTime value = new DateTime(2022, 3, 30);
+        DateTime value = new(2022, 3, 30);
         Assert.Equal("\"2022-03-30T00:00:00.0000000\"", new QueryStringBuilder().FormatQueryParam(value));
     }
 
     [Fact]
     public void TestFormatQueryParam_keyvaluepair()
     {
-        var value = new KeyValuePair<string, object>("from", 444.45);
+        KeyValuePair<string, object> value = new("from", 444.45);
         Assert.Equal("from:444.45", new QueryStringBuilder().FormatQueryParam(value));
     }
 
     [Fact]
     public void TestFormatQueryParam_dictionary()
     {
-        Dictionary<string, object> value = new Dictionary<string, object>
-            {
-                {"from", 444.45},
-                {"to", 555.45}
-            };
+        Dictionary<string, object> value = new()
+        {
+            { "from", 444.45 },
+            { "to", 555.45 }
+        };
         Assert.Equal("{from:444.45,to:555.45}", new QueryStringBuilder().FormatQueryParam(value));
     }
 
@@ -180,7 +180,7 @@ public class QueryStringBuilderTests
     public void TestFormatQueryParam_listNumber()
     {
         {
-            List<int> value = new List<int> { 43783, 43784, 43145 };
+            List<int> value = new() { 43783, 43784, 43145 };
             Assert.Equal("[43783,43784,43145]", new QueryStringBuilder().FormatQueryParam(value));
         }
         {
@@ -197,7 +197,7 @@ public class QueryStringBuilderTests
     public void TestFormatQueryParam_listString()
     {
         {
-            List<string> value = new List<string> { "a", "b", "c" };
+            List<string> value = new() { "a", "b", "c" };
             Assert.Equal("[\"a\",\"b\",\"c\"]", new QueryStringBuilder().FormatQueryParam(value));
         }
         {
@@ -210,7 +210,7 @@ public class QueryStringBuilderTests
     public void TestFormatQueryParam_listEnum()
     {
         {
-            List<TestEnum> value = new List<TestEnum> { TestEnum.ENABLED, TestEnum.DISABLED, TestEnum.HAYstack };
+            List<TestEnum> value = new() { TestEnum.ENABLED, TestEnum.DISABLED, TestEnum.HAYstack };
             Assert.Equal("[ENABLED,DISABLED,HAYstack]", new QueryStringBuilder().FormatQueryParam(value));
         }
         {
@@ -252,7 +252,7 @@ public class QueryStringBuilderTests
     [Fact]
     public void TestFormatQueryParam_Object()
     {
-        var @object = new Customer
+        Customer @object = new()
         {
             Name = "Test",
             Age = 10,
@@ -278,7 +278,7 @@ public class QueryStringBuilderTests
         Assert.Equal("{Age:10,Name:\"Test\",Orders:[{Product:{Color:{Blue:83,Green:12,Red:45},Name:\"Bee\",Price:10000}}]}", new QueryStringBuilder().FormatQueryParam(@object));
 
         // with inner object with null property
-        @object = new Customer
+        @object = new()
         {
             Name = "Test",
             Age = 10,
@@ -303,23 +303,23 @@ public class QueryStringBuilderTests
     public void BuildQueryParam_NestedListType_ParseNestedList()
     {
         // Arrange
-        QueryStringBuilder queryString = new QueryStringBuilder();
-        List<object> objList = new List<object>(new object[] { "aa", "bb", "cc" });
+        QueryStringBuilder queryString = new();
+        List<object> objList = new(new object[] { "aa", "bb", "cc" });
 
-        Dictionary<string, object> fromToMap = new Dictionary<string, object>
-            {
-                {"from", 444.45},
-                {"to", 555.45},
-            };
+        Dictionary<string, object> fromToMap = new()
+        {
+            { "from", 444.45 },
+            { "to", 555.45 },
+        };
 
-        Dictionary<string, object> nestedListMap = new Dictionary<string, object>
-            {
-                {"from", 123},
-                {"to", 454},
-                {"recurse", objList},
-                {"map", fromToMap},
-                {"name",  TestEnum.HAYstack}
-            };
+        Dictionary<string, object> nestedListMap = new()
+        {
+            { "from", 123 },
+            { "to", 454 },
+            { "recurse", objList },
+            { "map", fromToMap },
+            { "name", TestEnum.HAYstack }
+        };
 
         // Act
         string nestedListMapStr = queryString.FormatQueryParam(nestedListMap);
@@ -332,30 +332,30 @@ public class QueryStringBuilderTests
     public void Where_QueryString_ParseQueryString()
     {
         // Arrange
-        Query<Car> query = new Query<Car>("test1");
+        Query<Car> query = new("test1");
 
-        List<object> objList = new List<object>(new object[] { "aa", "bb", "cc" });
+        List<object> objList = new(new object[] { "aa", "bb", "cc" });
 
-        Dictionary<string, object> fromToMap = new Dictionary<string, object>
-            {
-                {"from", 444.45},
-                {"to", 555.45},
-            };
+        Dictionary<string, object> fromToMap = new()
+        {
+            { "from", 444.45 },
+            { "to", 555.45 },
+        };
 
-        Dictionary<string, object> nestedListMap = new Dictionary<string, object>
-            {
-                {"from", 123},
-                {"to", 454},
-                {"recurse", objList},
-                {"map", fromToMap},
-                {"name",  TestEnum.HAYstack}
-            };
+        Dictionary<string, object> nestedListMap = new()
+        {
+            { "from", 123 },
+            { "to", 454 },
+            { "recurse", objList },
+            { "map", fromToMap },
+            { "name", TestEnum.HAYstack }
+        };
 
         query
             .AddField("name")
             .AddArguments(nestedListMap);
 
-        QueryStringBuilder queryString = new QueryStringBuilder();
+        QueryStringBuilder queryString = new();
 
         // Act
         queryString.AddParams(query);
@@ -370,30 +370,30 @@ public class QueryStringBuilderTests
     public void Where_ClearQueryString_EmptyQueryString()
     {
         // Arrange
-        var query = new Query<object>("test1");
+        Query<object> query = new("test1");
 
-        List<object> objList = new List<object>(new object[] { "aa", "bb", "cc" });
+        List<object> objList = new(new object[] { "aa", "bb", "cc" });
 
-        Dictionary<string, object> fromToMap = new Dictionary<string, object>
-            {
-                {"from", 444.45},
-                {"to", 555.45},
-            };
+        Dictionary<string, object> fromToMap = new()
+        {
+            { "from", 444.45 },
+            { "to", 555.45 },
+        };
 
-        Dictionary<string, object> nestedListMap = new Dictionary<string, object>
-            {
-                {"from", 123},
-                {"to", 454},
-                {"recurse", objList},
-                {"map", fromToMap},
-                {"name",  TestEnum.HAYstack}
-            };
+        Dictionary<string, object> nestedListMap = new()
+        {
+            { "from", 123 },
+            { "to", 454 },
+            { "recurse", objList },
+            { "map", fromToMap },
+            { "name", TestEnum.HAYstack }
+        };
 
         query
             .AddField("name")
             .AddArguments(nestedListMap);
 
-        var queryString = new QueryStringBuilder();
+        QueryStringBuilder queryString = new();
 
         queryString.AddParams(query);
 
@@ -409,18 +409,18 @@ public class QueryStringBuilderTests
     {
         // Arrange
 
-        var subSelect = new Query<object>("subSelect");
+        Query<object> subSelect = new("subSelect");
 
-        Dictionary<string, object> mySubDict = new Dictionary<string, object>
-            {
-                {"subMake", "aston martin"},
-                {"subState", "ca"},
-                {"subLimit", 1},
-                {"__debug", TestEnum.DISABLED},
-                {"SuperQuerySpeed", TestEnum.ENABLED }
-            };
+        Dictionary<string, object> mySubDict = new()
+        {
+            { "subMake", "aston martin" },
+            { "subState", "ca" },
+            { "subLimit", 1 },
+            { "__debug", TestEnum.DISABLED },
+            { "SuperQuerySpeed", TestEnum.ENABLED }
+        };
 
-        var query = new Query<object>("test1")
+        IQuery<object> query = new Query<object>("test1")
             .AddField("more")
             .AddField("things")
             .AddField("in_a_select")
@@ -431,7 +431,7 @@ public class QueryStringBuilderTests
                 .AddArguments(mySubDict));
 
         // Act
-        var builder = new QueryStringBuilder();
+        QueryStringBuilder builder = new();
         builder.AddFields(query);
         string addParamStr = builder.QueryString.ToString();
 
@@ -443,16 +443,16 @@ public class QueryStringBuilderTests
     public void Build_AllElements_StringMatch()
     {
         // Arrange
-        Dictionary<string, object> mySubDict = new Dictionary<string, object>
-            {
-                {"subMake", "aston martin"},
-                {"subState", "ca"},
-                {"subLimit", 1},
-                {"__debug", TestEnum.DISABLED },
-                {"SuperQuerySpeed", TestEnum.ENABLED }
-            };
+        Dictionary<string, object> mySubDict = new()
+        {
+            { "subMake", "aston martin" },
+            { "subState", "ca" },
+            { "subLimit", 1 },
+            { "__debug", TestEnum.DISABLED },
+            { "SuperQuerySpeed", TestEnum.ENABLED }
+        };
 
-        var query = new Query<object>("test1")
+        IQuery<object> query = new Query<object>("test1")
             .Alias("test1Alias")
             .AddField("more")
             .AddField("things")
@@ -474,7 +474,7 @@ public class QueryStringBuilderTests
     public void QueryWithoutField()
     {
         // Arrange
-        var query = new Query<object>("test");
+        Query<object> query = new("test");
 
         // Act
         string buildStr = query.Build();

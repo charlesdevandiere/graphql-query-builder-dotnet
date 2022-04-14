@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using GraphQL.Query.Builder.UnitTests.Models;
 using System.Linq;
+using GraphQL.Query.Builder.UnitTests.Models;
 using Xunit;
 
 namespace GraphQL.Query.Builder.UnitTests;
@@ -10,7 +10,7 @@ public class QueryOfTTests
     [Fact]
     public void TestAddField()
     {
-        var query = new Query<Car>("car");
+        Query<Car> query = new("car");
         query.AddField(c => c.Name);
 
         Assert.Equal(new List<string> { nameof(Car.Name) }, query.SelectList);
@@ -19,7 +19,7 @@ public class QueryOfTTests
     [Fact]
     public void TestAddField_subQuery()
     {
-        var query = new Query<Car>("car");
+        Query<Car> query = new("car");
         query.AddField(c => c.Color, sq => sq);
 
         Assert.Equal(nameof(Car.Color), (query.SelectList[0] as IQuery<Color>).Name);
@@ -28,7 +28,7 @@ public class QueryOfTTests
     [Fact]
     public void TestAddField_customFormatter()
     {
-        var query = new Query<Car>("car", options: new QueryOptions
+        Query<Car> query = new("car", options: new QueryOptions
         {
             Formatter = property => $"__{property.Name.ToLower()}"
         });
@@ -40,7 +40,7 @@ public class QueryOfTTests
     [Fact]
     public void TestAddField_subQuery_customFormatter()
     {
-        var query = new Query<Car>("car", options: new QueryOptions
+        Query<Car> query = new("car", options: new QueryOptions
         {
             Formatter = property => $"__{property.Name.ToLower()}"
         });
@@ -52,7 +52,7 @@ public class QueryOfTTests
     [Fact]
     public void TestQuery()
     {
-        var query = new Query<Car>(nameof(Car))
+        IQuery<Car>? query = new Query<Car>(nameof(Car))
             .AddField(car => car.Name)
             .AddField(car => car.Price)
             .AddField(
@@ -68,19 +68,19 @@ public class QueryOfTTests
         Assert.Equal(nameof(Car.Price), query.SelectList[1]);
 
         Assert.Equal(nameof(Car.Color), (query.SelectList[2] as IQuery<Color>).Name);
-        var expectedSubSelectList = new List<string>
-            {
-                nameof(Color.Red),
-                nameof(Color.Green),
-                nameof(Color.Blue)
-            };
+        List<string> expectedSubSelectList = new()
+        {
+            nameof(Color.Red),
+            nameof(Color.Green),
+            nameof(Color.Blue)
+        };
         Assert.Equal(expectedSubSelectList, (query.SelectList[2] as IQuery<Color>).SelectList);
     }
 
     [Fact]
     public void TestQuery_build()
     {
-        var query = new Query<Car>("car")
+        IQuery<Car>? query = new Query<Car>("car")
             .AddArguments(new { id = "yk8h4vn0", km = 2100, imported = true, page = new { from = 1, to = 100 } })
             .AddField(car => car.Name)
             .AddField(car => car.Price)
@@ -99,7 +99,7 @@ public class QueryOfTTests
     [Fact]
     public void TestSubSelectWithList()
     {
-        var query = new Query<ObjectWithList>("object")
+        IQuery<ObjectWithList>? query = new Query<ObjectWithList>("object")
             .AddField<SubObject>(c => c.IEnumerable, sq => sq)
             .AddField<SubObject>(c => c.List, sq => sq)
             .AddField<SubObject>(c => c.IQueryable, sq => sq)
@@ -113,10 +113,10 @@ public class QueryOfTTests
 
     class ObjectWithList
     {
-        public IEnumerable<SubObject> IEnumerable { get; set; }
-        public List<SubObject> List { get; set; }
-        public IQueryable<SubObject> IQueryable { get; set; }
-        public SubObject[] Array { get; set; }
+        public IEnumerable<SubObject>? IEnumerable { get; set; }
+        public List<SubObject>? List { get; set; }
+        public IQueryable<SubObject>? IQueryable { get; set; }
+        public SubObject[]? Array { get; set; }
     }
 
     class SubObject

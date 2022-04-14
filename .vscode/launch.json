@@ -8,6 +8,7 @@
       "preLaunchTask": "build",
       "program": "${workspaceFolder}/sample/Pokedex/bin/Debug/net6.0/Pokedex.dll",
       "args": [
+        "bulbasaur",
         "pikachu"
       ],
       "cwd": "${workspaceFolder}/sample/Pokedex",

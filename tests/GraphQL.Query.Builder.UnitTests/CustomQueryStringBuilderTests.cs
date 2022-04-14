@@ -9,8 +9,11 @@ public class CustomQueryStringBuilderTests
     [Fact]
     public void TestOverride()
     {
-        string query = new Query<object>("something",
-                new QueryOptions { QueryStringBuilderFactory = () => new ConstantCaseEnumQueryStringBuilder() })
+        QueryOptions options = new()
+        {
+            QueryStringBuilderFactory = () => new ConstantCaseEnumQueryStringBuilder()
+        };
+        string query = new Query<object>("something", options)
             .AddArgument("case", Cases.ConstantCase)
             .AddField("some")
             .Build();
@@ -30,13 +33,13 @@ public class CustomQueryStringBuilderTests
         protected internal override string FormatQueryParam(object value) =>
             value switch
             {
-                Enum e => this.ToConstantCase(e.ToString()),
+                Enum e => ToConstantCase(e.ToString()),
                 _ => base.FormatQueryParam(value)
             };
 
-        private string ToConstantCase(string name)
+        private static string ToConstantCase(string name)
         {
-            var sb = new StringBuilder();
+            StringBuilder sb = new();
             bool firstUpperLetter = true;
             foreach (char c in name)
             {
@@ -44,7 +47,7 @@ public class CustomQueryStringBuilderTests
                 {
                     if (!firstUpperLetter)
                     {
-                        sb.Append("_");
+                        sb.Append('_');
                     }
                     firstUpperLetter = false;
                 }

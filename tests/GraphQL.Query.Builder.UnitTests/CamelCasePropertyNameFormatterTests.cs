@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 using GraphQL.Query.Builder.UnitTests.Models;
 using Xunit;
 

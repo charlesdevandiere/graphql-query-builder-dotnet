@@ -11,7 +11,7 @@ public static class CamelCasePropertyNameFormatter
     public static Func<PropertyInfo, string> Format = property =>
     {
         RequiredArgument.NotNull(property, nameof(property));
-        
+
         return char.ToLowerInvariant(property.Name[0]) + property.Name.Substring(1);
     };
 }

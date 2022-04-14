@@ -50,7 +50,7 @@ public class QueryStringBuilder : IQueryStringBuilder
     /// <param name="value"></param>
     /// <returns>The formatted query param.</returns>
     /// <exception cref="InvalidDataException">Invalid Object Type in Param List</exception>
-    internal protected virtual string FormatQueryParam(object value)
+    protected internal virtual string FormatQueryParam(object value)
     {
         switch (value)
         {
@@ -110,8 +110,8 @@ public class QueryStringBuilder : IQueryStringBuilder
                 return $"{{{string.Join(",", dictValue.Select(e => this.FormatQueryParam(e)))}}}";
 
             case IEnumerable enumerableValue:
-                var items = new List<string>();
-                foreach (var item in enumerableValue)
+                List<string> items = new();
+                foreach (object item in enumerableValue)
                 {
                     items.Add(this.FormatQueryParam(item));
                 }
@@ -143,11 +143,11 @@ public class QueryStringBuilder : IQueryStringBuilder
 
     /// <summary>Adds query params to the query string.</summary>
     /// <param name="query">The query.</param>
-    internal protected void AddParams<TSource>(IQuery<TSource> query)
+    protected internal void AddParams<TSource>(IQuery<TSource> query)
     {
         RequiredArgument.NotNull(query, nameof(query));
 
-        foreach (var param in query.Arguments)
+        foreach (KeyValuePair<string, object> param in query.Arguments)
         {
             this.QueryString.Append($"{param.Key}:{this.FormatQueryParam(param.Value)},");
         }
@@ -161,7 +161,7 @@ public class QueryStringBuilder : IQueryStringBuilder
     /// <summary>Adds fields to the query sting.</summary>
     /// <param name="query">The query.</param>
     /// <exception cref="ArgumentException">Invalid Object in Field List</exception>
-    internal protected void AddFields<TSource>(IQuery<TSource> query)
+    protected internal void AddFields<TSource>(IQuery<TSource> query)
     {
         foreach (object item in query.SelectList)
         {

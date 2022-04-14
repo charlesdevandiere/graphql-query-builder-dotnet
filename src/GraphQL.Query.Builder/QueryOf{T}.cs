@@ -70,7 +70,7 @@ public class Query<TSource> : IQuery<TSource>
         RequiredArgument.NotNull(selector, nameof(selector));
 
         PropertyInfo property = GetPropertyInfo(selector);
-        string name = GetPropertyName(property);
+        string name = this.GetPropertyName(property);
 
         this.SelectList.Add(name);
 
@@ -103,9 +103,9 @@ public class Query<TSource> : IQuery<TSource>
         RequiredArgument.NotNull(build, nameof(build));
 
         PropertyInfo property = GetPropertyInfo(selector);
-        string name = GetPropertyName(property);
+        string name = this.GetPropertyName(property);
 
-        return AddField(name, build);
+        return this.AddField(name, build);
     }
 
     /// <summary>Adds a sub-list field to the query.</summary>
@@ -122,9 +122,9 @@ public class Query<TSource> : IQuery<TSource>
         RequiredArgument.NotNull(build, nameof(build));
 
         PropertyInfo property = GetPropertyInfo(selector);
-        string name = GetPropertyName(property);
+        string name = this.GetPropertyName(property);
 
-        return AddField(name, build);
+        return this.AddField(name, build);
     }
 
     /// <summary>Adds a sub-object field to the query.</summary>
@@ -140,7 +140,7 @@ public class Query<TSource> : IQuery<TSource>
         RequiredArgument.NotNullOrEmpty(field, nameof(field));
         RequiredArgument.NotNull(build, nameof(build));
 
-        var query = new Query<TSubSource>(field, this.options);
+        Query<TSubSource> query = new(field, this.options);
         IQuery<TSubSource> subQuery = build.Invoke(query);
 
         this.SelectList.Add(subQuery);
@@ -192,7 +192,7 @@ public class Query<TSource> : IQuery<TSource>
         foreach (PropertyInfo property in properties)
         {
             this.Arguments.Add(
-                GetPropertyName(property),
+                this.GetPropertyName(property),
                 property.GetValue(arguments));
         }
 
@@ -218,27 +218,25 @@ public class Query<TSource> : IQuery<TSource>
     {
         RequiredArgument.NotNull(lambda, nameof(lambda));
 
-        MemberExpression member = lambda.Body as MemberExpression;
-        if (member == null)
+        if (lambda.Body is not MemberExpression member)
         {
-            throw new ArgumentException($"Expression '{lambda.ToString()}' body is not member expression.");
+            throw new ArgumentException($"Expression '{lambda}' body is not member expression.");
         }
 
-        PropertyInfo propertyInfo = member.Member as PropertyInfo;
-        if (propertyInfo == null)
+        if (member.Member is not PropertyInfo propertyInfo)
         {
-            throw new ArgumentException($"Expression '{lambda.ToString()}' not refers to a property.");
+            throw new ArgumentException($"Expression '{lambda}' not refers to a property.");
         }
 
-        if (propertyInfo.ReflectedType == null)
+        if (propertyInfo.ReflectedType is null)
         {
-            throw new ArgumentException($"Expression '{lambda.ToString()}' not refers to a property.");
+            throw new ArgumentException($"Expression '{lambda}' not refers to a property.");
         }
 
         Type type = typeof(TSource);
         if (type != propertyInfo.ReflectedType && !propertyInfo.ReflectedType.IsAssignableFrom(type))
         {
-            throw new ArgumentException($"Expression '{lambda.ToString()}' refers to a property that is not from type {type}.");
+            throw new ArgumentException($"Expression '{lambda}' refers to a property that is not from type {type}.");
         }
 
         return propertyInfo;
@@ -248,6 +246,8 @@ public class Query<TSource> : IQuery<TSource>
     {
         RequiredArgument.NotNull(property, nameof(property));
 
-        return this.options?.Formatter is not null ? this.options?.Formatter.Invoke(property) : property.Name;
+        return this.options?.Formatter is not null
+            ? this.options?.Formatter.Invoke(property)
+            : property.Name;
     }
 }

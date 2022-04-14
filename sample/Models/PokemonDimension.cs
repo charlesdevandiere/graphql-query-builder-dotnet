@@ -1,18 +1,17 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
-namespace Shared.Models
+namespace Shared.Models;
+
+public class PokemonDimension
 {
-    public class PokemonDimension
+    [JsonPropertyName("minimum")]
+    public string Minimum { get; set; }
+
+    [JsonPropertyName("maximum")]
+    public string Maximum { get; set; }
+
+    public override string ToString()
     {
-        [JsonPropertyName("minimum")]
-        public string Minimum { get; set; }
-
-        [JsonPropertyName("maximum")]
-        public string Maximum { get; set; }
-
-        public override string ToString()
-        {
-            return $"{this.Minimum} - {this.Maximum}";
-        }
+        return $"{this.Minimum} - {this.Maximum}";
     }
 }

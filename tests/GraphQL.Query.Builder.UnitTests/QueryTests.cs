@@ -15,7 +15,7 @@ public class QueryTests
         // Arrange
         const string name = "user";
 
-        var query = new Query<object>(name);
+        Query<object> query = new(name);
 
         // Assert
         Assert.Equal(name, query.Name);
@@ -31,13 +31,13 @@ public class QueryTests
     public void AddField_list()
     {
         // Arrange
-        var query = new Query<object>("something");
+        Query<object> query = new("something");
 
-        List<string> selectList = new List<string>()
-            {
-                "id",
-                "name"
-            };
+        List<string> selectList = new()
+        {
+            "id",
+            "name"
+        };
 
         // Act
         foreach (string field in selectList)
@@ -53,7 +53,7 @@ public class QueryTests
     public void AddField_string()
     {
         // Arrange
-        var query = new Query<object>("something");
+        Query<object> query = new("something");
 
         const string select = "id";
 
@@ -68,18 +68,18 @@ public class QueryTests
     public void AddField_chained()
     {
         // Arrange
-        var query = new Query<object>("something");
+        Query<object> query = new("something");
 
         // Act
         query.AddField("some").AddField("thing").AddField("else");
 
         // Assert
-        List<string> shouldEqual = new List<string>()
-            {
-                "some",
-                "thing",
-                "else"
-            };
+        List<string> shouldEqual = new()
+        {
+            "some",
+            "thing",
+            "else"
+        };
         Assert.Equal(shouldEqual, query.SelectList);
     }
 
@@ -87,7 +87,7 @@ public class QueryTests
     public void AddField_array()
     {
         // Arrange
-        var query = new Query<object>("something");
+        Query<object> query = new("something");
 
         string[] selects =
         {
@@ -102,11 +102,11 @@ public class QueryTests
         }
 
         // Assert
-        List<string> shouldEqual = new List<string>()
-            {
-                "id",
-                "name"
-            };
+        List<string> shouldEqual = new()
+        {
+            "id",
+            "name"
+        };
         Assert.Equal(shouldEqual, query.SelectList);
     }
 
@@ -114,7 +114,7 @@ public class QueryTests
     public void AddArgument_string_number()
     {
         // Arrange
-        var query = new Query<object>("something");
+        Query<object> query = new("something");
 
         // Act
         query.AddArgument("id", 1);
@@ -127,7 +127,7 @@ public class QueryTests
     public void AddArgument_string_string()
     {
         // Arrange
-        var query = new Query<object>("something");
+        Query<object> query = new("something");
 
         // Act
         query.AddArgument("name", "danny");
@@ -140,13 +140,13 @@ public class QueryTests
     public void AddArgument_string_dictionary()
     {
         // Arrange
-        var query = new Query<object>("something");
+        Query<object> query = new("something");
 
-        Dictionary<string, int> dict = new Dictionary<string, int>()
-            {
-                {"from", 1},
-                {"to", 100}
-            };
+        Dictionary<string, int> dict = new()
+        {
+            { "from", 1 },
+            { "to", 100 }
+        };
 
         // Act
         query.AddArgument("price", dict);
@@ -162,9 +162,9 @@ public class QueryTests
     public void AddArguments_object()
     {
         // Arrange
-        var query = new Query<object>("car");
+        Query<object> query = new("car");
 
-        var car = new Car
+        Car car = new()
         {
             Name = "Bee",
             Price = 10000
@@ -183,7 +183,7 @@ public class QueryTests
     public void AddArguments_anonymous()
     {
         // Arrange
-        var query = new Query<object>("something");
+        Query<object> query = new("something");
 
         var @object = new
         {
@@ -204,13 +204,13 @@ public class QueryTests
     public void AddArguments_dictionary()
     {
         // Arrange
-        var query = new Query<object>("something");
+        Query<object> query = new("something");
 
         Dictionary<string, object> dictionary = new()
-            {
-                { "from", 1 },
-                { "to", 100 }
-            };
+        {
+            { "from", 1 },
+            { "to", 100 }
+        };
 
         // Act
         query.AddArguments(dictionary);
@@ -225,13 +225,13 @@ public class QueryTests
     public void AddArgument_chained()
     {
         // Arrange
-        var query = new Query<object>("something");
+        Query<object> query = new("something");
 
-        Dictionary<string, int> dict = new Dictionary<string, int>()
-            {
-                {"from", 1},
-                {"to", 100}
-            };
+        Dictionary<string, int> dict = new()
+        {
+            { "from", 1 },
+            { "to", 100 }
+        };
 
         // Act
         query
@@ -240,12 +240,12 @@ public class QueryTests
             .AddArgument("price", dict);
 
         // Assert
-        Dictionary<string, object> shouldPass = new Dictionary<string, object>()
-            {
-                {"id", 123},
-                {"name", "danny"},
-                {"price", dict}
-            };
+        Dictionary<string, object> shouldPass = new()
+        {
+            { "id", 123 },
+            { "name", "danny" },
+            { "price", dict }
+        };
         Assert.Equal(shouldPass, query.Arguments);
     }
 }

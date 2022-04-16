@@ -5,6 +5,7 @@ using GraphQL;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
 using GraphQL.Query.Builder;
+using GraphQL.Query.Builder.Formatter.NewtonsoftJson;
 using Shared.Models;
 
 namespace Pokedex;
@@ -15,7 +16,8 @@ class PokemonService
 
     private readonly QueryOptions options = new()
     {
-        Formatter = CamelCasePropertyNameFormatter.Format
+        // Formatter = CamelCasePropertyNameFormatter.Format
+        Formatter = NewtonsoftJsonPropertyNameFormatter.Format
     };
 
     /// <summary>Initializes a new instance of the <see cref="PokemonService" /> class.</summary>

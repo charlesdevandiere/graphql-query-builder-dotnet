@@ -49,6 +49,5 @@ steps:
       summaryFileLocation: '**/Cobertura.xml'
 
   - publish: $(Build.ArtifactStagingDirectory)/out
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     artifact: out
     displayName: Publish artifact

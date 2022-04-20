@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using GraphQL.Query.Builder.UnitTests.Models;
 using Xunit;
 
@@ -28,6 +29,13 @@ public class QueryStringBuilderTests
         Assert.Equal(
             "\"{\\\"foo\\\":\\\"bar\\\",\\\"array\\\":[1,2]}\"",
             new QueryStringBuilder().FormatQueryParam(value));
+    }
+
+    [Fact]
+    public void TestFormatQueryParam_char()
+    {
+        char value = 'a';
+        Assert.Equal("\"a\"", new QueryStringBuilder().FormatQueryParam(value));
     }
 
     [Fact]
@@ -246,7 +254,9 @@ public class QueryStringBuilderTests
             }
         };
 
-        Assert.Equal("{Addresses:[{Number:123,Street:\"Street\"},{Number:123,Street:\"Street 2\"}],Age:10,Name:\"Test\",Orders:{Price:123,Product:\"Product 1\"}}", new QueryStringBuilder().FormatQueryParam(anonymous));
+        Assert.Equal(
+            "{Addresses:[{Number:123,Street:\"Street\"},{Number:123,Street:\"Street 2\"}],Age:10,Name:\"Test\",Orders:{Price:123,Product:\"Product 1\"}}",
+            new QueryStringBuilder().FormatQueryParam(anonymous));
     }
 
     [Fact]
@@ -275,7 +285,9 @@ public class QueryStringBuilderTests
                 }
         };
 
-        Assert.Equal("{Age:10,Name:\"Test\",Orders:[{Product:{Color:{Blue:83,Green:12,Red:45},Name:\"Bee\",Price:10000}}]}", new QueryStringBuilder().FormatQueryParam(@object));
+        Assert.Equal(
+            "{Age:10,Name:\"Test\",Orders:[{Product:{Color:{Blue:83,Green:12,Red:45},Name:\"Bee\",Price:10000}}]}",
+            new QueryStringBuilder().FormatQueryParam(@object));
 
         // with inner object with null property
         @object = new()
@@ -296,22 +308,20 @@ public class QueryStringBuilderTests
                 }
         };
 
-        Assert.Equal("{Age:10,Name:\"Test\",Orders:[{Product:{Name:\"Bee\",Price:10000}}]}", new QueryStringBuilder().FormatQueryParam(@object));
+        Assert.Equal(
+            "{Age:10,Name:\"Test\",Orders:[{Product:{Name:\"Bee\",Price:10000}}]}",
+            new QueryStringBuilder().FormatQueryParam(@object));
     }
 
     [Fact]
     public void BuildQueryParam_NestedListType_ParseNestedList()
     {
-        // Arrange
-        QueryStringBuilder queryString = new();
         List<object> objList = new(new object[] { "aa", "bb", "cc" });
-
         Dictionary<string, object> fromToMap = new()
         {
             { "from", 444.45 },
             { "to", 555.45 },
         };
-
         Dictionary<string, object> nestedListMap = new()
         {
             { "from", 123 },
@@ -321,27 +331,20 @@ public class QueryStringBuilderTests
             { "name", TestEnum.HAYstack }
         };
 
-        // Act
-        string nestedListMapStr = queryString.FormatQueryParam(nestedListMap);
-
-        // Assert
-        Assert.Equal("{from:123,to:454,recurse:[\"aa\",\"bb\",\"cc\"],map:{from:444.45,to:555.45},name:HAYstack}", nestedListMapStr);
+        Assert.Equal(
+            "{from:123,to:454,recurse:[\"aa\",\"bb\",\"cc\"],map:{from:444.45,to:555.45},name:HAYstack}",
+            new QueryStringBuilder().FormatQueryParam(nestedListMap));
     }
 
     [Fact]
     public void Where_QueryString_ParseQueryString()
     {
-        // Arrange
-        Query<Car> query = new("test1");
-
         List<object> objList = new(new object[] { "aa", "bb", "cc" });
-
         Dictionary<string, object> fromToMap = new()
         {
             { "from", 444.45 },
             { "to", 555.45 },
         };
-
         Dictionary<string, object> nestedListMap = new()
         {
             { "from", 123 },
@@ -350,36 +353,27 @@ public class QueryStringBuilderTests
             { "map", fromToMap },
             { "name", TestEnum.HAYstack }
         };
-
-        query
+        IQuery<Car> query = new Query<Car>("test1")
             .AddField("name")
             .AddArguments(nestedListMap);
 
         QueryStringBuilder queryString = new();
-
-        // Act
         queryString.AddParams(query);
 
-        string addParamStr = queryString.QueryString.ToString();
-
-        // Assert
-        Assert.Equal("from:123,to:454,recurse:[\"aa\",\"bb\",\"cc\"],map:{from:444.45,to:555.45},name:HAYstack", addParamStr);
+        Assert.Equal(
+            "from:123,to:454,recurse:[\"aa\",\"bb\",\"cc\"],map:{from:444.45,to:555.45},name:HAYstack",
+            queryString.QueryString.ToString());
     }
 
     [Fact]
     public void Where_ClearQueryString_EmptyQueryString()
     {
-        // Arrange
-        Query<object> query = new("test1");
-
         List<object> objList = new(new object[] { "aa", "bb", "cc" });
-
         Dictionary<string, object> fromToMap = new()
         {
             { "from", 444.45 },
             { "to", 555.45 },
         };
-
         Dictionary<string, object> nestedListMap = new()
         {
             { "from", 123 },
@@ -388,29 +382,20 @@ public class QueryStringBuilderTests
             { "map", fromToMap },
             { "name", TestEnum.HAYstack }
         };
-
-        query
+        IQuery<object> query = new Query<object>("test1")
             .AddField("name")
             .AddArguments(nestedListMap);
 
         QueryStringBuilder queryString = new();
-
         queryString.AddParams(query);
-
-        // Act
         queryString.QueryString.Clear();
 
-        // Assert
         Assert.True(string.IsNullOrEmpty(queryString.QueryString.ToString()));
     }
 
     [Fact]
     public void Select_QueryString_ParseQueryString()
     {
-        // Arrange
-
-        Query<object> subSelect = new("subSelect");
-
         Dictionary<string, object> mySubDict = new()
         {
             { "subMake", "aston martin" },
@@ -419,7 +404,6 @@ public class QueryStringBuilderTests
             { "__debug", TestEnum.DISABLED },
             { "SuperQuerySpeed", TestEnum.ENABLED }
         };
-
         IQuery<object> query = new Query<object>("test1")
             .AddField("more")
             .AddField("things")
@@ -430,19 +414,17 @@ public class QueryStringBuilderTests
                 .AddField("subModel")
                 .AddArguments(mySubDict));
 
-        // Act
         QueryStringBuilder builder = new();
         builder.AddFields(query);
-        string addParamStr = builder.QueryString.ToString();
 
-        // Assert
-        Assert.Equal("more things in_a_select subSelect(subMake:\"aston martin\",subState:\"ca\",subLimit:1,__debug:DISABLED,SuperQuerySpeed:ENABLED){subName subMake subModel}", addParamStr);
+        Assert.Equal(
+            "more things in_a_select subSelect(subMake:\"aston martin\",subState:\"ca\",subLimit:1,__debug:DISABLED,SuperQuerySpeed:ENABLED){subName subMake subModel}",
+            builder.QueryString.ToString());
     }
 
     [Fact]
     public void Build_AllElements_StringMatch()
     {
-        // Arrange
         Dictionary<string, object> mySubDict = new()
         {
             { "subMake", "aston martin" },
@@ -451,7 +433,6 @@ public class QueryStringBuilderTests
             { "__debug", TestEnum.DISABLED },
             { "SuperQuerySpeed", TestEnum.ENABLED }
         };
-
         IQuery<object> query = new Query<object>("test1")
             .Alias("test1Alias")
             .AddField("more")
@@ -463,23 +444,27 @@ public class QueryStringBuilderTests
                 .AddField("subModel")
                 .AddArguments(mySubDict));
 
-        // Act
-        string buildStr = query.Build();
-
-        // Assert
-        Assert.Equal("test1Alias:test1{more things in_a_select subSelect(subMake:\"aston martin\",subState:\"ca\",subLimit:1,__debug:DISABLED,SuperQuerySpeed:ENABLED){subName subMake subModel}}", buildStr);
+        Assert.Equal(
+            "test1Alias:test1{more things in_a_select subSelect(subMake:\"aston martin\",subState:\"ca\",subLimit:1,__debug:DISABLED,SuperQuerySpeed:ENABLED){subName subMake subModel}}",
+            new QueryStringBuilder().Build(query));
     }
 
     [Fact]
     public void QueryWithoutField()
     {
-        // Arrange
         Query<object> query = new("test");
 
-        // Act
-        string buildStr = query.Build();
+        Assert.Equal("test", new QueryStringBuilder().Build(query));
+    }
 
-        // Assert
-        Assert.Equal("test", buildStr);
+    [Fact]
+    public void QueryWithFormatter()
+    {
+        static string formatter(PropertyInfo property) => $"FIELD_{property.Name}";
+
+        QueryStringBuilder builder = new(formatter);
+        string param = builder.FormatQueryParam(new { Id = "urv7fe53", Name = "Bob" });
+
+        Assert.Equal("{FIELD_Id:\"urv7fe53\",FIELD_Name:\"Bob\"}", param);
     }
 }

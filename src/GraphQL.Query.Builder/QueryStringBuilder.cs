@@ -58,6 +58,9 @@ public class QueryStringBuilder : IQueryStringBuilder
                 string encoded = strValue.Replace("\"", "\\\"");
                 return $"\"{encoded}\"";
 
+            case char charValue:
+                return $"\"{charValue}\"";
+
             case byte byteValue:
                 return byteValue.ToString();
 
@@ -81,9 +84,6 @@ public class QueryStringBuilder : IQueryStringBuilder
 
             case ulong ulongValue:
                 return ulongValue.ToString();
-
-            case char charValue:
-                return charValue.ToString();
 
             case float floatValue:
                 return floatValue.ToString(CultureInfo.CreateSpecificCulture("en-us"));

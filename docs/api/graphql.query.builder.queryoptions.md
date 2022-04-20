@@ -18,15 +18,15 @@ Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) 
 
 ### **Formatter**
 
-Gets or sets the formatter.
+Gets or sets the property name formatter.
 
 ```csharp
-public Func<string, string> Formatter { get; set; }
+public Func<PropertyInfo, string> Formatter { get; set; }
 ```
 
 #### Property Value
 
-[Func&lt;String, String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.func-2)<br>
+[Func&lt;PropertyInfo, String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.func-2)<br>
 
 ### **QueryStringBuilderFactory**
 

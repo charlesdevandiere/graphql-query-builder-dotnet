@@ -33,11 +33,24 @@ public StringBuilder QueryString { get; }
 
 ### **QueryStringBuilder()**
 
-
+Initializes a new instance of the [QueryStringBuilder](./graphql.query.builder.querystringbuilder) class.
 
 ```csharp
 public QueryStringBuilder()
 ```
+
+### **QueryStringBuilder(Func&lt;PropertyInfo, String&gt;)**
+
+Initializes a new instance of the [QueryStringBuilder](./graphql.query.builder.querystringbuilder) class.
+
+```csharp
+public QueryStringBuilder(Func<PropertyInfo, string> formatter)
+```
+
+#### Parameters
+
+`formatter` [Func&lt;PropertyInfo, String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.func-2)<br>
+The property name formatter
 
 ## Methods
 
@@ -62,6 +75,7 @@ Formats query param.
  - Key value pair: `foo:"bar"` or `foo:10` ...
  - List: `["foo","bar"]` or `[1,2]` ...
  - Dictionary: `{foo:"bar",b:10}`
+ - Object: `{foo:"bar",b:10}`
 
 ```csharp
 protected internal string FormatQueryParam(object value)
@@ -80,6 +94,24 @@ The formatted query param.
 
 [InvalidDataException](https://docs.microsoft.com/en-us/dotnet/api/system.io.invaliddataexception)<br>
 Invalid Object Type in Param List
+
+### **ObjectToDictionary(Object)**
+
+Convert object into dictionary.
+
+```csharp
+internal Dictionary<string, object> ObjectToDictionary(object object)
+```
+
+#### Parameters
+
+`object` [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object)<br>
+The object.
+
+#### Returns
+
+[Dictionary&lt;String, Object&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2)<br>
+The object as dictionary.
 
 ### **AddParams&lt;TSource&gt;(IQuery&lt;TSource&gt;)**
 

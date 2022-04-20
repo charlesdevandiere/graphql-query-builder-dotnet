@@ -14,7 +14,7 @@ A tool to build GraphQL query from a C# model.
 Run this command with dotnet CLI:
 
 ```console
-> dotnet add package GraphQL.Query.Builder
+dotnet add package GraphQL.Query.Builder
 ```
 
 ## Usage
@@ -81,33 +81,24 @@ humans (id: "uE78f5hq") {
 ```
 
 By default, the `AddField()` method use the property name as field name.
-You can use custom formater or JsonPropertyAttribute to change this behavior.
+You can change this behavior by providing a custom formatter.
 
 ```csharp
-class Human
+QueryOptions options = new()
 {
-    [JsonProperty("firstName")]
-    public string FirstName { get; set; }
+    Formater = // Your custom formatter
+};
 
-    [JsonProperty("lastName")]
-    public string LastName { get; set; }
-
-    [JsonProperty("homePlanet")]
-    public Planet HomePlanet { get; set; }
-
-    [JsonProperty("friends")]
-    public IEnumerable<Human> Friends { get; set; }
-}
+var query = new Query<Human>("human", options);
 ```
 
-```csharp
-var query = new Query(options: new QueryOptions
-    {
-        Formater = QueryFormaters.CamelCaseFormater
-    });
-```
+Formater's type is ```Func<PropertyInfo, string>```
 
-Formater's type is ```Func<string, string>```
+There are a few existing formatters :
+
+- [CamelCasePropertyNameFormatter](api/graphql.query.builder.camelcasepropertynameformatter.md) : transforms property name into camel-case.
+- [GraphQL.Query.Builder.Formatter.SystemTextJson](https://github.com/charlesdevandiere/graphql-query-builder-formatter-systemtextjson) : use `JsonPropertyNameAttribute` value.
+- [GraphQL.Query.Builder.Formatter.NewtonsoftJson](https://github.com/charlesdevandiere/graphql-query-builder-formatter-newtonsoftjson) : use `JsonPropertyAttribute` value.
 
 ### Build the query
 

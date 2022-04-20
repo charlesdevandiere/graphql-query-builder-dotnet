@@ -191,7 +191,7 @@ public class QueryStringBuilder : IQueryStringBuilder
     /// <returns>The GraphQL query as string, without outer enclosing block.</returns>
     public string Build<TSource>(IQuery<TSource> query)
     {
-        if (!String.IsNullOrWhiteSpace(query.AliasName))
+        if (!string.IsNullOrWhiteSpace(query.AliasName))
         {
             this.QueryString.Append($"{query.AliasName}:");
         }

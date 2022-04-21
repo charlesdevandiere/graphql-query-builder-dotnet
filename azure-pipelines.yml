@@ -46,7 +46,10 @@ steps:
     displayName: 'Publish code coverage'
     inputs:
       codeCoverageTool: cobertura
-      summaryFileLocation: '**/Cobertura.xml'
+      summaryFileLocation: ./tests/Cobertura.xml
+      pathToSources: ./
+      reportDirectory: ./tests/coverage
+      failIfCoverageEmpty: true
 
   - publish: $(Build.ArtifactStagingDirectory)/out
     artifact: out

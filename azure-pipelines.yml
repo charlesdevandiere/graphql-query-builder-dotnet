@@ -46,9 +46,8 @@ steps:
     displayName: 'Publish code coverage'
     inputs:
       codeCoverageTool: cobertura
-      summaryFileLocation: '**/Cobertura.xml'
+      summaryFileLocation: ./tests/coverage/Cobertura.xml
 
   - publish: $(Build.ArtifactStagingDirectory)/out
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     artifact: out
     displayName: Publish artifact

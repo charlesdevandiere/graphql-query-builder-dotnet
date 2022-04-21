@@ -16,14 +16,14 @@ See sample [here](https://github.com/charlesdevandiere/graphql-query-builder-dot
 ## Install
 
 ```console
-> dotnet add package GraphQL.Query.Builder
+dotnet add package GraphQL.Query.Builder
 ```
 
 ## Usage
 
 ```csharp
 // Create the query
-var query = new Query<Human>("humans") // set the name of the query
+IQuery<Human> query = new Query<Human>("humans") // set the name of the query
     .AddArguments(new { id = "uE78f5hq" }) // add query arguments
     .AddField(h => h.FirstName) // add firstName field
     .AddField(h => h.LastName) // add lastName field
@@ -55,8 +55,3 @@ Console.WriteLine("{" + query.Build() + "}");
 // Output:
 // {humans(id:"uE78f5hq"){FirstName LastName HomePlanet{Name}Friends FirstName LastName}}
 ```
-
-## Dependencies
-
-- [Dawn.Guard](https://www.nuget.org/packages/Dawn.Guard/) (>= 1.12.0)
-- [Newtonsoft.Json](https://www.nuget.org/packages/GraphQL.Client/) (>= 12.0.3)

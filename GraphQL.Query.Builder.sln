@@ -1,21 +1,56 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32407.343
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{202101BE-DF6E-4893-99DA-F9B8910254F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Query.Builder", "src\GraphQL.Query.Builder\GraphQL.Query.Builder.csproj", "{DA0E8765-8C2D-4E72-A0DE-C3F4DA9BBCED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Query.Builder", "src\GraphQL.Query.Builder\GraphQL.Query.Builder.csproj", "{DA0E8765-8C2D-4E72-A0DE-C3F4DA9BBCED}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6426820E-52EF-437A-B528-18FE939AEB84}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Query.Builder.UnitTests", "tests\GraphQL.Query.Builder.UnitTests\GraphQL.Query.Builder.UnitTests.csproj", "{608A2F7E-24F4-474E-8757-2BABEA8AE005}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Query.Builder.UnitTests", "tests\GraphQL.Query.Builder.UnitTests\GraphQL.Query.Builder.UnitTests.csproj", "{608A2F7E-24F4-474E-8757-2BABEA8AE005}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{C48AF4F4-A750-446E-A4C0-91DEDF0E507F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "sample\Models\Models.csproj", "{816F7AF3-EE23-4DE1-BBEB-50510B3898E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "sample\Models\Models.csproj", "{816F7AF3-EE23-4DE1-BBEB-50510B3898E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pokedex", "sample\Pokedex\Pokedex.csproj", "{3240CA38-D18E-43F4-AA06-5C7FC35E4AA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pokedex", "sample\Pokedex\Pokedex.csproj", "{3240CA38-D18E-43F4-AA06-5C7FC35E4AA0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{619BB24C-CA4A-4117-86AB-DD1FB2E66C77}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		azure-pipelines.yml = azure-pipelines.yml
+		generate-documentation.bat = generate-documentation.bat
+		GitVersion.yml = GitVersion.yml
+		LICENSE = LICENSE
+		logo.pdn = logo.pdn
+		logo.png = logo.png
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{E5BDA139-5C76-4260-8FA8-60D306924304}"
+	ProjectSection(SolutionItems) = preProject
+		docs\_config.yml = docs\_config.yml
+		docs\README.md = docs\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "api", "api", "{AF5F52DB-31E5-4A57-ACBF-1392F9AF3C55}"
+	ProjectSection(SolutionItems) = preProject
+		docs\api\graphql.query.builder.iquery-1.md = docs\api\graphql.query.builder.iquery-1.md
+		docs\api\graphql.query.builder.iquery.md = docs\api\graphql.query.builder.iquery.md
+		docs\api\graphql.query.builder.iquerystringbuilder.md = docs\api\graphql.query.builder.iquerystringbuilder.md
+		docs\api\graphql.query.builder.query-1.md = docs\api\graphql.query.builder.query-1.md
+		docs\api\graphql.query.builder.queryformatters.md = docs\api\graphql.query.builder.queryformatters.md
+		docs\api\graphql.query.builder.queryoptions.md = docs\api\graphql.query.builder.queryoptions.md
+		docs\api\graphql.query.builder.querystringbuilder.md = docs\api\graphql.query.builder.querystringbuilder.md
+		docs\api\index.md = docs\api\index.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{38907AFF-FAA0-43D0-835C-275BB3E0261A}"
+	ProjectSection(SolutionItems) = preProject
+		.config\dotnet-tools.json = .config\dotnet-tools.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,9 +60,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{DA0E8765-8C2D-4E72-A0DE-C3F4DA9BBCED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -79,10 +111,19 @@ Global
 		{3240CA38-D18E-43F4-AA06-5C7FC35E4AA0}.Release|x86.ActiveCfg = Release|Any CPU
 		{3240CA38-D18E-43F4-AA06-5C7FC35E4AA0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{DA0E8765-8C2D-4E72-A0DE-C3F4DA9BBCED} = {202101BE-DF6E-4893-99DA-F9B8910254F1}
 		{608A2F7E-24F4-474E-8757-2BABEA8AE005} = {6426820E-52EF-437A-B528-18FE939AEB84}
 		{816F7AF3-EE23-4DE1-BBEB-50510B3898E1} = {C48AF4F4-A750-446E-A4C0-91DEDF0E507F}
 		{3240CA38-D18E-43F4-AA06-5C7FC35E4AA0} = {C48AF4F4-A750-446E-A4C0-91DEDF0E507F}
+		{E5BDA139-5C76-4260-8FA8-60D306924304} = {619BB24C-CA4A-4117-86AB-DD1FB2E66C77}
+		{AF5F52DB-31E5-4A57-ACBF-1392F9AF3C55} = {E5BDA139-5C76-4260-8FA8-60D306924304}
+		{38907AFF-FAA0-43D0-835C-275BB3E0261A} = {619BB24C-CA4A-4117-86AB-DD1FB2E66C77}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {464DBCD0-E769-4ECD-8217-FCC5ED5C4657}
 	EndGlobalSection
 EndGlobal

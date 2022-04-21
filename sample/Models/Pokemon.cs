@@ -1,53 +1,60 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
-namespace Shared.Models
+namespace Shared.Models;
+
+public class Pokemon
 {
-    public class Pokemon
+    [JsonPropertyName("attacks")]
+    [JsonProperty("attacks")]
+    public PokemonAttack Attacks { get; set; }
+
+    [JsonPropertyName("height")]
+    [JsonProperty("height")]
+    public PokemonDimension Height { get; set; }
+
+    [JsonPropertyName("id")]
+    [JsonProperty("id")]
+    public string Id { get; set; }
+
+    [JsonPropertyName("name")]
+    [JsonProperty("name")]
+    public string Name { get; set; }
+
+    [JsonPropertyName("number")]
+    [JsonProperty("number")]
+    public string Number { get; set; }
+
+    [JsonPropertyName("types")]
+    [JsonProperty("types")]
+    public string[] Types { get; set; }
+
+    [JsonPropertyName("weight")]
+    [JsonProperty("weight")]
+    public PokemonDimension Weight { get; set; }
+
+    public override string ToString()
     {
-        [JsonProperty("id")]
-        public string Id { get; set; }
-
-        [JsonProperty("number")]
-        public string Number { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("weight")]
-        public PokemonDimension Weight { get; set; }
-
-        [JsonProperty("height")]
-        public PokemonDimension Height { get; set; }
-
-        [JsonProperty("types")]
-        public string[] Types { get; set; }
-
-        [JsonProperty("attacks")]
-        public PokemonAttack Attacks { get; set; }
-
-        public override string ToString()
+        StringBuilder sb = new();
+        sb.AppendLine($"{this.Number} {this.Name}");
+        if (this.Height != null)
         {
-            var sb = new StringBuilder();
-            sb.AppendLine($"{this.Number} {this.Name}");
-            if (this.Height != null)
-            {
-                sb.AppendLine($"Height: {this.Height.ToString()}");
-            }
-            if (this.Weight != null)
-            {
-                sb.AppendLine($"Weight: {this.Weight.ToString()}");
-            }
-            if (this.Types != null && this.Types.Length > 0)
-            {
-                sb.AppendLine($"Types: {string.Join(", ", this.Types)}");
-            }
-            if (this.Attacks != null)
-            {
-                sb.AppendLine(this.Attacks.ToString());
-            }
-
-            return sb.ToString();
+            sb.AppendLine($"Height: {this.Height}");
         }
+        if (this.Weight != null)
+        {
+            sb.AppendLine($"Weight: {this.Weight}");
+        }
+        if (this.Types != null && this.Types.Length > 0)
+        {
+            sb.AppendLine($"Types: {string.Join(", ", this.Types)}");
+        }
+        if (this.Attacks != null)
+        {
+            sb.Append(this.Attacks.ToString());
+        }
+
+        return sb.ToString();
     }
 }

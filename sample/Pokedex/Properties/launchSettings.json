@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Pokedex": {
+      "commandName": "Project",
+      "commandLineArgs": "bulbasaur pikachu"
+    }
+  }
+}

@@ -1,9 +1,8 @@
 using Shared.Models;
 
-namespace Pokedex
+namespace Pokedex;
+
+public class PokemonResponse
 {
-    public class PokemonResponse
-    {
-        public Pokemon Pokemon { get; set; }
-    }
+    public Pokemon? Pokemon { get; set; }
 }

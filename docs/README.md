@@ -47,7 +47,7 @@ class Planet
 After that, you can write a query like this :
 
 ```csharp
-var query = new Query<Human>("humans") // set the name of the query
+IQuery<Human> query = new Query<Human>("humans") // set the name of the query
     .AddArguments(new { id = "uE78f5hq" }) // add query arguments
     .AddField(h => h.FirstName) // add firstName field
     .AddField(h => h.LastName) // add lastName field
@@ -89,7 +89,7 @@ QueryOptions options = new()
     Formater = // Your custom formatter
 };
 
-var query = new Query<Human>("human", options);
+IQuery<Human> query = new Query<Human>("human", options);
 ```
 
 Formater's type is ```Func<PropertyInfo, string>```

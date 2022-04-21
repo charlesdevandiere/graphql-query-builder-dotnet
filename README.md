@@ -23,7 +23,7 @@ dotnet add package GraphQL.Query.Builder
 
 ```csharp
 // Create the query
-Query<Human> query = new("humans") // set the name of the query
+IQuery<Human> query = new Query<Human>("humans") // set the name of the query
     .AddArguments(new { id = "uE78f5hq" }) // add query arguments
     .AddField(h => h.FirstName) // add firstName field
     .AddField(h => h.LastName) // add lastName field

@@ -39,7 +39,7 @@ steps:
       testRunner: xUnit
       testResultsFiles: '**/TestResults.xml'
 
-  - script: dotnet tool run reportgenerator -reports:**/coverage.cobertura.xml -targetdir:tests/coverage -reportTypes:Htlm;Cobertura
+  - script: dotnet tool run reportgenerator -reports:**/coverage.cobertura.xml -targetdir:tests/coverage -reportTypes:Html;Cobertura
     displayName: 'Generate code coverage report'
 
   - task: PublishCodeCoverageResults@1

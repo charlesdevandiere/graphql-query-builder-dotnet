@@ -39,7 +39,7 @@ steps:
       testRunner: xUnit
       testResultsFiles: '**/TestResults.xml'
 
-  - script: dotnet tool run reportgenerator -reports:**/coverage.cobertura.xml -targetdir:tests/coverage "-reportTypes:Html;Cobertura"
+  - script: dotnet tool run reportgenerator -reports:**/coverage.cobertura.xml -targetdir:tests/coverage -reportTypes:Cobertura
     displayName: 'Generate code coverage report'
 
   - task: PublishCodeCoverageResults@1
@@ -47,9 +47,6 @@ steps:
     inputs:
       codeCoverageTool: cobertura
       summaryFileLocation: ./tests/coverage/Cobertura.xml
-      pathToSources: ./
-      reportDirectory: ./tests/coverage
-      failIfCoverageEmpty: true
 
   - publish: $(Build.ArtifactStagingDirectory)/out
     artifact: out

@@ -5,7 +5,6 @@
 [Oo]bj/
 [Bb]in/
 packages/
-TestResults/
 out/
 
 # globs
@@ -51,4 +50,6 @@ Thumbs.db
 /.vs
 
 # test
+TestResults/
+coverage/
 *cobertura.xml

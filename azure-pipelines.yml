@@ -46,7 +46,7 @@ steps:
     displayName: 'Publish code coverage'
     inputs:
       codeCoverageTool: cobertura
-      summaryFileLocation: ./tests/Cobertura.xml
+      summaryFileLocation: ./tests/coverage/Cobertura.xml
       pathToSources: ./
       reportDirectory: ./tests/coverage
       failIfCoverageEmpty: true

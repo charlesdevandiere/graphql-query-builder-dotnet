@@ -47,6 +47,10 @@ public class Query<TSource> : IQuery<TSource>
         {
             this.QueryStringBuilder = options.QueryStringBuilderFactory();
         }
+        else if (options?.Formatter != null)
+        {
+            this.QueryStringBuilder = new QueryStringBuilder(options.Formatter);
+        }
     }
 
     /// <summary>Sets the query alias name.</summary>

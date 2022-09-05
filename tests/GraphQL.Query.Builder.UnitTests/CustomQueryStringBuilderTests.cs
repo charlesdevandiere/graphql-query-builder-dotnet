@@ -59,4 +59,25 @@ public class CustomQueryStringBuilderTests
             return result;
         }
     }
+
+    [Fact]
+    public void TestArgumentsWithCamelCasePropertyNameFormatter()
+    {
+        QueryOptions options = new()
+        {
+            Formatter = CamelCasePropertyNameFormatter.Format
+        };
+        string query = new Query<object>("something", options)
+            .AddArguments(new
+            {
+                SomeObject = new
+                {
+                    InnerObjectField = "camel case"
+                }
+            })
+            .AddField("some")
+            .Build();
+
+        Assert.Equal("something(someObject:{innerObjectField:\"camel case\"}){some}", query);
+    }
 }

@@ -16,6 +16,9 @@ public class Query<TSource> : IQuery<TSource>
     /// <summary>Gets the select list.</summary>
     public List<object> SelectList { get; } = new List<object>();
 
+    /// <summary>Gets the list of possible types to include on the select (for unions)</summary>
+    public List<object> PossibleTypesList { get; } = new List<object>();
+
     /// <summary>Gets the arguments.</summary>
     public Dictionary<string, object> Arguments { get; } = new Dictionary<string, object>();
 
@@ -201,6 +204,68 @@ public class Query<TSource> : IQuery<TSource>
         }
 
         return this;
+    }
+
+    /// <summary>
+    /// Adds an `... on` clause to indicate that the result is one of __posibleTypes on a UNION object.
+    /// </summary>
+    /// <param name="type">The possible Type</param>
+    /// <returns>The quer</returns>
+    public IQuery<TSource> AddPossibleType(string type)
+    {
+        RequiredArgument.NotNullOrEmpty(type, nameof(type));
+        this.PossibleTypesList.Add(type);
+        return this;
+    }
+
+    /// <summary>Adds a possible type as the query result. This uses the `... on Model` clause and requires inner fields to be added to the query.</summary>
+    /// <typeparam name="TSubSource">The sub-object type as defined on the Schema.</typeparam>
+    /// <param name="field">The possible type.</param>
+    /// <param name="build">The possible result query building function.</param>
+    /// <returns>The query.</returns>
+    public IQuery<TSource> AddPossibleType<TSubSource>(string field, Func<IQuery<TSubSource>, IQuery<TSubSource>> build) where TSubSource : class
+    {
+        RequiredArgument.NotNullOrEmpty(field, nameof(field));
+        RequiredArgument.NotNull(build, nameof(build));
+
+        Query<TSubSource> query = new(field, this.options);
+        IQuery<TSubSource> subQuery = build.Invoke(query);
+
+        this.PossibleTypesList.Add(subQuery);
+
+        return this;
+    }
+
+    /// <summary>Adds a possible type as the query result. This uses the `... on Model` clause and requires inner fields to be added to the query.</summary>
+    /// <typeparam name="TProperty">The possible type.</typeparam>
+    /// <param name="possibleType">The possible type selector.</param>
+    /// <returns>The query.</returns>
+    public IQuery<TSource> AddPossibleType<TProperty>(Expression<Func<TSource, TProperty>> possibleType)
+    {
+        RequiredArgument.NotNull(possibleType, nameof(possibleType));
+
+        PropertyInfo property = GetPropertyInfo(possibleType);
+        string name = this.GetPropertyName(property);
+
+        this.PossibleTypesList.Add(name);
+
+        return this;
+    }
+
+    /// <summary>Adds a possible type as the query result. This uses the `... on Model` clause and requires inner fields to be added to the query.</summary>
+    /// <typeparam name="TPossibleType">The opssible type.</typeparam>
+    /// <param name="selector">The field selector.</param>
+    /// <param name="build">The fields builder for the possible type.</param>
+    /// <returns>The query.</returns>
+    public IQuery<TSource> AddPossibleType<TPossibleType>(Expression<Func<TSource, TPossibleType>> selector, Func<IQuery<TPossibleType>, IQuery<TPossibleType>> build) where TPossibleType : class
+    {
+        RequiredArgument.NotNull(selector, nameof(selector));
+        RequiredArgument.NotNull(build, nameof(build));
+
+        PropertyInfo property = GetPropertyInfo(selector);
+        string name = this.GetPropertyName(property);
+
+        return this.AddPossibleType(name, build);
     }
 
     /// <summary>Builds the query.</summary>

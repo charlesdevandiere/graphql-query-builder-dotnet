@@ -110,6 +110,7 @@ public class QueryOfTTests
         Assert.Equal(shouldEqual, query.SelectList);
     }
 
+
     [Fact]
     public void AddArgument_string_number()
     {
@@ -351,6 +352,74 @@ public class QueryOfTTests
         Assert.Equal(typeof(Query<SubObject>), query.SelectList[1].GetType());
         Assert.Equal(typeof(Query<SubObject>), query.SelectList[2].GetType());
         Assert.Equal(typeof(Query<SubObject>), query.SelectList[3].GetType());
+    }
+
+    [Fact]
+    public void AddPossibleType_array()
+    {
+        // Arrange
+        Query<object> query = new("something");
+
+        string[] types =
+        {
+                "UnionA",
+                "UnionB"
+            };
+
+        // Act
+        foreach (string type in types)
+        {
+            query.AddPossibleType(type);
+        }
+
+        // Assert
+        List<string> shouldEqual = new()
+        {
+            "UnionA",
+            "UnionB"
+        };
+        Assert.Equal(shouldEqual, query.PossibleTypesList);
+    }
+
+    [Fact]
+    public void AddPossibleType_chained()
+    {
+        // Arrange
+        Query<object> query = new("something");
+
+        // Act
+        query.AddPossibleType("UnionA").AddPossibleType("UnionB").AddPossibleType("UnionC");
+
+        // Assert
+        List<string> shouldEqual = new()
+        {
+            "UnionA",
+            "UnionB",
+            "UnionC"
+        };
+        Assert.Equal(shouldEqual, query.PossibleTypesList);
+    }
+
+    [Fact]
+    public void AddPossibleType_selector()
+    {
+        Query<Order> query = new("order");
+
+        // Act
+        query.AddPossibleType(o => o.Product,
+                q => q.AddField(pt => pt.Color,
+                    pc => pc.AddField(c => c.Blue)))
+            .AddField("anotherField");
+
+        // Assert
+        List<string> shouldEqual = new()
+        {
+            "Product",
+        };
+        Assert.Equal(1, query.PossibleTypesList.Count);
+        Assert.IsAssignableFrom(typeof(IQuery<Car>), query.PossibleTypesList[0]);
+        Assert.Equal(1, ((IQuery<Car>)query.PossibleTypesList[0]).SelectList.Count);
+
     }
 
     class ObjectWithList

@@ -186,6 +186,29 @@ public class QueryStringBuilder : IQueryStringBuilder
         }
     }
 
+    /// <summary>Adds fields to the query sting.</summary>
+    /// <param name="query">The query.</param>
+    /// <exception cref="ArgumentException">Invalid Object in Field List</exception>
+    protected internal void AddPossibleTypes<TSource>(IQuery<TSource> query)
+    {
+        foreach (object item in query.PossibleTypesList)
+        {
+            switch (item)
+            {
+                case string field:
+                    this.QueryString.Append($" ... on {field} ");
+                    break;
+
+                case IQuery subQuery:
+                    this.QueryString.Append($" ... on {subQuery.Build()}");
+                    break;
+
+                default:
+                    throw new ArgumentException("Invalid Possible Type Specified, must be `string` or `Query`");
+            }
+        }
+    }
+
     /// <summary>Builds the query.</summary>
     /// <param name="query">The query.</param>
     /// <returns>The GraphQL query as string, without outer enclosing block.</returns>
@@ -209,12 +232,15 @@ public class QueryStringBuilder : IQueryStringBuilder
         {
             this.QueryString.Append("{");
             this.AddFields(query);
+            this.AddPossibleTypes(query);
             this.QueryString.Append("}");
         }
         else
         {
             this.AddFields(query);
+            this.AddPossibleTypes(query);
         }
+
 
         return this.QueryString.ToString();
     }

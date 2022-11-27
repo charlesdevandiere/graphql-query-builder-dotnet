@@ -10,6 +10,9 @@ public interface IQuery<TSource> : IQuery
     /// <summary>Gets the select list.</summary>
     List<object> SelectList { get; }
 
+    /// <summary>Gets the possible types list.</summary>
+    List<object> PossibleTypesList { get; }
+
     /// <summary>Gets the arguments.</summary>
     Dictionary<string, object> Arguments { get; }
 
@@ -75,4 +78,37 @@ public interface IQuery<TSource> : IQuery
     /// <param name="arguments">The arguments object.</param>
     /// <returns>The query.</returns>
     IQuery<TSource> AddArguments<TArguments>(TArguments arguments) where TArguments : class;
+
+    /// <summary>
+    /// Adds a possible type as the query result. This uses the `... on Model` clause and requires inner fields to be added to the query.
+    /// </summary>
+    /// <param name="type">The possible type name as defined on the Schema</param>
+    /// <returns></returns>
+    IQuery<TSource> AddPossibleType(string type);
+
+    /// <summary>Adds a possible type as the query result. This uses the `... on Model` clause and requires inner fields to be added to the query..</summary>
+    /// <typeparam name="TSubSource">The sub-object type as defined on the Schema.</typeparam>
+    /// <param name="field">The possible type.</param>
+    /// <param name="build">The possible result query building function.</param>
+    /// <returns>The query.</returns>
+    IQuery<TSource> AddPossibleType<TSubSource>(
+        string field,
+        Func<IQuery<TSubSource>, IQuery<TSubSource>> build)
+        where TSubSource : class;
+
+    /// <summary>Adds a possible type as the query result. This uses the `... on Model` clause and requires inner fields to be added to the query.</summary>
+    /// <typeparam name="TProperty">The possible type.</typeparam>
+    /// <param name="possibleType">The possible type selector.</param>
+    /// <returns>The query.</returns>
+    IQuery<TSource> AddPossibleType<TPossibleType>(Expression<Func<TSource, TPossibleType>> possibleType);
+
+    /// <summary>Adds a possible type as the query result. This uses the `... on Model` clause and requires inner fields to be added to the query.</summary>
+    /// <typeparam name="TPossibleType">The opssible type.</typeparam>
+    /// <param name="selector">The field selector.</param>
+    /// <param name="build">The fields builder for the possible type.</param>
+    /// <returns>The query.</returns>
+    IQuery<TSource> AddPossibleType<TPossibleType>(
+        Expression<Func<TSource, TPossibleType>> selector,
+        Func<IQuery<TPossibleType>, IQuery<TPossibleType>> build)
+        where TPossibleType : class;
 }

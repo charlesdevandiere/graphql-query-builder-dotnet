@@ -1,5 +1,5 @@
 using System;
-namespace GraphQL.Query.Builder.Formatters
+namespace GraphQL.Query.Builder
 {
     public static class ProperCaseTypeNameFormatter
     {

@@ -8,7 +8,7 @@ public static class CamelCasePropertyNameFormatter
 {
     /// <summary>Formats the property name in camel case.</summary>
     /// <value>The property.</value>
-    public static Func<PropertyInfo, string> FormatPropertyName = property =>
+    public static Func<PropertyInfo, string> Formatter = property =>
     {
         RequiredArgument.NotNull(property, nameof(property));
 

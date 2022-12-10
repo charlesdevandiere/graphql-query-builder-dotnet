@@ -1,5 +1,5 @@
 using System;
-using GraphQL.Query.Builder.Formatters;
+using GraphQL.Query.Builder;
 using GraphQL.Query.Builder.UnitTests.Models;
 using Xunit;
 

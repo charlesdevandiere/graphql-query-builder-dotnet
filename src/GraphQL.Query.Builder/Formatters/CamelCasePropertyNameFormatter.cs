@@ -14,13 +14,4 @@ public static class CamelCasePropertyNameFormatter
 
         return char.ToLowerInvariant(property.Name[0]) + property.Name.Substring(1);
     };
-
-    /// <summary>Formats the type name in camel case.</summary>
-    /// <value>The property.</value>
-    public static Func<Type, string> FormatTypeName = type =>
-    {
-        RequiredArgument.NotNull(type, nameof(type));
-        return char.ToLowerInvariant(type.Name[0]) + type.Name.Substring(1);
-        //return char.ToLowerInvariant(type.Name[0]) + type.Name.Substring(1);
-    };
 }

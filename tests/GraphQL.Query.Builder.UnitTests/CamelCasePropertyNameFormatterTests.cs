@@ -10,7 +10,7 @@ public class CamelCasePropertyNameFormatterTests
     public void Format_ShouldTransfomeNameIntoCamelCase()
     {
         {
-            string name = CamelCasePropertyNameFormatter.Format.Invoke(typeof(Car).GetProperty(nameof(Car.Name)));
+            string name = CamelCasePropertyNameFormatter.FormatPropertyName.Invoke(typeof(Car).GetProperty(nameof(Car.Name)));
             Assert.Equal("name", name);
         }
     }
@@ -18,6 +18,6 @@ public class CamelCasePropertyNameFormatterTests
     [Fact]
     public void Format_ShouldThrowIfPropertyIsNull()
     {
-        Assert.Throws<ArgumentNullException>(() => CamelCasePropertyNameFormatter.Format.Invoke(null));
+        Assert.Throws<ArgumentNullException>(() => CamelCasePropertyNameFormatter.FormatPropertyName.Invoke(null));
     }
 }

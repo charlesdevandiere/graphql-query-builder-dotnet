@@ -31,12 +31,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\logo.png" Pack="true" PackagePath="/"/>
+    <None Include="..\..\logo.png" Pack="true" PackagePath="/" />
     <None Include="..\..\LICENSE" Pack="true" PackagePath="LICENSE" />
     <None Include="..\..\README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 </Project>

@@ -25,7 +25,14 @@ public interface IQuery<TSource> : IQuery
     /// <typeparam name="TProperty">The property type.</typeparam>
     /// <param name="selector">The field selector.</param>
     /// <returns>The query.</returns>
+    IQuery<TSource> AddField<TProperty>(Expression<Func<TSource, IEnumerable<TProperty>>> selector);
+
+    /// <summary>Adds a field to the query.</summary>
+    /// <typeparam name="TProperty">The property type.</typeparam>
+    /// <param name="selector">The field selector.</param>
+    /// <returns>The query.</returns>
     IQuery<TSource> AddField<TProperty>(Expression<Func<TSource, TProperty>> selector);
+
 
     /// <summary>Adds a field to the query.</summary>
     /// <param name="field">The field name.</param>
@@ -56,7 +63,7 @@ public interface IQuery<TSource> : IQuery
     /// <typeparam name="TSubSource">The sub-object type.</typeparam>
     /// <param name="field">The field name.</param>
     /// <param name="build">The sub-object query building function.</param>
-    /// <returns>The query.</returns>
+    /// <returns>The query.</returns>p
     IQuery<TSource> AddField<TSubSource>(
         string field,
         Func<IQuery<TSubSource>, IQuery<TSubSource>> build)
@@ -92,23 +99,13 @@ public interface IQuery<TSource> : IQuery
     /// <param name="build">The possible result query building function.</param>
     /// <returns>The query.</returns>
     IQuery<TSource> AddPossibleType<TSubSource>(
-        string field,
-        Func<IQuery<TSubSource>, IQuery<TSubSource>> build)
+        Expression<Func<IQuery<TSubSource>, IQuery<TSubSource>>> build)
         where TSubSource : class;
 
     /// <summary>Adds a possible type as the query result. This uses the `... on Model` clause and requires inner fields to be added to the query.</summary>
-    /// <typeparam name="TProperty">The possible type.</typeparam>
-    /// <param name="possibleType">The possible type selector.</param>
+    /// <typeparam name="TSubSource">The sub-object type as defined on the Schema.</typeparam>
+    /// <param name="field">The possible type.</param>
+    /// <param name="build">The possible result query building function.</param>
     /// <returns>The query.</returns>
-    IQuery<TSource> AddPossibleType<TPossibleType>(Expression<Func<TSource, TPossibleType>> possibleType);
-
-    /// <summary>Adds a possible type as the query result. This uses the `... on Model` clause and requires inner fields to be added to the query.</summary>
-    /// <typeparam name="TPossibleType">The opssible type.</typeparam>
-    /// <param name="selector">The field selector.</param>
-    /// <param name="build">The fields builder for the possible type.</param>
-    /// <returns>The query.</returns>
-    IQuery<TSource> AddPossibleType<TPossibleType>(
-        Expression<Func<TSource, TPossibleType>> selector,
-        Func<IQuery<TPossibleType>, IQuery<TPossibleType>> build)
-        where TPossibleType : class;
+    IQuery<TSource> AddPossibleType<TSubSource>(string field, Expression<Func<IQuery<TSubSource>, IQuery<TSubSource>>> build);
 }

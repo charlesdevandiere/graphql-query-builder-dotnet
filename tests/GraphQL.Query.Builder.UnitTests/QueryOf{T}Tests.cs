@@ -406,10 +406,9 @@ public class QueryOfTTests
         Query<Order> query = new("order");
 
         // Act
-        query.AddPossibleType(o => o.Product,
-                q => q.AddField(pt => pt.Color,
-                    pc => pc.AddField(c => c.Blue)))
-            .AddField("anotherField");
+        query.AddPossibleType<Car>(q => q.AddField(pt => pt.Color,
+                                    pc => pc.AddField(c => c.Blue)))
+             .AddField("anotherField");
 
         // Assert
         List<string> shouldEqual = new()

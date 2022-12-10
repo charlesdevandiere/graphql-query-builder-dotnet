@@ -65,7 +65,7 @@ public class CustomQueryStringBuilderTests
     {
         QueryOptions options = new()
         {
-            Formatter = CamelCasePropertyNameFormatter.Format
+            Formatter = CamelCasePropertyNameFormatter.FormatPropertyName
         };
         string query = new Query<object>("something", options)
             .AddArguments(new

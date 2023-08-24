@@ -15,7 +15,7 @@ See sample [here](https://github.com/charlesdevandiere/graphql-query-builder-dot
 
 ## Install
 
-```console
+```shell
 dotnet add package GraphQL.Query.Builder
 ```
 

@@ -1,13 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Client.Abstractions.Websocket;
 using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
 using GraphQL.Client.Serializer.SystemTextJson;
 using GraphQL.Query.Builder;
-using GraphQL.Query.Builder.Formatter.NewtonsoftJson;
 using GraphQL.Query.Builder.Formatter.SystemTextJson;
 using Shared.Models;
 
@@ -20,12 +15,9 @@ class PokemonService
     private readonly QueryOptions options = new()
     {
         Formatter = SystemTextJsonPropertyNameFormatter.Format
-        // Formatter = NewtonsoftJsonPropertyNameFormatter.Format
-        // Formatter = CamelCasePropertyNameFormatter.Format
     };
 
     private readonly IGraphQLWebsocketJsonSerializer serializer = new SystemTextJsonSerializer();
-    // private readonly IGraphQLWebsocketJsonSerializer serializer = new NewtonsoftJsonSerializer();
 
     /// <summary>Initializes a new instance of the <see cref="PokemonService" /> class.</summary>
     /// <param name="apiUrl">The pokemon graphQL API URL</param>

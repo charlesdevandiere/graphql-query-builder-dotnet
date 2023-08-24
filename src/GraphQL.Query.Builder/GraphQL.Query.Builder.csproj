@@ -6,7 +6,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <Authors>Charles de Vandière</Authors>
-    <Copyright>© 2022 Charles de Vandière</Copyright>
+    <Copyright>© 2023 Charles de Vandière</Copyright>
     <Product>GraphQL.Query.Builder</Product>
     <Title>GraphQL.Query.Builder</Title>
     <Description>A tool to build GraphQL query from a C# model.</Description>

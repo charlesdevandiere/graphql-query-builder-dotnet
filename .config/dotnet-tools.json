@@ -3,13 +3,13 @@
   "isRoot": true,
   "tools": {
     "xmldoc2markdown": {
-      "version": "2.1.1",
+      "version": "3.1.0",
       "commands": [
         "xmldoc2md"
       ]
     },
     "dotnet-reportgenerator-globaltool": {
-      "version": "5.1.4",
+      "version": "5.1.24",
       "commands": [
         "reportgenerator"
       ]

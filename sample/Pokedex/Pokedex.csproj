@@ -2,22 +2,21 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\GraphQL.Query.Builder\GraphQL.Query.Builder.csproj" />
-    <ProjectReference Include="..\Models\Models.csproj" />
+    <ProjectReference Include="../../src/GraphQL.Query.Builder/GraphQL.Query.Builder.csproj" />
+    <ProjectReference Include="../Models/Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL.Client" Version="4.0.2" />
-    <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="4.0.2" />
-    <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="4.0.2" />
-    <PackageReference Include="GraphQL.Query.Builder.Formatter.NewtonsoftJson" Version="1.0.0" />
-    <PackageReference Include="GraphQL.Query.Builder.Formatter.SystemTextJson" Version="1.0.0" />
+    <PackageReference Include="GraphQL.Client" Version="6.0.0" />
+    <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.0.0" />
+    <PackageReference Include="GraphQL.Query.Builder.Formatter.SystemTextJson" Version="1.0.1" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,3 @@
-using System;
 using Pokedex;
 using Shared.Models;
 

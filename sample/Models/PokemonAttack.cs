@@ -1,17 +1,14 @@
 using System.Text;
 using System.Text.Json.Serialization;
-using Newtonsoft.Json;
 
 namespace Shared.Models;
 
 public class PokemonAttack
 {
     [JsonPropertyName("fast")]
-    [JsonProperty("fast")]
     public Attack[] Fast { get; set; }
 
     [JsonPropertyName("special")]
-    [JsonProperty("special")]
     public Attack[] Special { get; set; }
 
     public override string ToString()

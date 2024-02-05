@@ -44,8 +44,6 @@ public Func<IQueryStringBuilder> QueryStringBuilderFactory { get; set; }
 
 ### **QueryOptions()**
 
-
-
 ```csharp
 public QueryOptions()
 ```

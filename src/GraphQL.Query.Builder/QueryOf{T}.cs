@@ -1,9 +1,11 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 [assembly: InternalsVisibleTo("GraphQL.Query.Builder.UnitTests")]
 namespace GraphQL.Query.Builder;
@@ -16,6 +18,9 @@ public class Query<TSource> : IQuery<TSource>
     /// <summary>Gets the select list.</summary>
     public List<object> SelectList { get; } = new List<object>();
 
+    /// <summary>Gets the list of possible types to include on the select (for unions)</summary>
+    public List<object> PossibleTypesList { get; } = new List<object>();
+
     /// <summary>Gets the arguments.</summary>
     public Dictionary<string, object> Arguments { get; } = new Dictionary<string, object>();
 
@@ -25,23 +30,34 @@ public class Query<TSource> : IQuery<TSource>
     /// <summary>Gets the alias name.</summary>
     public string AliasName { get; private set; }
 
+    /// <summary>
+    /// Gets the query type.
+    /// </summary>
+    public QueryType Type { get; set; } = QueryType.Query;
+
     /// <summary>Gets the query string builder.</summary>
     private IQueryStringBuilder QueryStringBuilder { get; set; } = new QueryStringBuilder();
 
-    /// <summary>Initializes a new instance of the <see cref="Query{TSource}" /> class.</summary>
-    public Query(string name)
+    /// <summary>
+    /// Gets the Query runner object that executes queries.
+    /// </summary>
+    public Func<IQuery<TSource>,Task<TSource>> QueryRunner { get; private set; }
+
+    /// <summary>Initializes a new instance of the <see cref="ExecutableQuery{TSource}" /> class.</summary>
+    public Query(string name, QueryType type = QueryType.Query)
     {
         RequiredArgument.NotNullOrEmpty(name, nameof(name));
-
         this.Name = name;
+        this.Type = type;
     }
 
-    /// <summary>Initializes a new instance of the <see cref="Query{TSource}" /> class.</summary>
-    public Query(string name, QueryOptions options)
+    /// <summary>Initializes a new instance of the <see cref="ExecutableQuery{TSource}" /> class.</summary>
+    public Query(string name, QueryOptions options, QueryType type = QueryType.Query)
     {
         RequiredArgument.NotNullOrEmpty(name, nameof(name));
 
         this.Name = name;
+        this.Type = type;
         this.options = options;
         if (options?.QueryStringBuilderFactory != null)
         {
@@ -87,9 +103,7 @@ public class Query<TSource> : IQuery<TSource>
     public IQuery<TSource> AddField(string field)
     {
         RequiredArgument.NotNullOrEmpty(field, nameof(field));
-
         this.SelectList.Add(field);
-
         return this;
     }
 
@@ -203,6 +217,50 @@ public class Query<TSource> : IQuery<TSource>
         return this;
     }
 
+    /// <summary>
+    /// Adds an `... on` clause to indicate that the result is one of __posibleTypes on a UNION object.
+    /// </summary>
+    /// <param name="type">The possible Type</param>
+    /// <returns>The quer</returns>
+    public IQuery<TSource> AddPossibleType(string type)
+    {
+        RequiredArgument.NotNullOrEmpty(type, nameof(type));
+        this.PossibleTypesList.Add(type);
+        return this;
+    }
+
+    /// <summary>Adds a possible type as the query result. This uses the `... on Model` clause and requires inner fields to be added to the query.</summary>
+    /// <typeparam name="TSubSource">The sub-object type as defined on the Schema.</typeparam>
+    /// <param name="field">The possible type.</param>
+    /// <param name="build">The possible result query building function.</param>
+    /// <returns>The query.</returns>
+    public IQuery<TSource> AddPossibleType<TPossibleType>(string field, Expression<Func<IQuery<TPossibleType>, IQuery<TPossibleType>>> build)
+    {
+        RequiredArgument.NotNullOrEmpty(field, nameof(field));
+        RequiredArgument.NotNull(build, nameof(build));
+
+        var func = build.Compile();
+        Query<TPossibleType> query = new(field, this.options);
+        IQuery<TPossibleType> subQuery = func.Invoke(query);
+
+        this.PossibleTypesList.Add(subQuery);
+
+        return this;
+    }
+
+    /// <summary>Adds a possible type as the query result. This uses the `... on Model` clause and requires inner fields to be added to the query.</summary>
+    /// <typeparam name="TProperty">The possible type.</typeparam>
+    /// <param name="possibleType">The possible type selector.</param>
+    /// <returns>The query.</returns>
+    public IQuery<TSource> AddPossibleType<TPossibleType>(Expression<Func<IQuery<TPossibleType>, IQuery<TPossibleType>>> build) where TPossibleType : class
+    {
+        RequiredArgument.NotNull(build, nameof(build));
+
+        Type possibleType = typeof(TPossibleType);
+        string name = this.GetTypeName(possibleType);
+        return AddPossibleType(name, build);
+    }
+
     /// <summary>Builds the query.</summary>
     /// <returns>The GraphQL query as string, without outer enclosing block.</returns>
     /// <exception cref="ArgumentException">Must have a 'Name' specified in the Query</exception>
@@ -210,8 +268,48 @@ public class Query<TSource> : IQuery<TSource>
     public string Build()
     {
         this.QueryStringBuilder.Clear();
-
         return this.QueryStringBuilder.Build(this);
+    }
+
+    public string Compile()
+    {
+        string strQuery = "{" + this.Build() + "}";
+        string strType = this.Type switch
+        {
+            QueryType.Query => "query",
+            QueryType.Mutation => "mutation"
+        };
+
+        return $"{strType} {strQuery}";
+
+    }
+
+    private static PropertyInfo GetPropertyInfo<TProperty>(Expression<Func<IQuery<TSource>, IQuery<TProperty>>> lambda)
+    {
+        RequiredArgument.NotNull(lambda, nameof(lambda));
+
+        if (lambda.Body is not MemberExpression member)
+        {
+            throw new ArgumentException($"Expression '{lambda}' body is not member expression.");
+        }
+
+        if (member.Member is not PropertyInfo propertyInfo)
+        {
+            throw new ArgumentException($"Expression '{lambda}' not refers to a property.");
+        }
+
+        if (propertyInfo.ReflectedType is null)
+        {
+            throw new ArgumentException($"Expression '{lambda}' not refers to a property.");
+        }
+
+        Type type = typeof(TSource);
+        if (type != propertyInfo.ReflectedType && !propertyInfo.ReflectedType.IsAssignableFrom(type))
+        {
+            throw new ArgumentException($"Expression '{lambda}' refers to a property that is not from type {type}.");
+        }
+
+        return propertyInfo;
     }
 
     /// <summary>Gets property infos from lambda.</summary>
@@ -250,8 +348,32 @@ public class Query<TSource> : IQuery<TSource>
     {
         RequiredArgument.NotNull(property, nameof(property));
 
-        return this.options?.Formatter is not null
+        bool ignoreFormatter = property.GetCustomAttribute(typeof(IgnoreFormatterAttribute)) != null;
+        return this.options?.Formatter is not null && !ignoreFormatter
             ? this.options?.Formatter.Invoke(property)
             : property.Name;
+    }
+
+    protected string GetTypeName(Type type)
+    {
+        RequiredArgument.NotNull(type, nameof(type));
+
+        return this.options?.TypeFormatter is not null
+            ? this.options?.TypeFormatter.Invoke(type)
+            : type.Name;
+    }
+
+    public IQuery<TSource> AddField<TProperty>(Expression<Func<TSource, IEnumerable<TProperty>>> selector)
+    {
+        RequiredArgument.NotNull(selector, nameof(selector));
+        PropertyInfo property = GetPropertyInfo(selector);
+        string name = this.GetPropertyName(property);
+        return this.AddField(name);
+    }
+
+    public async Task<TSource> Execute()
+    {
+        if (QueryRunner == null) throw new NullReferenceException("QueryExecutor not set.");
+        return await QueryRunner.Invoke(this);
     }
 }

@@ -442,10 +442,31 @@ public class QueryStringBuilderTests
                 .AddField("subName")
                 .AddField("subMake")
                 .AddField("subModel")
-                .AddArguments(mySubDict));
+                .AddArguments(mySubDict))
+            .AddPossibleType<object>("PossibleResult", q => q
+                .AddField("subField1")
+                .AddField("subField2"));
 
         Assert.Equal(
-            "test1Alias:test1{more things in_a_select subSelect(subMake:\"aston martin\",subState:\"ca\",subLimit:1,__debug:DISABLED,SuperQuerySpeed:ENABLED){subName subMake subModel}}",
+            "test1Alias:test1{more things in_a_select subSelect(subMake:\"aston martin\",subState:\"ca\",subLimit:1,__debug:DISABLED,SuperQuerySpeed:ENABLED){subName subMake subModel} ... on PossibleResult{subField1 subField2}}",
+            new QueryStringBuilder().Build(query));
+    }
+
+    [Fact]
+    public void Build_NestedPossibleTypes()
+    {
+        IQuery<object> query = new Query<object>("test1")
+            .Alias("test1Alias")
+            .AddField("field1")
+            .AddField<object>("field2", q => q
+                .AddField("subField21")
+                .AddPossibleType<object>("SubPossibleResult", q => q
+                    .AddField("possibleResultField1")))
+            .AddPossibleType<object>("RootPossibleResult", q => q
+                .AddField("rootPossibleResultField1"));
+
+        Assert.Equal(
+            "test1Alias:test1{field1 field2{subField21 ... on SubPossibleResult{possibleResultField1}} ... on RootPossibleResult{rootPossibleResultField1}}",
             new QueryStringBuilder().Build(query));
     }
 

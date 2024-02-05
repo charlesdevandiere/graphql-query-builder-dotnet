@@ -120,7 +120,8 @@ public class QueryStringBuilder : IQueryStringBuilder
             case { } objectValue:
                 Dictionary<string, object> dictionay = this.ObjectToDictionary(objectValue);
                 return this.FormatQueryParam(dictionay);
-
+            case null:
+                throw new ArgumentNullException(nameof(value));
             default:
                 throw new InvalidDataException($"Invalid Object Type in Param List: {value.GetType()}");
         }
@@ -149,7 +150,8 @@ public class QueryStringBuilder : IQueryStringBuilder
 
         foreach (KeyValuePair<string, object> param in query.Arguments)
         {
-            this.QueryString.Append($"{param.Key}:{this.FormatQueryParam(param.Value)},");
+            if(param.Value != null)
+                this.QueryString.Append($"{param.Key}:{this.FormatQueryParam(param.Value)},");
         }
 
         if (query.Arguments.Count > 0)
@@ -186,6 +188,31 @@ public class QueryStringBuilder : IQueryStringBuilder
         }
     }
 
+    /// <summary>Adds fields to the query sting.</summary>
+    /// <param name="query">The query.</param>
+    /// <exception cref="ArgumentException">Invalid Object in Field List</exception>
+    protected internal void AddPossibleTypes<TSource>(IQuery<TSource> query)
+    {
+        foreach (object item in query.PossibleTypesList)
+        {
+            switch (item)
+            {
+                case string field:
+                    this.QueryString.Append($" ... on {field} ");
+                    break;
+
+                case IQuery subQuery:
+                    this.QueryString.Append($" ... on {subQuery.Build()}");
+                    break;
+
+                default:
+                    throw new ArgumentException("Invalid Possible Type Specified, must be `string` or `Query`");
+            }
+        }
+    }
+
+
+
     /// <summary>Builds the query.</summary>
     /// <param name="query">The query.</param>
     /// <returns>The GraphQL query as string, without outer enclosing block.</returns>
@@ -205,16 +232,14 @@ public class QueryStringBuilder : IQueryStringBuilder
             this.QueryString.Append(")");
         }
 
-        if (query.SelectList.Count > 0)
+        if (query.SelectList.Count > 0 || query.PossibleTypesList.Count > 0)
         {
             this.QueryString.Append("{");
             this.AddFields(query);
+            this.AddPossibleTypes(query);
             this.QueryString.Append("}");
         }
-        else
-        {
-            this.AddFields(query);
-        }
+
 
         return this.QueryString.ToString();
     }

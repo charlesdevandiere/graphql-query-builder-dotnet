@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 using Xunit;
 
@@ -30,7 +29,7 @@ public class CustomQueryStringBuilderTests
 
     class ConstantCaseEnumQueryStringBuilder : QueryStringBuilder
     {
-        protected internal override string FormatQueryParam(object value) =>
+        protected internal override string FormatQueryParam(object? value) =>
             value switch
             {
                 Enum e => ToConstantCase(e.ToString()),

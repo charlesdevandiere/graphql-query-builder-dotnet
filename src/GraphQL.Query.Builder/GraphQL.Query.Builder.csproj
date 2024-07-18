@@ -2,11 +2,13 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Version>0.0.0</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <Authors>Charles de Vandière</Authors>
-    <Copyright>© 2023 Charles de Vandière</Copyright>
+    <Copyright>© 2024 Charles de Vandière</Copyright>
     <Product>GraphQL.Query.Builder</Product>
     <Title>GraphQL.Query.Builder</Title>
     <Description>A tool to build GraphQL query from a C# model.</Description>
@@ -37,6 +39,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
   </ItemGroup>
 </Project>

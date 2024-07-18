@@ -1,7 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Query.Builder.UnitTests.Models;
 using Xunit;
 
@@ -24,7 +21,9 @@ public class QueryOfTTests
     [Fact]
     public void Query_name_required()
     {
+#nullable disable
         Assert.Throws<ArgumentNullException>(() => new Query<object>(null));
+#nullable restore
     }
 
     [Fact]
@@ -33,11 +32,7 @@ public class QueryOfTTests
         // Arrange
         Query<object> query = new("something");
 
-        List<string> selectList = new()
-        {
-            "id",
-            "name"
-        };
+        List<string> selectList = ["id", "name"];
 
         // Act
         foreach (string field in selectList)
@@ -61,7 +56,7 @@ public class QueryOfTTests
         query.AddField(select);
 
         // Assert
-        Assert.Equal(select, query.SelectList.First());
+        Assert.Equal(select, query.SelectList[0]);
     }
 
     [Fact]
@@ -74,12 +69,12 @@ public class QueryOfTTests
         query.AddField("some").AddField("thing").AddField("else");
 
         // Assert
-        List<string> shouldEqual = new()
-        {
+        List<string> shouldEqual =
+        [
             "some",
             "thing",
             "else"
-        };
+        ];
         Assert.Equal(shouldEqual, query.SelectList);
     }
 
@@ -102,11 +97,11 @@ public class QueryOfTTests
         }
 
         // Assert
-        List<string> shouldEqual = new()
-        {
+        List<string> shouldEqual =
+        [
             "id",
             "name"
-        };
+        ];
         Assert.Equal(shouldEqual, query.SelectList);
     }
 
@@ -152,10 +147,10 @@ public class QueryOfTTests
         query.AddArgument("price", dict);
 
         // Assert
-        Dictionary<string, int> queryWhere = (Dictionary<string, int>)query.Arguments["price"];
+        Dictionary<string, int> queryWhere = (Dictionary<string, int>)query.Arguments["price"]!;
         Assert.Equal(1, queryWhere["from"]);
         Assert.Equal(100, queryWhere["to"]);
-        Assert.Equal(dict, (ICollection)query.Arguments["price"]);
+        Assert.Equal(dict, (ICollection)query.Arguments["price"]!);
     }
 
     [Fact]
@@ -206,7 +201,7 @@ public class QueryOfTTests
         // Arrange
         Query<object> query = new("something");
 
-        Dictionary<string, object> dictionary = new()
+        Dictionary<string, object?> dictionary = new()
         {
             { "from", 1 },
             { "to", 100 }
@@ -240,7 +235,7 @@ public class QueryOfTTests
             .AddArgument("price", dict);
 
         // Assert
-        Dictionary<string, object> shouldPass = new()
+        Dictionary<string, object?> shouldPass = new()
         {
             { "id", 123 },
             { "name", "danny" },
@@ -264,7 +259,7 @@ public class QueryOfTTests
         Query<Car> query = new("car");
         query.AddField(c => c.Color, sq => sq);
 
-        Assert.Equal(nameof(Car.Color), (query.SelectList[0] as IQuery<Color>).Name);
+        Assert.Equal(nameof(Car.Color), (query.SelectList[0] as IQuery<Color>)?.Name);
     }
 
     [Fact]
@@ -288,7 +283,7 @@ public class QueryOfTTests
         });
         query.AddField(c => c.Color, sq => sq);
 
-        Assert.Equal("__color", (query.SelectList[0] as IQuery<Color>).Name);
+        Assert.Equal("__color", (query.SelectList[0] as IQuery<Color>)?.Name);
     }
 
     [Fact]
@@ -300,23 +295,23 @@ public class QueryOfTTests
             .AddField(
                 car => car.Color,
                 sq => sq
-                    .AddField(color => color.Red)
-                    .AddField(color => color.Green)
-                    .AddField(color => color.Blue));
+                    .AddField(color => color!.Red)
+                    .AddField(color => color!.Green)
+                    .AddField(color => color!.Blue));
 
         Assert.Equal(nameof(Car), query.Name);
         Assert.Equal(3, query.SelectList.Count);
         Assert.Equal(nameof(Car.Name), query.SelectList[0]);
         Assert.Equal(nameof(Car.Price), query.SelectList[1]);
 
-        Assert.Equal(nameof(Car.Color), (query.SelectList[2] as IQuery<Color>).Name);
-        List<string> expectedSubSelectList = new()
-        {
+        Assert.Equal(nameof(Car.Color), (query.SelectList[2] as IQuery<Color>)?.Name);
+        List<string> expectedSubSelectList =
+        [
             nameof(Color.Red),
             nameof(Color.Green),
             nameof(Color.Blue)
-        };
-        Assert.Equal(expectedSubSelectList, (query.SelectList[2] as IQuery<Color>).SelectList);
+        ];
+        Assert.Equal(expectedSubSelectList, (query.SelectList[2] as IQuery<Color>)?.SelectList);
     }
 
     [Fact]
@@ -329,9 +324,9 @@ public class QueryOfTTests
             .AddField(
                 car => car.Color,
                 sq => sq
-                    .AddField(color => color.Red)
-                    .AddField(color => color.Green)
-                    .AddField(color => color.Blue));
+                    .AddField(color => color!.Red)
+                    .AddField(color => color!.Green)
+                    .AddField(color => color!.Blue));
 
         string result = query.Build();
 
@@ -342,15 +337,15 @@ public class QueryOfTTests
     public void TestSubSelectWithList()
     {
         IQuery<ObjectWithList>? query = new Query<ObjectWithList>("object")
-            .AddField<SubObject>(c => c.IEnumerable, sq => sq)
-            .AddField<SubObject>(c => c.List, sq => sq)
-            .AddField<SubObject>(c => c.IQueryable, sq => sq)
-            .AddField<SubObject>(c => c.Array, sq => sq);
+            .AddField<SubObject>(c => c.IEnumerable!, sq => sq)
+            .AddField<SubObject>(c => c.List!, sq => sq)
+            .AddField<SubObject>(c => c.IQueryable!, sq => sq)
+            .AddField<SubObject>(c => c.Array!, sq => sq);
 
-        Assert.Equal(typeof(Query<SubObject>), query.SelectList[0].GetType());
-        Assert.Equal(typeof(Query<SubObject>), query.SelectList[1].GetType());
-        Assert.Equal(typeof(Query<SubObject>), query.SelectList[2].GetType());
-        Assert.Equal(typeof(Query<SubObject>), query.SelectList[3].GetType());
+        Assert.Equal(typeof(Query<SubObject>), query.SelectList[0]?.GetType());
+        Assert.Equal(typeof(Query<SubObject>), query.SelectList[1]?.GetType());
+        Assert.Equal(typeof(Query<SubObject>), query.SelectList[2]?.GetType());
+        Assert.Equal(typeof(Query<SubObject>), query.SelectList[3]?.GetType());
     }
 
     class ObjectWithList

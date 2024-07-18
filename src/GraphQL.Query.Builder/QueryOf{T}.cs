@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -11,19 +8,19 @@ namespace GraphQL.Query.Builder;
 /// <summary>The query class.</summary>
 public class Query<TSource> : IQuery<TSource>
 {
-    private readonly QueryOptions options;
+    private readonly QueryOptions? options;
 
     /// <summary>Gets the select list.</summary>
-    public List<object> SelectList { get; } = new List<object>();
+    public List<object?> SelectList { get; } = [];
 
     /// <summary>Gets the arguments.</summary>
-    public Dictionary<string, object> Arguments { get; } = new Dictionary<string, object>();
+    public Dictionary<string, object?> Arguments { get; } = [];
 
     /// <summary>Gets the query name.</summary>
     public string Name { get; private set; }
 
     /// <summary>Gets the alias name.</summary>
-    public string AliasName { get; private set; }
+    public string? AliasName { get; private set; }
 
     /// <summary>Gets the query string builder.</summary>
     private IQueryStringBuilder QueryStringBuilder { get; set; } = new QueryStringBuilder();
@@ -37,7 +34,7 @@ public class Query<TSource> : IQuery<TSource>
     }
 
     /// <summary>Initializes a new instance of the <see cref="Query{TSource}" /> class.</summary>
-    public Query(string name, QueryOptions options)
+    public Query(string name, QueryOptions? options)
     {
         RequiredArgument.NotNullOrEmpty(name, nameof(name));
 
@@ -101,7 +98,7 @@ public class Query<TSource> : IQuery<TSource>
     public IQuery<TSource> AddField<TSubSource>(
         Expression<Func<TSource, TSubSource>> selector,
         Func<IQuery<TSubSource>, IQuery<TSubSource>> build)
-        where TSubSource : class
+        where TSubSource : class?
     {
         RequiredArgument.NotNull(selector, nameof(selector));
         RequiredArgument.NotNull(build, nameof(build));
@@ -120,7 +117,7 @@ public class Query<TSource> : IQuery<TSource>
     public IQuery<TSource> AddField<TSubSource>(
         Expression<Func<TSource, IEnumerable<TSubSource>>> selector,
         Func<IQuery<TSubSource>, IQuery<TSubSource>> build)
-        where TSubSource : class
+        where TSubSource : class?
     {
         RequiredArgument.NotNull(selector, nameof(selector));
         RequiredArgument.NotNull(build, nameof(build));
@@ -139,7 +136,7 @@ public class Query<TSource> : IQuery<TSource>
     public IQuery<TSource> AddField<TSubSource>(
         string field,
         Func<IQuery<TSubSource>, IQuery<TSubSource>> build)
-        where TSubSource : class
+        where TSubSource : class?
     {
         RequiredArgument.NotNullOrEmpty(field, nameof(field));
         RequiredArgument.NotNull(build, nameof(build));
@@ -156,7 +153,7 @@ public class Query<TSource> : IQuery<TSource>
     /// <param name="key">The argument name.</param>
     /// <param name="value">The value.</param>
     /// <returns>The query.</returns>
-    public IQuery<TSource> AddArgument(string key, object value)
+    public IQuery<TSource> AddArgument(string key, object? value)
     {
         RequiredArgument.NotNullOrEmpty(key, nameof(key));
 
@@ -168,11 +165,11 @@ public class Query<TSource> : IQuery<TSource>
     /// <summary>Adds arguments to the query.</summary>
     /// <param name="arguments">the dictionary argument.</param>
     /// <returns>The query.</returns>
-    public IQuery<TSource> AddArguments(Dictionary<string, object> arguments)
+    public IQuery<TSource> AddArguments(Dictionary<string, object?> arguments)
     {
         RequiredArgument.NotNull(arguments, nameof(arguments));
 
-        foreach (KeyValuePair<string, object> argument in arguments)
+        foreach (KeyValuePair<string, object?> argument in arguments)
         {
             this.Arguments.Add(argument.Key, argument.Value);
         }
@@ -251,7 +248,7 @@ public class Query<TSource> : IQuery<TSource>
         RequiredArgument.NotNull(property, nameof(property));
 
         return this.options?.Formatter is not null
-            ? this.options?.Formatter.Invoke(property)
+            ? this.options.Formatter.Invoke(property)
             : property.Name;
     }
 }

@@ -1,9 +1,5 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -12,10 +8,10 @@ namespace GraphQL.Query.Builder;
 /// <summary>The GraphQL query builder class.</summary>
 public class QueryStringBuilder : IQueryStringBuilder
 {
-    private readonly Func<PropertyInfo, string> formatter;
+    private readonly Func<PropertyInfo, string>? formatter;
 
     /// <summary>The query string builder.</summary>
-    public StringBuilder QueryString { get; } = new StringBuilder();
+    public StringBuilder QueryString { get; } = new();
 
     /// <summary>Initializes a new instance of the <see cref="QueryStringBuilder" /> class.</summary>
     public QueryStringBuilder() { }
@@ -37,23 +33,59 @@ public class QueryStringBuilder : IQueryStringBuilder
     /// Formats query param.
     /// 
     /// Returns:
-    /// - String: `"foo"`
-    /// - Number: `10`
-    /// - Boolean: `true` or `false`
-    /// - Enum: `EnumValue`
-    /// - DateTime: `"2022-06-15T13:45:30.0000000Z"`
-    /// - Key value pair: `foo:"bar"` or `foo:10` ...
-    /// - List: `["foo","bar"]` or `[1,2]` ...
-    /// - Dictionary: `{foo:"bar",b:10}`
-    /// - Object: `{foo:"bar",b:10}`
+    ///   <list type="bullet">
+    ///     <item>
+    ///       <term>null</term>
+    ///       <description><c>null</c></description>
+    ///     </item>
+    ///     <item>
+    ///       <term>String</term>
+    ///       <description><c>"foo"</c></description>
+    ///     </item>
+    ///     <item>
+    ///       <term>Number</term>
+    ///       <description><c>10</c></description>
+    ///     </item>
+    ///     <item>
+    ///       <term>Boolean</term>
+    ///       <description><c>true</c> or <c>false</c></description>
+    ///     </item>
+    ///     <item>
+    ///       <term>Enum</term>
+    ///       <description><c>EnumValue</c></description>
+    ///     </item>
+    ///     <item>
+    ///       <term>DateTime</term>
+    ///       <description><c>"2024-06-15T13:45:30.0000000Z"</c></description>
+    ///     </item>
+    ///     <item>
+    ///       <term>Key value pair</term>
+    ///       <description><c>foo:"bar"</c> or <c>foo:10</c> ...</description>
+    ///     </item>
+    ///     <item>
+    ///       <term>List</term>
+    ///       <description><c>["foo","bar"]</c> or <c>[1,2]</c> ...</description>
+    ///     </item>
+    ///     <item>
+    ///       <term>Dictionary</term>
+    ///       <description><c>{foo:"bar",b:10}</c></description>
+    ///     </item>
+    ///     <item>
+    ///       <term>Object</term>
+    ///       <description><c>{foo:"bar",b:10}</c></description>
+    ///     </item>
+    ///   </list>
     /// </summary>
     /// <param name="value"></param>
     /// <returns>The formatted query param.</returns>
     /// <exception cref="InvalidDataException">Invalid Object Type in Param List</exception>
-    protected internal virtual string FormatQueryParam(object value)
+    protected internal virtual string FormatQueryParam(object? value)
     {
         switch (value)
         {
+            case null:
+                return "null";
+
             case string strValue:
                 string encoded = strValue.Replace("\"", "\\\"");
                 return $"\"{encoded}\"";
@@ -110,7 +142,7 @@ public class QueryStringBuilder : IQueryStringBuilder
                 return $"{{{string.Join(",", dictValue.Select(e => this.FormatQueryParam(e)))}}}";
 
             case IEnumerable enumerableValue:
-                List<string> items = new();
+                List<string> items = [];
                 foreach (object item in enumerableValue)
                 {
                     items.Add(this.FormatQueryParam(item));
@@ -147,7 +179,7 @@ public class QueryStringBuilder : IQueryStringBuilder
     {
         RequiredArgument.NotNull(query, nameof(query));
 
-        foreach (KeyValuePair<string, object> param in query.Arguments)
+        foreach (KeyValuePair<string, object?> param in query.Arguments)
         {
             this.QueryString.Append($"{param.Key}:{this.FormatQueryParam(param.Value)},");
         }
@@ -163,7 +195,7 @@ public class QueryStringBuilder : IQueryStringBuilder
     /// <exception cref="ArgumentException">Invalid Object in Field List</exception>
     protected internal void AddFields<TSource>(IQuery<TSource> query)
     {
-        foreach (object item in query.SelectList)
+        foreach (object? item in query.SelectList)
         {
             switch (item)
             {

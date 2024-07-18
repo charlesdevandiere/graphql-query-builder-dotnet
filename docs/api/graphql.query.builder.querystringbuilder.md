@@ -67,15 +67,17 @@ public void Clear()
 Formats query param.
  
  Returns:
- - String: `"foo"`
- - Number: `10`
- - Boolean: `true` or `false`
- - Enum: `EnumValue`
- - DateTime: `"2022-06-15T13:45:30.0000000Z"`
- - Key value pair: `foo:"bar"` or `foo:10` ...
- - List: `["foo","bar"]` or `[1,2]` ...
- - Dictionary: `{foo:"bar",b:10}`
- - Object: `{foo:"bar",b:10}`
+
+- **null** - `null`
+- **String** - `"foo"`
+- **Number** - `10`
+- **Boolean** - `true` or `false`
+- **Enum** - `EnumValue`
+- **DateTime** - `"2024-06-15T13:45:30.0000000Z"`
+- **Key value pair** - `foo:"bar"` or `foo:10` ...
+- **List** - `["foo","bar"]` or `[1,2]` ...
+- **Dictionary** - `{foo:"bar",b:10}`
+- **Object** - `{foo:"bar",b:10}`
 
 ```csharp
 protected internal string FormatQueryParam(object value)

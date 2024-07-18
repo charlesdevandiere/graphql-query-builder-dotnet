@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 
 namespace GraphQL.Query.Builder;
@@ -7,8 +6,8 @@ namespace GraphQL.Query.Builder;
 public class QueryOptions
 {
     /// <summary>Gets or sets the property name formatter.</summary>
-    public Func<PropertyInfo, string> Formatter { get; set; }
+    public Func<PropertyInfo, string>? Formatter { get; set; }
 
     /// <summary>Gets or sets the query string builder factory.</summary>
-    public Func<IQueryStringBuilder> QueryStringBuilderFactory { get; set; }
+    public Func<IQueryStringBuilder>? QueryStringBuilderFactory { get; set; }
 }

@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace GraphQL.Query.Builder;
@@ -8,10 +6,10 @@ namespace GraphQL.Query.Builder;
 public interface IQuery<TSource> : IQuery
 {
     /// <summary>Gets the select list.</summary>
-    List<object> SelectList { get; }
+    List<object?> SelectList { get; }
 
     /// <summary>Gets the arguments.</summary>
-    Dictionary<string, object> Arguments { get; }
+    Dictionary<string, object?> Arguments { get; }
 
     /// <summary>Sets the query alias name.</summary>
     /// <param name="alias">The alias name.</param>
@@ -37,7 +35,7 @@ public interface IQuery<TSource> : IQuery
     IQuery<TSource> AddField<TSubSource>(
         Expression<Func<TSource, TSubSource>> selector,
         Func<IQuery<TSubSource>, IQuery<TSubSource>> build)
-        where TSubSource : class;
+        where TSubSource : class?;
 
     /// <summary>Adds a sub-list field to the query.</summary>
     /// <typeparam name="TSubSource">The sub-list object type.</typeparam>
@@ -47,7 +45,7 @@ public interface IQuery<TSource> : IQuery
     IQuery<TSource> AddField<TSubSource>(
         Expression<Func<TSource, IEnumerable<TSubSource>>> selector,
         Func<IQuery<TSubSource>, IQuery<TSubSource>> build)
-        where TSubSource : class;
+        where TSubSource : class?;
 
     /// <summary>Adds a sub-object field to the query.</summary>
     /// <typeparam name="TSubSource">The sub-object type.</typeparam>
@@ -57,18 +55,18 @@ public interface IQuery<TSource> : IQuery
     IQuery<TSource> AddField<TSubSource>(
         string field,
         Func<IQuery<TSubSource>, IQuery<TSubSource>> build)
-        where TSubSource : class;
+        where TSubSource : class?;
 
     /// <summary>Adds a new argument to the query.</summary>
     /// <param name="key">The argument name.</param>
     /// <param name="value">The value.</param>
     /// <returns>The query.</returns>
-    IQuery<TSource> AddArgument(string key, object value);
+    IQuery<TSource> AddArgument(string key, object? value);
 
     /// <summary>Adds arguments to the query.</summary>
     /// <param name="arguments">the dictionary argument.</param>
     /// <returns>The query.</returns>
-    IQuery<TSource> AddArguments(Dictionary<string, object> arguments);
+    IQuery<TSource> AddArguments(Dictionary<string, object?> arguments);
 
     /// <summary>Adds arguments to the query.</summary>
     /// <typeparam name="TArguments">The arguments object type.</typeparam>

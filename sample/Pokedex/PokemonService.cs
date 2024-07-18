@@ -36,21 +36,21 @@ class PokemonService
             .AddField(p => p.Number)
             .AddField(p => p.Name)
             .AddField(p => p.Height, hq => hq
-                .AddField(h => h.Minimum)
-                .AddField(h => h.Maximum)
+                .AddField(h => h!.Minimum)
+                .AddField(h => h!.Maximum)
             )
             .AddField(p => p.Weight, wq => wq
-                .AddField(w => w.Minimum)
-                .AddField(w => w.Maximum)
+                .AddField(w => w!.Minimum)
+                .AddField(w => w!.Maximum)
             )
             .AddField(p => p.Types)
             .AddField(p => p.Attacks, aq => aq
-                .AddField<Attack>(a => a.Fast, fq => fq
+                .AddField<Attack>(a => a!.Fast, fq => fq
                     .AddField(f => f.Name)
                     .AddField(f => f.Type)
                     .AddField(f => f.Damage)
                 )
-                .AddField<Attack>(a => a.Special, sq => sq
+                .AddField<Attack>(a => a!.Special, sq => sq
                     .AddField(f => f.Name)
                     .AddField(f => f.Type)
                     .AddField(f => f.Damage)
@@ -83,12 +83,12 @@ class PokemonService
             .AddField(p => p.Number)
             .AddField(p => p.Name)
             .AddField(p => p.Height, hq => hq
-                .AddField(h => h.Minimum)
-                .AddField(h => h.Maximum)
+                .AddField(h => h!.Minimum)
+                .AddField(h => h!.Maximum)
             )
             .AddField(p => p.Weight, wq => wq
-                .AddField(w => w.Minimum)
-                .AddField(w => w.Maximum)
+                .AddField(w => w!.Minimum)
+                .AddField(w => w!.Maximum)
             )
             .AddField(p => p.Types);
         GraphQLRequest request = new() { Query = "{" + query.Build() + "}" };
@@ -96,6 +96,6 @@ class PokemonService
         using GraphQLHttpClient client = new(this.graphqlPokemonUrl, this.serializer);
         GraphQLResponse<PokemonsResponse> response = await client.SendQueryAsync<PokemonsResponse>(request);
 
-        return response.Data.Pokemons ?? Array.Empty<Pokemon>();
+        return response.Data.Pokemons ?? [];
     }
 }

@@ -1,5 +1,3 @@
-using System;
-
 namespace GraphQL.Query.Builder;
 
 internal static class RequiredArgument

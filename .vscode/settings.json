@@ -1,4 +1,8 @@
 {
   "omnisharp.organizeImportsOnFormat": true,
-  "yaml.format.singleQuote": true
+  "yaml.format.singleQuote": true,
+  "sonarlint.connectedMode.project": {
+    "connectionId": "charlesdevandiere",
+    "projectKey": "charlesdevandiere_graphql-query-builder-dotnet"
+  }
 }

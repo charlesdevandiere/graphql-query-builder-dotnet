@@ -6,25 +6,25 @@ namespace Shared.Models;
 public class Pokemon
 {
     [JsonPropertyName("attacks")]
-    public PokemonAttack Attacks { get; set; }
+    public PokemonAttack? Attacks { get; set; }
 
     [JsonPropertyName("height")]
-    public PokemonDimension Height { get; set; }
+    public PokemonDimension? Height { get; set; }
 
     [JsonPropertyName("id")]
-    public string Id { get; set; }
+    public string Id { get; set; } = string.Empty;
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     [JsonPropertyName("number")]
-    public string Number { get; set; }
+    public string Number { get; set; } = string.Empty;
 
     [JsonPropertyName("types")]
-    public string[] Types { get; set; }
+    public string[]? Types { get; set; }
 
     [JsonPropertyName("weight")]
-    public PokemonDimension Weight { get; set; }
+    public PokemonDimension? Weight { get; set; }
 
     public override string ToString()
     {

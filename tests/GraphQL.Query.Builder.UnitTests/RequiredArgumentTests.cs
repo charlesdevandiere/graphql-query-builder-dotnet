@@ -1,4 +1,3 @@
-using System;
 using Xunit;
 
 namespace GraphQL.Query.Builder.UnitTests;
@@ -11,6 +10,7 @@ public class RequiredArgumentTests
     {
         string str = "foo";
         RequiredArgument.NotNull(str, nameof(str));
+        Assert.True(true);
     }
 
     [Fact]
@@ -25,7 +25,9 @@ public class RequiredArgumentTests
     public void NotNull_ShouldThrowArgumentNullExceptionWithNoParamName()
     {
         string? str = null;
+#nullable disable
         ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => RequiredArgument.NotNull(str, null));
+#nullable restore
         Assert.Equal("Value cannot be null.", exception.Message);
     }
 
@@ -33,7 +35,9 @@ public class RequiredArgumentTests
     public void NotNullOrEmpty_ShouldThrowArgumentNullException()
     {
         string? str = null;
+#nullable disable
         ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => RequiredArgument.NotNullOrEmpty(str, nameof(str)));
+#nullable restore
         Assert.Equal($"Value cannot be null. (Parameter '{nameof(str)}')", exception.Message);
     }
 
@@ -41,7 +45,9 @@ public class RequiredArgumentTests
     public void NotNullOrEmpty_ShouldThrowArgumentNullExceptionWithNoParamName()
     {
         string? str = null;
+#nullable disable
         ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => RequiredArgument.NotNullOrEmpty(str, null));
+#nullable restore
         Assert.Equal("Value cannot be null.", exception.Message);
     }
 
@@ -57,7 +63,9 @@ public class RequiredArgumentTests
     public void NotNullOrEmpty_ShouldThrowArgumentExceptionWithNoParamName()
     {
         string str = "";
+#nullable disable
         ArgumentException exception = Assert.Throws<ArgumentException>(() => RequiredArgument.NotNullOrEmpty(str, null));
+#nullable restore
         Assert.Equal("Value cannot be empty.", exception.Message);
     }
 }

@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 using GraphQL.Query.Builder.UnitTests.Models;
 using Xunit;
@@ -13,6 +11,12 @@ public class QueryStringBuilderTests
         ENABLED,
         DISABLED,
         HAYstack
+    }
+
+    [Fact]
+    public void TestFormatQueryParam_null()
+    {
+        Assert.Equal("null", new QueryStringBuilder().FormatQueryParam(null));
     }
 
     [Fact]
@@ -162,8 +166,8 @@ public class QueryStringBuilderTests
     [Fact]
     public void TestFormatQueryParam_date()
     {
-        DateTime value = new(2022, 3, 30);
-        Assert.Equal("\"2022-03-30T00:00:00.0000000\"", new QueryStringBuilder().FormatQueryParam(value));
+        DateTime value = new(2022, 3, 30, 0, 0, 0, DateTimeKind.Utc);
+        Assert.Equal("\"2022-03-30T00:00:00.0000000Z\"", new QueryStringBuilder().FormatQueryParam(value));
     }
 
     [Fact]
@@ -176,7 +180,7 @@ public class QueryStringBuilderTests
     [Fact]
     public void TestFormatQueryParam_dictionary()
     {
-        Dictionary<string, object> value = new()
+        Dictionary<string, object?> value = new()
         {
             { "from", 444.45 },
             { "to", 555.45 }
@@ -188,15 +192,15 @@ public class QueryStringBuilderTests
     public void TestFormatQueryParam_listNumber()
     {
         {
-            List<int> value = new() { 43783, 43784, 43145 };
+            List<int> value = [43783, 43784, 43145];
             Assert.Equal("[43783,43784,43145]", new QueryStringBuilder().FormatQueryParam(value));
         }
         {
-            int[] value = new[] { 43783, 43784, 43145 };
+            int[] value = [43783, 43784, 43145];
             Assert.Equal("[43783,43784,43145]", new QueryStringBuilder().FormatQueryParam(value));
         }
         {
-            double[] value = new[] { 43.783, 43.784, 43.145 };
+            double[] value = [43.783, 43.784, 43.145];
             Assert.Equal("[43.783,43.784,43.145]", new QueryStringBuilder().FormatQueryParam(value));
         }
     }
@@ -205,11 +209,11 @@ public class QueryStringBuilderTests
     public void TestFormatQueryParam_listString()
     {
         {
-            List<string> value = new() { "a", "b", "c" };
+            List<string> value = ["a", "b", "c"];
             Assert.Equal("[\"a\",\"b\",\"c\"]", new QueryStringBuilder().FormatQueryParam(value));
         }
         {
-            string[] value = new[] { "a", "b", "c" };
+            string[] value = ["a", "b", "c"];
             Assert.Equal("[\"a\",\"b\",\"c\"]", new QueryStringBuilder().FormatQueryParam(value));
         }
     }
@@ -218,11 +222,11 @@ public class QueryStringBuilderTests
     public void TestFormatQueryParam_listEnum()
     {
         {
-            List<TestEnum> value = new() { TestEnum.ENABLED, TestEnum.DISABLED, TestEnum.HAYstack };
+            List<TestEnum> value = [TestEnum.ENABLED, TestEnum.DISABLED, TestEnum.HAYstack];
             Assert.Equal("[ENABLED,DISABLED,HAYstack]", new QueryStringBuilder().FormatQueryParam(value));
         }
         {
-            TestEnum[] value = new[] { TestEnum.ENABLED, TestEnum.DISABLED, TestEnum.HAYstack };
+            TestEnum[] value = [TestEnum.ENABLED, TestEnum.DISABLED, TestEnum.HAYstack];
             Assert.Equal("[ENABLED,DISABLED,HAYstack]", new QueryStringBuilder().FormatQueryParam(value));
         }
     }
@@ -266,8 +270,8 @@ public class QueryStringBuilderTests
         {
             Name = "Test",
             Age = 10,
-            Orders = new List<Order>
-                {
+            Orders =
+                [
                     new()
                     {
                         Product = new Car
@@ -282,7 +286,7 @@ public class QueryStringBuilderTests
                             }
                         }
                     }
-                }
+                ]
         };
 
         Assert.Equal(
@@ -294,8 +298,8 @@ public class QueryStringBuilderTests
         {
             Name = "Test",
             Age = 10,
-            Orders = new List<Order>
-                {
+            Orders =
+                [
                     new()
                     {
                         Product = new Car
@@ -305,7 +309,7 @@ public class QueryStringBuilderTests
                             Color = null
                         }
                     }
-                }
+                ]
         };
 
         Assert.Equal(
@@ -316,13 +320,13 @@ public class QueryStringBuilderTests
     [Fact]
     public void BuildQueryParam_NestedListType_ParseNestedList()
     {
-        List<object> objList = new(new object[] { "aa", "bb", "cc" });
-        Dictionary<string, object> fromToMap = new()
+        List<object> objList = ["aa", "bb", "cc"];
+        Dictionary<string, object?> fromToMap = new()
         {
             { "from", 444.45 },
             { "to", 555.45 },
         };
-        Dictionary<string, object> nestedListMap = new()
+        Dictionary<string, object?> nestedListMap = new()
         {
             { "from", 123 },
             { "to", 454 },
@@ -339,13 +343,13 @@ public class QueryStringBuilderTests
     [Fact]
     public void Where_QueryString_ParseQueryString()
     {
-        List<object> objList = new(new object[] { "aa", "bb", "cc" });
-        Dictionary<string, object> fromToMap = new()
+        List<object> objList = ["aa", "bb", "cc"];
+        Dictionary<string, object?> fromToMap = new()
         {
             { "from", 444.45 },
             { "to", 555.45 },
         };
-        Dictionary<string, object> nestedListMap = new()
+        Dictionary<string, object?> nestedListMap = new()
         {
             { "from", 123 },
             { "to", 454 },
@@ -368,13 +372,13 @@ public class QueryStringBuilderTests
     [Fact]
     public void Where_ClearQueryString_EmptyQueryString()
     {
-        List<object> objList = new(new object[] { "aa", "bb", "cc" });
-        Dictionary<string, object> fromToMap = new()
+        List<object> objList = ["aa", "bb", "cc"];
+        Dictionary<string, object?> fromToMap = new()
         {
             { "from", 444.45 },
             { "to", 555.45 },
         };
-        Dictionary<string, object> nestedListMap = new()
+        Dictionary<string, object?> nestedListMap = new()
         {
             { "from", 123 },
             { "to", 454 },
@@ -396,7 +400,7 @@ public class QueryStringBuilderTests
     [Fact]
     public void Select_QueryString_ParseQueryString()
     {
-        Dictionary<string, object> mySubDict = new()
+        Dictionary<string, object?> mySubDict = new()
         {
             { "subMake", "aston martin" },
             { "subState", "ca" },
@@ -425,7 +429,7 @@ public class QueryStringBuilderTests
     [Fact]
     public void Build_AllElements_StringMatch()
     {
-        Dictionary<string, object> mySubDict = new()
+        Dictionary<string, object?> mySubDict = new()
         {
             { "subMake", "aston martin" },
             { "subState", "ca" },

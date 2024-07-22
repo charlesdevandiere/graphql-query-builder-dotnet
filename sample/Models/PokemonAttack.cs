@@ -6,10 +6,10 @@ namespace Shared.Models;
 public class PokemonAttack
 {
     [JsonPropertyName("fast")]
-    public Attack[] Fast { get; set; }
+    public Attack[] Fast { get; set; } = [];
 
     [JsonPropertyName("special")]
-    public Attack[] Special { get; set; }
+    public Attack[] Special { get; set; } = [];
 
     public override string ToString()
     {

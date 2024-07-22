@@ -1,5 +1,3 @@
-using System;
-
 namespace GraphQL.Query.Builder;
 
 /// <summary>The query interface.</summary>
@@ -9,7 +7,7 @@ public interface IQuery
     string Name { get; }
 
     /// <summary>Gets the alias name.</summary>
-    string AliasName { get; }
+    string? AliasName { get; }
 
     /// <summary>Builds the query.</summary>
     /// <returns>The GraphQL query as string, without outer enclosing block.</returns>

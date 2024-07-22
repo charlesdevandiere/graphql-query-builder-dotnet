@@ -1,6 +1,8 @@
 {
-  "omnisharp.enableRoslynAnalyzers": true,
   "omnisharp.organizeImportsOnFormat": true,
-  "omnisharp.useModernNet": true,
-  "yaml.format.singleQuote": true
+  "yaml.format.singleQuote": true,
+  "sonarlint.connectedMode.project": {
+    "connectionId": "charlesdevandiere",
+    "projectKey": "charlesdevandiere_graphql-query-builder-dotnet"
+  }
 }

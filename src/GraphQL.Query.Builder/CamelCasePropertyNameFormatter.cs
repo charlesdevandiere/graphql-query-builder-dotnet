@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 
 namespace GraphQL.Query.Builder;
@@ -8,7 +7,7 @@ public static class CamelCasePropertyNameFormatter
 {
     /// <summary>Formats the property name in camel case.</summary>
     /// <value>The property.</value>
-    public static Func<PropertyInfo, string> Format = property =>
+    public static readonly Func<PropertyInfo, string> Format = property =>
     {
         RequiredArgument.NotNull(property, nameof(property));
 

@@ -8,7 +8,8 @@ namespace GraphQL.Query.Builder;
 /// <summary>The GraphQL query builder class.</summary>
 public class QueryStringBuilder : IQueryStringBuilder
 {
-    private readonly Func<PropertyInfo, string>? formatter;
+    /// <summary>The property name formatter.</summary>
+    protected readonly Func<PropertyInfo, string>? formatter;
 
     /// <summary>The query string builder.</summary>
     public StringBuilder QueryString { get; } = new();
@@ -21,6 +22,35 @@ public class QueryStringBuilder : IQueryStringBuilder
     public QueryStringBuilder(Func<PropertyInfo, string> formatter)
     {
         this.formatter = formatter;
+    }
+
+    /// <summary>Builds the query.</summary>
+    /// <param name="query">The query.</param>
+    /// <returns>The GraphQL query as string, without outer enclosing block.</returns>
+    public string Build<TSource>(IQuery<TSource> query)
+    {
+        if (!string.IsNullOrWhiteSpace(query.AliasName))
+        {
+            this.QueryString.Append($"{query.AliasName}:");
+        }
+
+        this.QueryString.Append(query.Name);
+
+        if (query.Arguments.Count > 0)
+        {
+            this.QueryString.Append("(");
+            this.AddParams(query);
+            this.QueryString.Append(")");
+        }
+
+        if (query.SelectList.Count > 0)
+        {
+            this.QueryString.Append("{");
+            this.AddFields(query);
+            this.QueryString.Append("}");
+        }
+
+        return this.QueryString.ToString();
     }
 
     /// <summary>Clears the string builder.</summary>
@@ -158,21 +188,6 @@ public class QueryStringBuilder : IQueryStringBuilder
         }
     }
 
-    /// <summary>Convert object into dictionary.</summary>
-    /// <param name="object">The object.</param>
-    /// <returns>The object as dictionary.</returns>
-    internal Dictionary<string, object> ObjectToDictionary(object @object) =>
-        @object
-            .GetType()
-            .GetProperties()
-            .Where(property => property.GetValue(@object) != null)
-            .Select(property =>
-                new KeyValuePair<string, object>(
-                    this.formatter is not null ? this.formatter.Invoke(property) : property.Name,
-                    property.GetValue(@object)))
-            .OrderBy(property => property.Key)
-            .ToDictionary(property => property.Key, property => property.Value);
-
     /// <summary>Adds query params to the query string.</summary>
     /// <param name="query">The query.</param>
     protected internal void AddParams<TSource>(IQuery<TSource> query)
@@ -218,36 +233,18 @@ public class QueryStringBuilder : IQueryStringBuilder
         }
     }
 
-    /// <summary>Builds the query.</summary>
-    /// <param name="query">The query.</param>
-    /// <returns>The GraphQL query as string, without outer enclosing block.</returns>
-    public string Build<TSource>(IQuery<TSource> query)
-    {
-        if (!string.IsNullOrWhiteSpace(query.AliasName))
-        {
-            this.QueryString.Append($"{query.AliasName}:");
-        }
-
-        this.QueryString.Append(query.Name);
-
-        if (query.Arguments.Count > 0)
-        {
-            this.QueryString.Append("(");
-            this.AddParams(query);
-            this.QueryString.Append(")");
-        }
-
-        if (query.SelectList.Count > 0)
-        {
-            this.QueryString.Append("{");
-            this.AddFields(query);
-            this.QueryString.Append("}");
-        }
-        else
-        {
-            this.AddFields(query);
-        }
-
-        return this.QueryString.ToString();
-    }
+    /// <summary>Convert object into dictionary.</summary>
+    /// <param name="object">The object.</param>
+    /// <returns>The object as dictionary.</returns>
+    private Dictionary<string, object> ObjectToDictionary(object @object) =>
+        @object
+            .GetType()
+            .GetProperties()
+            .Where(property => property.GetValue(@object) != null)
+            .Select(property =>
+                new KeyValuePair<string, object>(
+                    this.formatter is not null ? this.formatter.Invoke(property) : property.Name,
+                    property.GetValue(@object)))
+            .OrderBy(property => property.Key)
+            .ToDictionary(property => property.Key, property => property.Value);
 }

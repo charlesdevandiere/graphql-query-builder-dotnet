@@ -16,7 +16,8 @@ public interface IQuery<TSource> : IQuery
 
 `TSource`<br>
 
-Implements [IQuery](./graphql.query.builder.iquery)
+Implements [IQuery](./graphql.query.builder.iquery)<br>
+Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullablecontextattribute)
 
 ## Properties
 
@@ -177,6 +178,55 @@ The field name.
 
 `build` Func&lt;IQuery&lt;TSubSource&gt;, IQuery&lt;TSubSource&gt;&gt;<br>
 The sub-object query building function.
+
+#### Returns
+
+[IQuery&lt;TSource&gt;](./graphql.query.builder.iquery-1)<br>
+The query.
+
+### **AddUnion&lt;TUnionType&gt;(String, Func&lt;IQuery&lt;TUnionType&gt;, IQuery&lt;TUnionType&gt;&gt;)**
+
+Adds an union to the query.
+
+```csharp
+IQuery<TSource> AddUnion<TUnionType>(string typeName, Func<IQuery<TUnionType>, IQuery<TUnionType>> build)
+```
+
+#### Type Parameters
+
+`TUnionType`<br>
+The union type.
+
+#### Parameters
+
+`typeName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+The union type name.
+
+`build` Func&lt;IQuery&lt;TUnionType&gt;, IQuery&lt;TUnionType&gt;&gt;<br>
+The union building function.
+
+#### Returns
+
+[IQuery&lt;TSource&gt;](./graphql.query.builder.iquery-1)<br>
+The query.
+
+### **AddUnion&lt;TUnionType&gt;(Func&lt;IQuery&lt;TUnionType&gt;, IQuery&lt;TUnionType&gt;&gt;)**
+
+Adds an union to the query.
+
+```csharp
+IQuery<TSource> AddUnion<TUnionType>(Func<IQuery<TUnionType>, IQuery<TUnionType>> build)
+```
+
+#### Type Parameters
+
+`TUnionType`<br>
+The union type.
+
+#### Parameters
+
+`build` Func&lt;IQuery&lt;TUnionType&gt;, IQuery&lt;TUnionType&gt;&gt;<br>
+The union building function.
 
 #### Returns
 

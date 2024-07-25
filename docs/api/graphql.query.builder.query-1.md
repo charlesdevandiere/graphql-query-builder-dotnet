@@ -17,7 +17,18 @@ public class Query<TSource> : IQuery`1, IQuery
 `TSource`<br>
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [Query&lt;TSource&gt;](./graphql.query.builder.query-1)<br>
-Implements IQuery&lt;TSource&gt;, [IQuery](./graphql.query.builder.iquery)
+Implements IQuery&lt;TSource&gt;, [IQuery](./graphql.query.builder.iquery)<br>
+Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](./system.runtime.compilerservices.nullableattribute)
+
+## Fields
+
+### **options**
+
+The query options.
+
+```csharp
+protected QueryOptions options;
+```
 
 ## Properties
 
@@ -68,6 +79,18 @@ public string AliasName { get; private set; }
 #### Property Value
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+
+### **QueryStringBuilder**
+
+Gets the query string builder.
+
+```csharp
+protected IQueryStringBuilder QueryStringBuilder { get; }
+```
+
+#### Property Value
+
+[IQueryStringBuilder](./graphql.query.builder.iquerystringbuilder)<br>
 
 ## Constructors
 
@@ -230,6 +253,55 @@ The field name.
 
 `build` Func&lt;IQuery&lt;TSubSource&gt;, IQuery&lt;TSubSource&gt;&gt;<br>
 The sub-object query building function.
+
+#### Returns
+
+IQuery&lt;TSource&gt;<br>
+The query.
+
+### **AddUnion&lt;TUnionType&gt;(String, Func&lt;IQuery&lt;TUnionType&gt;, IQuery&lt;TUnionType&gt;&gt;)**
+
+Adds an union to the query.
+
+```csharp
+public IQuery<TSource> AddUnion<TUnionType>(string typeName, Func<IQuery<TUnionType>, IQuery<TUnionType>> build)
+```
+
+#### Type Parameters
+
+`TUnionType`<br>
+The union type.
+
+#### Parameters
+
+`typeName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+The union type name.
+
+`build` Func&lt;IQuery&lt;TUnionType&gt;, IQuery&lt;TUnionType&gt;&gt;<br>
+The union building function.
+
+#### Returns
+
+IQuery&lt;TSource&gt;<br>
+The query.
+
+### **AddUnion&lt;TUnionType&gt;(Func&lt;IQuery&lt;TUnionType&gt;, IQuery&lt;TUnionType&gt;&gt;)**
+
+Adds an union to the query.
+
+```csharp
+public IQuery<TSource> AddUnion<TUnionType>(Func<IQuery<TUnionType>, IQuery<TUnionType>> build)
+```
+
+#### Type Parameters
+
+`TUnionType`<br>
+The union type.
+
+#### Parameters
+
+`build` Func&lt;IQuery&lt;TUnionType&gt;, IQuery&lt;TUnionType&gt;&gt;<br>
+The union building function.
 
 #### Returns
 

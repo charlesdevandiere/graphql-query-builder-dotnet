@@ -8,7 +8,8 @@ namespace GraphQL.Query.Builder;
 /// <summary>The query class.</summary>
 public class Query<TSource> : IQuery<TSource>
 {
-    private readonly QueryOptions? options;
+    /// <summary>The query options.</summary>
+    protected readonly QueryOptions? options;
 
     /// <summary>Gets the select list.</summary>
     public List<object?> SelectList { get; } = [];
@@ -23,7 +24,7 @@ public class Query<TSource> : IQuery<TSource>
     public string? AliasName { get; private set; }
 
     /// <summary>Gets the query string builder.</summary>
-    private IQueryStringBuilder QueryStringBuilder { get; set; } = new QueryStringBuilder();
+    protected IQueryStringBuilder QueryStringBuilder { get; } = new QueryStringBuilder();
 
     /// <summary>Initializes a new instance of the <see cref="Query{TSource}" /> class.</summary>
     public Query(string name)
@@ -147,6 +148,40 @@ public class Query<TSource> : IQuery<TSource>
         this.SelectList.Add(subQuery);
 
         return this;
+    }
+
+    /// <summary>Adds an union to the query.</summary>
+    /// <typeparam name="TUnionType">The union type.</typeparam>
+    /// <param name="typeName">The union type name.</param>
+    /// <param name="build">The union building function.</param>
+    /// <returns>The query.</returns>
+    public IQuery<TSource> AddUnion<TUnionType>(
+        string typeName,
+        Func<IQuery<TUnionType>, IQuery<TUnionType>> build)
+        where TUnionType : class?, TSource
+    {
+        RequiredArgument.NotNullOrEmpty(typeName, nameof(typeName));
+        RequiredArgument.NotNull(build, nameof(build));
+
+        Query<TUnionType> query = new($"... on {typeName}", this.options);
+        IQuery<TUnionType> union = build.Invoke(query);
+
+        this.SelectList.Add(union);
+
+        return this;
+    }
+
+    /// <summary>Adds an union to the query.</summary>
+    /// <typeparam name="TUnionType">The union type.</typeparam>
+    /// <param name="build">The union building function.</param>
+    /// <returns>The query.</returns>
+    public IQuery<TSource> AddUnion<TUnionType>(
+        Func<IQuery<TUnionType>, IQuery<TUnionType>> build)
+        where TUnionType : class?, TSource
+    {
+        RequiredArgument.NotNull(build, nameof(build));
+
+        return this.AddUnion(typeof(TUnionType).Name, build);
     }
 
     /// <summary>Adds a new argument to the query.</summary>

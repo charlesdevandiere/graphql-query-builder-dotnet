@@ -57,6 +57,24 @@ public interface IQuery<TSource> : IQuery
         Func<IQuery<TSubSource>, IQuery<TSubSource>> build)
         where TSubSource : class?;
 
+    /// <summary>Adds an union to the query.</summary>
+    /// <typeparam name="TUnionType">The union type.</typeparam>
+    /// <param name="typeName">The union type name.</param>
+    /// <param name="build">The union building function.</param>
+    /// <returns>The query.</returns>
+    IQuery<TSource> AddUnion<TUnionType>(
+        string typeName,
+        Func<IQuery<TUnionType>, IQuery<TUnionType>> build)
+        where TUnionType : class?, TSource;
+
+    /// <summary>Adds an union to the query.</summary>
+    /// <typeparam name="TUnionType">The union type.</typeparam>
+    /// <param name="build">The union building function.</param>
+    /// <returns>The query.</returns>
+    IQuery<TSource> AddUnion<TUnionType>(
+        Func<IQuery<TUnionType>, IQuery<TUnionType>> build)
+        where TUnionType : class?, TSource;
+
     /// <summary>Adds a new argument to the query.</summary>
     /// <param name="key">The argument name.</param>
     /// <param name="value">The value.</param>

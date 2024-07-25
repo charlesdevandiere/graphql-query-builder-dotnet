@@ -334,6 +334,31 @@ public class QueryOfTTests
     }
 
     [Fact]
+    public void TestQueryWithUnion()
+    {
+        IQuery<Vehicule>? query = new Query<Vehicule>("vehicule")
+            .AddUnion<Car>(
+                union => union
+                    .AddField(car => car.Name)
+                    .AddField(car => car.Price))
+            .AddField(vehicule => vehicule.Manufacturer)
+            .AddUnion<Truck>(
+                "BeautifulTruck",
+                union => union
+                    .AddField(truck => truck.Name)
+                    .AddField(
+                        truck => truck.Color,
+                        sq => sq
+                            .AddField(color => color!.Red)
+                            .AddField(color => color!.Green)
+                            .AddField(color => color!.Blue)));
+
+        string result = query.Build();
+
+        Assert.Equal("vehicule{... on Car{Name Price} Manufacturer ... on BeautifulTruck{Name Color{Red Green Blue}}}", result);
+    }
+
+    [Fact]
     public void TestSubSelectWithList()
     {
         IQuery<ObjectWithList>? query = new Query<ObjectWithList>("object")

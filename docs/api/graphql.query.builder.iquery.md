@@ -12,6 +12,8 @@ The query interface.
 public interface IQuery
 ```
 
+Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullablecontextattribute)
+
 ## Properties
 
 ### **Name**

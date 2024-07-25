@@ -12,6 +12,8 @@ The GraphQL query builder interface.
 public interface IQueryStringBuilder
 ```
 
+Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullablecontextattribute)
+
 ## Methods
 
 ### **Clear()**

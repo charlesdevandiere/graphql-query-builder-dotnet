@@ -13,7 +13,18 @@ public class QueryStringBuilder : IQueryStringBuilder
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [QueryStringBuilder](./graphql.query.builder.querystringbuilder)<br>
-Implements [IQueryStringBuilder](./graphql.query.builder.iquerystringbuilder)
+Implements [IQueryStringBuilder](./graphql.query.builder.iquerystringbuilder)<br>
+Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](./system.runtime.compilerservices.nullableattribute)
+
+## Fields
+
+### **formatter**
+
+The property name formatter.
+
+```csharp
+protected Func<PropertyInfo, string> formatter;
+```
 
 ## Properties
 
@@ -53,6 +64,28 @@ public QueryStringBuilder(Func<PropertyInfo, string> formatter)
 The property name formatter
 
 ## Methods
+
+### **Build&lt;TSource&gt;(IQuery&lt;TSource&gt;)**
+
+Builds the query.
+
+```csharp
+public string Build<TSource>(IQuery<TSource> query)
+```
+
+#### Type Parameters
+
+`TSource`<br>
+
+#### Parameters
+
+`query` IQuery&lt;TSource&gt;<br>
+The query.
+
+#### Returns
+
+[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+The GraphQL query as string, without outer enclosing block.
 
 ### **Clear()**
 
@@ -97,24 +130,6 @@ The formatted query param.
 [InvalidDataException](https://docs.microsoft.com/en-us/dotnet/api/system.io.invaliddataexception)<br>
 Invalid Object Type in Param List
 
-### **ObjectToDictionary(Object)**
-
-Convert object into dictionary.
-
-```csharp
-internal Dictionary<string, object> ObjectToDictionary(object object)
-```
-
-#### Parameters
-
-`object` [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object)<br>
-The object.
-
-#### Returns
-
-[Dictionary&lt;String, Object&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2)<br>
-The object as dictionary.
-
 ### **AddParams&lt;TSource&gt;(IQuery&lt;TSource&gt;)**
 
 Adds query params to the query string.
@@ -153,28 +168,6 @@ The query.
 
 [ArgumentException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentexception)<br>
 Invalid Object in Field List
-
-### **Build&lt;TSource&gt;(IQuery&lt;TSource&gt;)**
-
-Builds the query.
-
-```csharp
-public string Build<TSource>(IQuery<TSource> query)
-```
-
-#### Type Parameters
-
-`TSource`<br>
-
-#### Parameters
-
-`query` IQuery&lt;TSource&gt;<br>
-The query.
-
-#### Returns
-
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-The GraphQL query as string, without outer enclosing block.
 
 ---
 

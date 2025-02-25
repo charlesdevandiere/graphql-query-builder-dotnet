@@ -86,7 +86,7 @@ You can change this behavior by providing a custom formatter.
 ```csharp
 QueryOptions options = new()
 {
-    Formater = // Your custom formatter
+    Formatter = // Your custom formatter
 };
 
 IQuery<Human> query = new Query<Human>("human", options);

@@ -26,6 +26,14 @@ The property name formatter.
 protected Func<PropertyInfo, string> formatter;
 ```
 
+### **ignoreCondition**
+
+The ignore condition for null/default properties.
+
+```csharp
+protected QueryIgnoreCondition ignoreCondition;
+```
+
 ## Properties
 
 ### **QueryString**
@@ -62,6 +70,22 @@ public QueryStringBuilder(Func<PropertyInfo, string> formatter)
 
 `formatter` [Func&lt;PropertyInfo, String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.func-2)<br>
 The property name formatter
+
+### **QueryStringBuilder(Func&lt;PropertyInfo, String&gt;, QueryIgnoreCondition)**
+
+Initializes a new instance of the [QueryStringBuilder](./graphql.query.builder.querystringbuilder) class.
+
+```csharp
+public QueryStringBuilder(Func<PropertyInfo, string> formatter, QueryIgnoreCondition ignoreCondition)
+```
+
+#### Parameters
+
+`formatter` [Func&lt;PropertyInfo, String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.func-2)<br>
+The property name formatter
+
+`ignoreCondition` [QueryIgnoreCondition](./graphql.query.builder.queryignorecondition)<br>
+The ignore condition for null/default properties
 
 ## Methods
 

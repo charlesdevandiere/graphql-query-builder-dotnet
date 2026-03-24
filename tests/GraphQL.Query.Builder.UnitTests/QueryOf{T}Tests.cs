@@ -169,9 +169,11 @@ public class QueryOfTTests
         query.AddArguments(car);
 
         // Assert
-        Assert.Equal(2, query.Arguments.Count);
+        Assert.Equal(4, query.Arguments.Count);
         Assert.Equal("Bee", query.Arguments[nameof(Car.Name)]);
         Assert.Equal(10000m, query.Arguments[nameof(Car.Price)]);
+        Assert.Null(query.Arguments[nameof(Car.Color)]);
+        Assert.Null(query.Arguments[nameof(Car.Manufacturer)]);
     }
 
     [Fact]
@@ -371,6 +373,138 @@ public class QueryOfTTests
         Assert.Equal(typeof(Query<SubObject>), query.SelectList[1]?.GetType());
         Assert.Equal(typeof(Query<SubObject>), query.SelectList[2]?.GetType());
         Assert.Equal(typeof(Query<SubObject>), query.SelectList[3]?.GetType());
+    }
+
+    [Fact]
+    public void AddArgument_DuplicateKey_OverwritesValue()
+    {
+        Query<object> query = new("test");
+        query.AddArgument("id", 1);
+        query.AddArgument("id", 2);
+
+        Assert.Single(query.Arguments);
+        Assert.Equal(2, query.Arguments["id"]);
+    }
+
+    [Fact]
+    public void AddArguments_DefaultIgnoreCondition_Never_IncludesNullProperties()
+    {
+        QueryOptions options = new() { DefaultIgnoreCondition = QueryIgnoreCondition.Never };
+        Query<object> query = new("test", options);
+        query.AddArguments(new { name = "Bob", age = (int?)null });
+
+        Assert.Equal(2, query.Arguments.Count);
+        Assert.Equal("Bob", query.Arguments["name"]);
+        Assert.Null(query.Arguments["age"]);
+    }
+
+    [Fact]
+    public void AddArguments_DefaultIgnoreCondition_WhenWritingNull_SkipsNullProperties()
+    {
+        QueryOptions options = new() { DefaultIgnoreCondition = QueryIgnoreCondition.WhenWritingNull };
+        Query<object> query = new("test", options);
+        query.AddArguments(new { name = "Bob", age = (int?)null });
+
+        Assert.Single(query.Arguments);
+        Assert.Equal("Bob", query.Arguments["name"]);
+    }
+
+    [Fact]
+    public void AddArguments_DefaultIgnoreCondition_WhenWritingDefault_SkipsDefaultProperties()
+    {
+        QueryOptions options = new() { DefaultIgnoreCondition = QueryIgnoreCondition.WhenWritingDefault };
+        Query<object> query = new("test", options);
+        query.AddArguments(new { name = "Bob", age = 0, active = false });
+
+        Assert.Single(query.Arguments);
+        Assert.Equal("Bob", query.Arguments["name"]);
+    }
+
+    [Fact]
+    public void AddArguments_DefaultIgnoreCondition_WhenWritingNull_KeepsDefaultValueTypes()
+    {
+        QueryOptions options = new() { DefaultIgnoreCondition = QueryIgnoreCondition.WhenWritingNull };
+        Query<object> query = new("test", options);
+        query.AddArguments(new { name = "Bob", age = 0, active = false });
+
+        Assert.Equal(3, query.Arguments.Count);
+        Assert.Equal("Bob", query.Arguments["name"]);
+        Assert.Equal(0, query.Arguments["age"]);
+        Assert.Equal(false, query.Arguments["active"]);
+    }
+
+    [Fact]
+    public void AddArguments_DefaultIgnoreCondition_WhenWritingDefault_KeepsNonDefaultValueTypes()
+    {
+        QueryOptions options = new() { DefaultIgnoreCondition = QueryIgnoreCondition.WhenWritingDefault };
+        Query<object> query = new("test", options);
+        query.AddArguments(new { name = "Bob", age = 5, active = true });
+
+        Assert.Equal(3, query.Arguments.Count);
+        Assert.Equal("Bob", query.Arguments["name"]);
+        Assert.Equal(5, query.Arguments["age"]);
+        Assert.Equal(true, query.Arguments["active"]);
+    }
+
+    [Fact]
+    public void Build_DefaultIgnoreCondition_Never_IncludesNullInOutput()
+    {
+        QueryOptions options = new() { DefaultIgnoreCondition = QueryIgnoreCondition.Never };
+        IQuery<Customer> query = new Query<Customer>("customer", options)
+            .AddField(c => c.Name)
+            .AddArguments(new { name = "Bob", age = (int?)null });
+
+        string result = query.Build();
+
+        Assert.Equal("customer(age:null,name:\"Bob\"){Name}", result);
+    }
+
+    [Fact]
+    public void Build_DefaultIgnoreCondition_WhenWritingNull_ExcludesNullFromOutput()
+    {
+        QueryOptions options = new() { DefaultIgnoreCondition = QueryIgnoreCondition.WhenWritingNull };
+        IQuery<Customer> query = new Query<Customer>("customer", options)
+            .AddField(c => c.Name)
+            .AddArguments(new { name = "Bob", age = (int?)null });
+
+        string result = query.Build();
+
+        Assert.Equal("customer(name:\"Bob\"){Name}", result);
+    }
+
+    [Theory]
+    [InlineData("id} mutation { deleteAll")]
+    [InlineData("field name")]
+    [InlineData("123field")]
+    [InlineData("field-name")]
+    [InlineData("")]
+    public void AddField_InvalidName_ThrowsArgumentException(string invalidName)
+    {
+        Query<object> query = new("test");
+        Assert.Throws<ArgumentException>(() => query.AddField(invalidName));
+    }
+
+    [Theory]
+    [InlineData("key} inject")]
+    [InlineData("123key")]
+    [InlineData("key-name")]
+    [InlineData("")]
+    public void AddArgument_InvalidKey_ThrowsArgumentException(string invalidKey)
+    {
+        Query<object> query = new("test");
+        Assert.Throws<ArgumentException>(() => query.AddArgument(invalidKey, "value"));
+    }
+
+    [Theory]
+    [InlineData("validName")]
+    [InlineData("_private")]
+    [InlineData("__typename")]
+    [InlineData("field123")]
+    public void AddField_ValidName_Succeeds(string validName)
+    {
+        Query<object> query = new("test");
+        query.AddField(validName);
+        Assert.Equal(validName, query.SelectList[0]);
     }
 
     class ObjectWithList

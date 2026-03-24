@@ -11,17 +11,26 @@ public class QueryStringBuilder : IQueryStringBuilder
     /// <summary>The property name formatter.</summary>
     protected readonly Func<PropertyInfo, string>? formatter;
 
+    /// <summary>The ignore condition for null/default properties.</summary>
+    protected readonly QueryIgnoreCondition ignoreCondition;
+
     /// <summary>The query string builder.</summary>
     public StringBuilder QueryString { get; } = new();
 
     /// <summary>Initializes a new instance of the <see cref="QueryStringBuilder" /> class.</summary>
-    public QueryStringBuilder() { }
+    public QueryStringBuilder() : this(null, QueryIgnoreCondition.Never) { }
 
     /// <summary>Initializes a new instance of the <see cref="QueryStringBuilder" /> class.</summary>
     /// <param name="formatter">The property name formatter</param>
-    public QueryStringBuilder(Func<PropertyInfo, string> formatter)
+    public QueryStringBuilder(Func<PropertyInfo, string> formatter) : this(formatter, QueryIgnoreCondition.Never) { }
+
+    /// <summary>Initializes a new instance of the <see cref="QueryStringBuilder" /> class.</summary>
+    /// <param name="formatter">The property name formatter</param>
+    /// <param name="ignoreCondition">The ignore condition for null/default properties</param>
+    public QueryStringBuilder(Func<PropertyInfo, string>? formatter, QueryIgnoreCondition ignoreCondition)
     {
         this.formatter = formatter;
+        this.ignoreCondition = ignoreCondition;
     }
 
     /// <summary>Builds the query.</summary>
@@ -109,7 +118,19 @@ public class QueryStringBuilder : IQueryStringBuilder
     /// <param name="value"></param>
     /// <returns>The formatted query param.</returns>
     /// <exception cref="InvalidDataException">Invalid Object Type in Param List</exception>
-    protected internal virtual string FormatQueryParam(object? value)
+    protected internal virtual string FormatQueryParam(object? value) =>
+        this.FormatQueryParam(value, new HashSet<object>(ReferenceComparer.Instance));
+
+    /// <summary>Reference equality comparer for circular reference detection.</summary>
+    private sealed class ReferenceComparer : IEqualityComparer<object>
+    {
+        public static readonly ReferenceComparer Instance = new();
+        public new bool Equals(object? x, object? y) => ReferenceEquals(x, y);
+        public int GetHashCode(object obj) => System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(obj);
+    }
+
+    /// <summary>Formats query param with circular reference detection.</summary>
+    private string FormatQueryParam(object? value, HashSet<object> visited)
     {
         switch (value)
         {
@@ -117,7 +138,12 @@ public class QueryStringBuilder : IQueryStringBuilder
                 return "null";
 
             case string strValue:
-                string encoded = strValue.Replace("\"", "\\\"");
+                string encoded = strValue
+                    .Replace("\\", "\\\\")
+                    .Replace("\"", "\\\"")
+                    .Replace("\n", "\\n")
+                    .Replace("\r", "\\r")
+                    .Replace("\t", "\\t");
                 return $"\"{encoded}\"";
 
             case char charValue:
@@ -148,13 +174,13 @@ public class QueryStringBuilder : IQueryStringBuilder
                 return ulongValue.ToString();
 
             case float floatValue:
-                return floatValue.ToString(CultureInfo.CreateSpecificCulture("en-us"));
+                return floatValue.ToString(CultureInfo.InvariantCulture);
 
             case double doubleValue:
-                return doubleValue.ToString(CultureInfo.CreateSpecificCulture("en-us"));
+                return doubleValue.ToString(CultureInfo.InvariantCulture);
 
             case decimal decimalValue:
-                return decimalValue.ToString(CultureInfo.CreateSpecificCulture("en-us"));
+                return decimalValue.ToString(CultureInfo.InvariantCulture);
 
             case bool booleanValue:
                 return booleanValue ? "true" : "false";
@@ -163,25 +189,37 @@ public class QueryStringBuilder : IQueryStringBuilder
                 return enumValue.ToString();
 
             case DateTime dateTimeValue:
-                return this.FormatQueryParam(dateTimeValue.ToString("o"));
+                return this.FormatQueryParam(dateTimeValue.ToString("o"), visited);
 
-            case KeyValuePair<string, object> kvValue:
-                return $"{kvValue.Key}:{this.FormatQueryParam(kvValue.Value)}";
+            case { } kvValue when IsStringKeyValuePair(kvValue, out string? kvKey, out object? kvVal):
+                return $"{kvKey}:{this.FormatQueryParam(kvVal, visited)}";
 
-            case IDictionary<string, object> dictValue:
-                return $"{{{string.Join(",", dictValue.Select(e => this.FormatQueryParam(e)))}}}";
+            case IDictionary<string, object?> dictValue:
+                return $"{{{string.Join(",", dictValue.Select(e => $"{e.Key}:{this.FormatQueryParam(e.Value, visited)}"))}}}";
 
             case IEnumerable enumerableValue:
                 List<string> items = [];
                 foreach (object item in enumerableValue)
                 {
-                    items.Add(this.FormatQueryParam(item));
+                    items.Add(this.FormatQueryParam(item, visited));
                 }
                 return $"[{string.Join(",", items)}]";
 
             case { } objectValue:
-                Dictionary<string, object> dictionay = this.ObjectToDictionary(objectValue);
-                return this.FormatQueryParam(dictionay);
+                if (!visited.Add(objectValue))
+                {
+                    throw new InvalidOperationException("Circular reference detected.");
+                }
+
+                try
+                {
+                    Dictionary<string, object?> dictionary = this.ObjectToDictionary(objectValue);
+                    return this.FormatQueryParam(dictionary, visited);
+                }
+                finally
+                {
+                    visited.Remove(objectValue);
+                }
 
             default:
                 throw new InvalidDataException($"Invalid Object Type in Param List: {value.GetType()}");
@@ -233,18 +271,63 @@ public class QueryStringBuilder : IQueryStringBuilder
         }
     }
 
-    /// <summary>Convert object into dictionary.</summary>
-    /// <param name="object">The object.</param>
-    /// <returns>The object as dictionary.</returns>
-    private Dictionary<string, object> ObjectToDictionary(object @object) =>
-        @object
-            .GetType()
-            .GetProperties()
-            .Where(property => property.GetValue(@object) != null)
+    private static bool IsStringKeyValuePair(object value, out string? key, out object? val)
+    {
+        Type type = value.GetType();
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
+        {
+            Type keyType = type.GetGenericArguments()[0];
+            if (keyType == typeof(string))
+            {
+                key = (string?)type.GetProperty("Key")!.GetValue(value);
+                val = type.GetProperty("Value")!.GetValue(value);
+                return true;
+            }
+        }
+
+        key = null;
+        val = null;
+        return false;
+    }
+
+    private Dictionary<string, object?> ObjectToDictionary(object @object)
+    {
+        IEnumerable<PropertyInfo> properties = @object.GetType().GetProperties();
+
+        if (this.ignoreCondition == QueryIgnoreCondition.WhenWritingNull)
+        {
+            properties = properties.Where(property => property.GetValue(@object) is not null);
+        }
+        else if (this.ignoreCondition == QueryIgnoreCondition.WhenWritingDefault)
+        {
+            properties = properties.Where(property => !IsDefaultValue(property, @object));
+        }
+
+        return properties
             .Select(property =>
-                new KeyValuePair<string, object>(
+                new KeyValuePair<string, object?>(
                     this.formatter is not null ? this.formatter.Invoke(property) : property.Name,
                     property.GetValue(@object)))
             .OrderBy(property => property.Key)
             .ToDictionary(property => property.Key, property => property.Value);
+    }
+
+    private static bool IsDefaultValue(PropertyInfo property, object @object)
+    {
+        object? value = property.GetValue(@object);
+
+        if (value is null)
+        {
+            return true;
+        }
+
+        Type type = property.PropertyType;
+        if (type.IsValueType)
+        {
+            object? defaultValue = Activator.CreateInstance(type);
+            return value.Equals(defaultValue);
+        }
+
+        return false;
+    }
 }

@@ -12,6 +12,8 @@
 
 [Query&lt;TSource&gt;](./graphql.query.builder.query-1)
 
+[QueryIgnoreCondition](./graphql.query.builder.queryignorecondition)
+
 [QueryOptions](./graphql.query.builder.queryoptions)
 
 [QueryStringBuilder](./graphql.query.builder.querystringbuilder)

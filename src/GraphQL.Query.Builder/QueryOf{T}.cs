@@ -23,9 +23,6 @@ public class Query<TSource> : IQuery<TSource>
     /// <summary>Gets the alias name.</summary>
     public string? AliasName { get; private set; }
 
-    /// <summary>Gets the query string builder.</summary>
-    protected IQueryStringBuilder QueryStringBuilder { get; } = new QueryStringBuilder();
-
     /// <summary>Initializes a new instance of the <see cref="Query{TSource}" /> class.</summary>
     public Query(string name)
     {
@@ -41,14 +38,6 @@ public class Query<TSource> : IQuery<TSource>
 
         this.Name = name;
         this.options = options;
-        if (options?.QueryStringBuilderFactory != null)
-        {
-            this.QueryStringBuilder = options.QueryStringBuilderFactory();
-        }
-        else if (options?.Formatter != null)
-        {
-            this.QueryStringBuilder = new QueryStringBuilder(options.Formatter);
-        }
     }
 
     /// <summary>Sets the query alias name.</summary>
@@ -84,7 +73,7 @@ public class Query<TSource> : IQuery<TSource>
     /// <returns>The query.</returns>
     public IQuery<TSource> AddField(string field)
     {
-        RequiredArgument.NotNullOrEmpty(field, nameof(field));
+        GraphQLNameValidator.Validate(field, nameof(field));
 
         this.SelectList.Add(field);
 
@@ -139,7 +128,7 @@ public class Query<TSource> : IQuery<TSource>
         Func<IQuery<TSubSource>, IQuery<TSubSource>> build)
         where TSubSource : class?
     {
-        RequiredArgument.NotNullOrEmpty(field, nameof(field));
+        GraphQLNameValidator.Validate(field, nameof(field));
         RequiredArgument.NotNull(build, nameof(build));
 
         Query<TSubSource> query = new(field, this.options);
@@ -190,9 +179,9 @@ public class Query<TSource> : IQuery<TSource>
     /// <returns>The query.</returns>
     public IQuery<TSource> AddArgument(string key, object? value)
     {
-        RequiredArgument.NotNullOrEmpty(key, nameof(key));
+        GraphQLNameValidator.Validate(key, nameof(key));
 
-        this.Arguments.Add(key, value);
+        this.Arguments[key] = value;
 
         return this;
     }
@@ -206,7 +195,7 @@ public class Query<TSource> : IQuery<TSource>
 
         foreach (KeyValuePair<string, object?> argument in arguments)
         {
-            this.Arguments.Add(argument.Key, argument.Value);
+            this.Arguments[argument.Key] = argument.Value;
         }
 
         return this;
@@ -220,16 +209,22 @@ public class Query<TSource> : IQuery<TSource>
     {
         RequiredArgument.NotNull(arguments, nameof(arguments));
 
-        IEnumerable<PropertyInfo> properties = arguments
-            .GetType()
-            .GetProperties()
-            .Where(property => property.GetValue(arguments) != null)
-            .OrderBy(property => property.Name);
-        foreach (PropertyInfo property in properties)
+        QueryIgnoreCondition ignoreCondition = this.options?.DefaultIgnoreCondition ?? QueryIgnoreCondition.Never;
+
+        IEnumerable<PropertyInfo> properties = arguments.GetType().GetProperties();
+
+        if (ignoreCondition == QueryIgnoreCondition.WhenWritingNull)
         {
-            this.Arguments.Add(
-                this.GetPropertyName(property),
-                property.GetValue(arguments));
+            properties = properties.Where(property => property.GetValue(arguments) is not null);
+        }
+        else if (ignoreCondition == QueryIgnoreCondition.WhenWritingDefault)
+        {
+            properties = properties.Where(property => !IsDefaultValue(property, arguments));
+        }
+
+        foreach (PropertyInfo property in properties.OrderBy(property => property.Name))
+        {
+            this.Arguments[this.GetPropertyName(property)] = property.GetValue(arguments);
         }
 
         return this;
@@ -241,9 +236,22 @@ public class Query<TSource> : IQuery<TSource>
     /// <exception cref="ArgumentException">Must have a one or more 'Select' fields in the Query</exception>
     public string Build()
     {
-        this.QueryStringBuilder.Clear();
+        IQueryStringBuilder builder = this.CreateQueryStringBuilder();
 
-        return this.QueryStringBuilder.Build(this);
+        return builder.Build(this);
+    }
+
+    /// <summary>Creates a new query string builder instance.</summary>
+    private IQueryStringBuilder CreateQueryStringBuilder()
+    {
+        if (this.options?.QueryStringBuilderFactory is not null)
+        {
+            return this.options.QueryStringBuilderFactory();
+        }
+
+        QueryIgnoreCondition ignoreCondition = this.options?.DefaultIgnoreCondition ?? QueryIgnoreCondition.Never;
+
+        return new QueryStringBuilder(this.options?.Formatter, ignoreCondition);
     }
 
     /// <summary>Gets property infos from lambda.</summary>
@@ -276,6 +284,25 @@ public class Query<TSource> : IQuery<TSource>
         }
 
         return propertyInfo;
+    }
+
+    private static bool IsDefaultValue(PropertyInfo property, object @object)
+    {
+        object? value = property.GetValue(@object);
+
+        if (value is null)
+        {
+            return true;
+        }
+
+        Type type = property.PropertyType;
+        if (type.IsValueType)
+        {
+            object? defaultValue = Activator.CreateInstance(type);
+            return value.Equals(defaultValue);
+        }
+
+        return false;
     }
 
     private string GetPropertyName(PropertyInfo property)

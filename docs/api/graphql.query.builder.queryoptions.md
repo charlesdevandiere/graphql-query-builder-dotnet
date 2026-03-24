@@ -40,6 +40,19 @@ public Func<IQueryStringBuilder> QueryStringBuilderFactory { get; set; }
 
 [Func&lt;IQueryStringBuilder&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.func-1)<br>
 
+### **DefaultIgnoreCondition**
+
+Gets or sets the condition under which properties with null or default values are ignored during serialization.
+ Defaults to [QueryIgnoreCondition.Never](./graphql.query.builder.queryignorecondition#never).
+
+```csharp
+public QueryIgnoreCondition DefaultIgnoreCondition { get; set; }
+```
+
+#### Property Value
+
+[QueryIgnoreCondition](./graphql.query.builder.queryignorecondition)<br>
+
 ## Constructors
 
 ### **QueryOptions()**

@@ -10,4 +10,10 @@ public class QueryOptions
 
     /// <summary>Gets or sets the query string builder factory.</summary>
     public Func<IQueryStringBuilder>? QueryStringBuilderFactory { get; set; }
+
+    /// <summary>
+    /// Gets or sets the condition under which properties with null or default values are ignored during serialization.
+    /// Defaults to <see cref="QueryIgnoreCondition.Never"/>.
+    /// </summary>
+    public QueryIgnoreCondition DefaultIgnoreCondition { get; set; } = QueryIgnoreCondition.Never;
 }

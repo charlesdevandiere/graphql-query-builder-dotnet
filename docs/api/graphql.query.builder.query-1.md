@@ -80,18 +80,6 @@ public string AliasName { get; private set; }
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
-### **QueryStringBuilder**
-
-Gets the query string builder.
-
-```csharp
-protected IQueryStringBuilder QueryStringBuilder { get; }
-```
-
-#### Property Value
-
-[IQueryStringBuilder](./graphql.query.builder.iquerystringbuilder)<br>
-
 ## Constructors
 
 ### **Query(String)**

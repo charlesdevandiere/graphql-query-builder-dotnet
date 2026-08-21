@@ -1,3 +1,8 @@
+---
+layout: default
+title: QueryStringBuilder
+---
+
 [`< Back`](./)
 
 ---
@@ -12,7 +17,7 @@ The GraphQL query builder class.
 public class QueryStringBuilder : IQueryStringBuilder
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [QueryStringBuilder](./graphql.query.builder.querystringbuilder)<br>
+Inheritance [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object) → [QueryStringBuilder](./graphql.query.builder.querystringbuilder)<br>
 Implements [IQueryStringBuilder](./graphql.query.builder.iquerystringbuilder)<br>
 Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](./system.runtime.compilerservices.nullableattribute)
 
@@ -23,7 +28,7 @@ Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullable
 The property name formatter.
 
 ```csharp
-protected Func<PropertyInfo, string> formatter;
+protected Func<PropertyInfo, string>? formatter;
 ```
 
 ### **ignoreCondition**
@@ -41,12 +46,18 @@ protected QueryIgnoreCondition ignoreCondition;
 The query string builder.
 
 ```csharp
-public StringBuilder QueryString { get; }
+public StringBuilder QueryString { get; private set; }
 ```
 
 #### Property Value
 
-[StringBuilder](https://docs.microsoft.com/en-us/dotnet/api/system.text.stringbuilder)<br>
+[StringBuilder](https://learn.microsoft.com/en-us/dotnet/api/system.text.stringbuilder)<br>
+
+**Remarks:**
+
+[QueryStringBuilder.Build&lt;TSource&gt;(IGraphQLField&lt;TSource&gt;)](./graphql.query.builder.querystringbuilder#buildtsourceigraphqlfieldtsource) and [QueryStringBuilder.BuildSelectionSet&lt;TSource&gt;(IGraphQLField&lt;TSource&gt;)](./graphql.query.builder.querystringbuilder#buildselectionsettsourceigraphqlfieldtsource) each swap in their own
+ buffer for the duration of the call, so a builder instance reused across — or nested within —
+ several builds never accumulates the output of the previous one.
 
 ## Constructors
 
@@ -68,7 +79,7 @@ public QueryStringBuilder(Func<PropertyInfo, string> formatter)
 
 #### Parameters
 
-`formatter` [Func&lt;PropertyInfo, String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.func-2)<br>
+`formatter` [Func&lt;PropertyInfo, String&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.func-2)<br>
 The property name formatter
 
 ### **QueryStringBuilder(Func&lt;PropertyInfo, String&gt;, QueryIgnoreCondition)**
@@ -76,12 +87,12 @@ The property name formatter
 Initializes a new instance of the [QueryStringBuilder](./graphql.query.builder.querystringbuilder) class.
 
 ```csharp
-public QueryStringBuilder(Func<PropertyInfo, string> formatter, QueryIgnoreCondition ignoreCondition)
+public QueryStringBuilder(Func<PropertyInfo, string>? formatter, QueryIgnoreCondition ignoreCondition)
 ```
 
 #### Parameters
 
-`formatter` [Func&lt;PropertyInfo, String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.func-2)<br>
+`formatter` [Func&lt;PropertyInfo, String&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.func-2)?<br>
 The property name formatter
 
 `ignoreCondition` [QueryIgnoreCondition](./graphql.query.builder.queryignorecondition)<br>
@@ -89,12 +100,12 @@ The ignore condition for null/default properties
 
 ## Methods
 
-### **Build&lt;TSource&gt;(IQuery&lt;TSource&gt;)**
+### **Build&lt;TSource&gt;(IGraphQLField&lt;TSource&gt;)**
 
 Builds the query.
 
 ```csharp
-public string Build<TSource>(IQuery<TSource> query)
+public string Build<TSource>(IGraphQLField<TSource> query)
 ```
 
 #### Type Parameters
@@ -103,13 +114,35 @@ public string Build<TSource>(IQuery<TSource> query)
 
 #### Parameters
 
-`query` IQuery&lt;TSource&gt;<br>
+`query` IGraphQLField&lt;TSource&gt;<br>
 The query.
 
 #### Returns
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 The GraphQL query as string, without outer enclosing block.
+
+### **BuildSelectionSet&lt;TSource&gt;(IGraphQLField&lt;TSource&gt;)**
+
+Builds the query selection set, without the enclosing braces.
+
+```csharp
+public string BuildSelectionSet<TSource>(IGraphQLField<TSource> query)
+```
+
+#### Type Parameters
+
+`TSource`<br>
+
+#### Parameters
+
+`query` IGraphQLField&lt;TSource&gt;<br>
+The query.
+
+#### Returns
+
+[String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
+The GraphQL selection set as string.
 
 ### **Clear()**
 
@@ -131,35 +164,41 @@ Formats query param.
 - **Boolean** - `true` or `false`
 - **Enum** - `EnumValue`
 - **DateTime** - `"2024-06-15T13:45:30.0000000Z"`
+- **DateTimeOffset** - `"2024-06-15T13:45:30.0000000+02:00"`
+- **TimeSpan** - `"00:05:00"`
+- **Guid** - `"2c1e0e0a-0000-4000-8000-000000000001"`
+- **Uri** - `"https://example.com/a"`
 - **Key value pair** - `foo:"bar"` or `foo:10` ...
 - **List** - `["foo","bar"]` or `[1,2]` ...
 - **Dictionary** - `{foo:"bar",b:10}`
 - **Object** - `{foo:"bar",b:10}`
 
+Objects are serialized from their public, readable, non-indexed instance properties.
+
 ```csharp
-protected internal string FormatQueryParam(object value)
+protected internal virtual string FormatQueryParam(object? value)
 ```
 
 #### Parameters
 
-`value` [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object)<br>
+`value` [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object)?<br>
 
 #### Returns
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 The formatted query param.
 
 #### Exceptions
 
-[InvalidDataException](https://docs.microsoft.com/en-us/dotnet/api/system.io.invaliddataexception)<br>
+[InvalidDataException](https://learn.microsoft.com/en-us/dotnet/api/system.io.invaliddataexception)<br>
 Invalid Object Type in Param List
 
-### **AddParams&lt;TSource&gt;(IQuery&lt;TSource&gt;)**
+### **AddParams&lt;TSource&gt;(IGraphQLField&lt;TSource&gt;)**
 
 Adds query params to the query string.
 
 ```csharp
-protected internal void AddParams<TSource>(IQuery<TSource> query)
+protected internal void AddParams<TSource>(IGraphQLField<TSource> query)
 ```
 
 #### Type Parameters
@@ -168,15 +207,15 @@ protected internal void AddParams<TSource>(IQuery<TSource> query)
 
 #### Parameters
 
-`query` IQuery&lt;TSource&gt;<br>
+`query` IGraphQLField&lt;TSource&gt;<br>
 The query.
 
-### **AddFields&lt;TSource&gt;(IQuery&lt;TSource&gt;)**
+### **AddFields&lt;TSource&gt;(IGraphQLField&lt;TSource&gt;)**
 
 Adds fields to the query sting.
 
 ```csharp
-protected internal void AddFields<TSource>(IQuery<TSource> query)
+protected internal void AddFields<TSource>(IGraphQLField<TSource> query)
 ```
 
 #### Type Parameters
@@ -185,12 +224,12 @@ protected internal void AddFields<TSource>(IQuery<TSource> query)
 
 #### Parameters
 
-`query` IQuery&lt;TSource&gt;<br>
+`query` IGraphQLField&lt;TSource&gt;<br>
 The query.
 
 #### Exceptions
 
-[ArgumentException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentexception)<br>
+[ArgumentException](https://learn.microsoft.com/en-us/dotnet/api/system.argumentexception)<br>
 Invalid Object in Field List
 
 ---

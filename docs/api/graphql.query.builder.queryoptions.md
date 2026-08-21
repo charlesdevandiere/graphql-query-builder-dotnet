@@ -1,3 +1,8 @@
+---
+layout: default
+title: QueryOptions
+---
+
 [`< Back`](./)
 
 ---
@@ -12,7 +17,7 @@ The query options class.
 public class QueryOptions
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [QueryOptions](./graphql.query.builder.queryoptions)
+Inheritance [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object) → [QueryOptions](./graphql.query.builder.queryoptions)
 
 ## Properties
 
@@ -21,24 +26,24 @@ Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) 
 Gets or sets the property name formatter.
 
 ```csharp
-public Func<PropertyInfo, string> Formatter { get; set; }
+public Func<PropertyInfo, string>? Formatter { get; set; }
 ```
 
 #### Property Value
 
-[Func&lt;PropertyInfo, String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.func-2)<br>
+[Func&lt;PropertyInfo, String&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.func-2)<br>
 
 ### **QueryStringBuilderFactory**
 
 Gets or sets the query string builder factory.
 
 ```csharp
-public Func<IQueryStringBuilder> QueryStringBuilderFactory { get; set; }
+public Func<IQueryStringBuilder>? QueryStringBuilderFactory { get; set; }
 ```
 
 #### Property Value
 
-[Func&lt;IQueryStringBuilder&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.func-1)<br>
+[Func&lt;IQueryStringBuilder&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.func-1)<br>
 
 ### **DefaultIgnoreCondition**
 

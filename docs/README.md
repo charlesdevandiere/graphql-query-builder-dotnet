@@ -4,10 +4,11 @@
 
 A tool to build GraphQL query from a C# model.
 
-[![Build Status](https://dev.azure.com/charlesdevandiere/charlesdevandiere/_apis/build/status/charlesdevandiere.graphql-query-builder?branchName=master)](https://dev.azure.com/charlesdevandiere/charlesdevandiere/_build/latest?definitionId=3&branchName=master)
-![Coverage](https://img.shields.io/azure-devops/coverage/charlesdevandiere/charlesdevandiere/3/master)
+[![Build Status](https://github.com/charlesdevandiere/graphql-query-builder-dotnet/actions/workflows/ci.yml/badge.svg)](https://github.com/charlesdevandiere/graphql-query-builder-dotnet/actions/workflows/ci.yml)
 [![Nuget](https://img.shields.io/nuget/v/GraphQL.Query.Builder.svg?color=blue&logo=nuget)](https://www.nuget.org/packages/GraphQL.Query.Builder)
 [![Downloads](https://img.shields.io/nuget/dt/GraphQL.Query.Builder.svg?logo=nuget)](https://www.nuget.org/packages/GraphQL.Query.Builder)
+
+Upgrading from v2.x? See the [migration guide](MIGRATION_v2_to_v3.md).
 
 ## Install
 

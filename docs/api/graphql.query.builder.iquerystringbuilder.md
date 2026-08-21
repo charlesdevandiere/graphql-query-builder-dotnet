@@ -1,3 +1,8 @@
+---
+layout: default
+title: IQueryStringBuilder
+---
+
 [`< Back`](./)
 
 ---
@@ -24,12 +29,12 @@ Clears the string builder.
 void Clear()
 ```
 
-### **Build&lt;TSource&gt;(IQuery&lt;TSource&gt;)**
+### **Build&lt;TSource&gt;(IGraphQLField&lt;TSource&gt;)**
 
 Builds the query.
 
 ```csharp
-string Build<TSource>(IQuery<TSource> query)
+string Build<TSource>(IGraphQLField<TSource> query)
 ```
 
 #### Type Parameters
@@ -38,13 +43,35 @@ string Build<TSource>(IQuery<TSource> query)
 
 #### Parameters
 
-`query` IQuery&lt;TSource&gt;<br>
+`query` IGraphQLField&lt;TSource&gt;<br>
 The query.
 
 #### Returns
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 The GraphQL query as string, without outer enclosing block.
+
+### **BuildSelectionSet&lt;TSource&gt;(IGraphQLField&lt;TSource&gt;)**
+
+Builds the query selection set, without the enclosing braces.
+
+```csharp
+string BuildSelectionSet<TSource>(IGraphQLField<TSource> query)
+```
+
+#### Type Parameters
+
+`TSource`<br>
+
+#### Parameters
+
+`query` IGraphQLField&lt;TSource&gt;<br>
+The query.
+
+#### Returns
+
+[String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
+The GraphQL selection set as string.
 
 ---
 

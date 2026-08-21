@@ -30,7 +30,7 @@ class PokemonService
     /// <param name="name">The Pokemon name.</param>
     public async Task<Pokemon?> GetPokemon(string name)
     {
-        IQuery<Pokemon> query = new Query<Pokemon>("pokemon", this.options)
+        IGraphQLField<Pokemon> query = new GraphQLField<Pokemon>("pokemon", this.options)
             .AddArguments(new { name })
             .AddField(p => p.Id)
             .AddField(p => p.Number)
@@ -56,7 +56,10 @@ class PokemonService
                     .AddField(f => f.Damage)
                 )
             );
-        GraphQLRequest request = new() { Query = "{" + query.Build() + "}" };
+        string operationQuery = new GraphQLOperation(OperationType.Query)
+            .AddQuery(query)
+            .Build();
+        GraphQLRequest request = new() { Query = operationQuery };
 
         using GraphQLHttpClient client = new(this.graphqlPokemonUrl, this.serializer);
         GraphQLResponse<PokemonResponse> response = await client.SendQueryAsync<PokemonResponse>(request);
@@ -77,7 +80,7 @@ class PokemonService
     /// <summary>Returns all Pokemons</summary>
     public async Task<IEnumerable<Pokemon?>> GetAllPokemons()
     {
-        IQuery<Pokemon> query = new Query<Pokemon>("pokemons", this.options)
+        IGraphQLField<Pokemon> query = new GraphQLField<Pokemon>("pokemons", this.options)
             .AddArguments(new { first = 100 })
             .AddField(p => p.Id)
             .AddField(p => p.Number)
@@ -91,7 +94,10 @@ class PokemonService
                 .AddField(w => w!.Maximum)
             )
             .AddField(p => p.Types);
-        GraphQLRequest request = new() { Query = "{" + query.Build() + "}" };
+        string operationQuery = new GraphQLOperation(OperationType.Query)
+            .AddQuery(query)
+            .Build();
+        GraphQLRequest request = new() { Query = operationQuery };
 
         using GraphQLHttpClient client = new(this.graphqlPokemonUrl, this.serializer);
         GraphQLResponse<PokemonsResponse> response = await client.SendQueryAsync<PokemonsResponse>(request);

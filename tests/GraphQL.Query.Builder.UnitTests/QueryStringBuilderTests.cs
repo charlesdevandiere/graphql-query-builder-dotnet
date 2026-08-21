@@ -198,6 +198,13 @@ public class QueryStringBuilderTests
     }
 
     [Fact]
+    public void TestFormatQueryParam_rawString()
+    {
+        RawString value = new("$file");
+        Assert.Equal("$file", new QueryStringBuilder().FormatQueryParam(value));
+    }
+
+    [Fact]
     public void TestFormatQueryParam_enum()
     {
         TestEnum value = TestEnum.DISABLED;

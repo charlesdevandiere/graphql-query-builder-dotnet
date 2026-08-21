@@ -264,6 +264,9 @@ public class QueryStringBuilder : IQueryStringBuilder
 
             case bool booleanValue:
                 return booleanValue ? "true" : "false";
+            
+            case RawString rawStringValue:
+                return rawStringValue.Value;
 
             case Enum enumValue:
                 return enumValue.ToString();

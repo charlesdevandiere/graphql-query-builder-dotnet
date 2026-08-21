@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -16,7 +16,7 @@
   <ItemGroup>
     <PackageReference Include="GraphQL.Client" Version="6.1.0" />
     <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.1.0" />
-    <PackageReference Include="GraphQL.Query.Builder.Formatter.SystemTextJson" Version="1.0.3" />
+    <PackageReference Include="GraphQL.Query.Builder.Formatter.SystemTextJson" Version="1.0.5" />
   </ItemGroup>
 
 </Project>

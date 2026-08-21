@@ -5,8 +5,8 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("GraphQL.Query.Builder.UnitTests")]
 namespace GraphQL.Query.Builder;
 
-/// <summary>The query class.</summary>
-public class Query<TSource> : IQuery<TSource>
+/// <summary>The GraphQL field class.</summary>
+public class GraphQLField<TSource> : IGraphQLField<TSource>
 {
     /// <summary>The query options.</summary>
     protected readonly QueryOptions? options;
@@ -23,40 +23,53 @@ public class Query<TSource> : IQuery<TSource>
     /// <summary>Gets the alias name.</summary>
     public string? AliasName { get; private set; }
 
-    /// <summary>Gets the query string builder.</summary>
-    protected IQueryStringBuilder QueryStringBuilder { get; } = new QueryStringBuilder();
+    /// <summary>Gets the directives attached to the field.</summary>
+    public List<GraphQLDirective> Directives { get; } = [];
 
-    /// <summary>Initializes a new instance of the <see cref="Query{TSource}" /> class.</summary>
-    public Query(string name)
+    /// <summary>Initializes a new instance of the <see cref="GraphQLField{TSource}" /> class.</summary>
+    /// <param name="name">The field name.</param>
+    /// <exception cref="ArgumentException">The name is not a valid GraphQL name.</exception>
+    public GraphQLField(string name) : this(name, null) { }
+
+    /// <summary>Initializes a new instance of the <see cref="GraphQLField{TSource}" /> class.</summary>
+    /// <param name="name">The field name.</param>
+    /// <param name="options">The query options.</param>
+    /// <exception cref="ArgumentException">The name is not a valid GraphQL name.</exception>
+    public GraphQLField(string name, QueryOptions? options)
     {
-        RequiredArgument.NotNullOrEmpty(name, nameof(name));
-
-        this.Name = name;
-    }
-
-    /// <summary>Initializes a new instance of the <see cref="Query{TSource}" /> class.</summary>
-    public Query(string name, QueryOptions? options)
-    {
-        RequiredArgument.NotNullOrEmpty(name, nameof(name));
+        GraphQLNameValidator.Validate(name, nameof(name));
 
         this.Name = name;
         this.options = options;
-        if (options?.QueryStringBuilderFactory != null)
-        {
-            this.QueryStringBuilder = options.QueryStringBuilderFactory();
-        }
-        else if (options?.Formatter != null)
-        {
-            this.QueryStringBuilder = new QueryStringBuilder(options.Formatter);
-        }
+    }
+
+    /// <summary>Initializes a new instance whose name is not a plain GraphQL name, such as an inline fragment.</summary>
+    /// <param name="options">The query options.</param>
+    /// <param name="rawName">The already validated raw field name.</param>
+    private GraphQLField(QueryOptions? options, string rawName)
+    {
+        this.Name = rawName;
+        this.options = options;
+    }
+
+    /// <summary>Creates an inline fragment field (<c>... on TypeName</c>).</summary>
+    /// <param name="typeName">The type name.</param>
+    /// <param name="options">The query options.</param>
+    /// <returns>The inline fragment field.</returns>
+    private static GraphQLField<TSource> InlineFragment(string typeName, QueryOptions? options)
+    {
+        GraphQLNameValidator.Validate(typeName, nameof(typeName));
+
+        return new GraphQLField<TSource>(options, $"... on {typeName}");
     }
 
     /// <summary>Sets the query alias name.</summary>
     /// <param name="alias">The alias name.</param>
     /// <returns>The query.</returns>
-    public IQuery<TSource> Alias(string alias)
+    /// <exception cref="ArgumentException">The alias is not a valid GraphQL name.</exception>
+    public IGraphQLField<TSource> Alias(string alias)
     {
-        RequiredArgument.NotNullOrEmpty(alias, nameof(alias));
+        GraphQLNameValidator.Validate(alias, nameof(alias));
 
         this.AliasName = alias;
 
@@ -67,7 +80,7 @@ public class Query<TSource> : IQuery<TSource>
     /// <typeparam name="TProperty">The property type.</typeparam>
     /// <param name="selector">The field selector.</param>
     /// <returns>The query.</returns>
-    public IQuery<TSource> AddField<TProperty>(Expression<Func<TSource, TProperty>> selector)
+    public IGraphQLField<TSource> AddField<TProperty>(Expression<Func<TSource, TProperty>> selector)
     {
         RequiredArgument.NotNull(selector, nameof(selector));
 
@@ -82,9 +95,9 @@ public class Query<TSource> : IQuery<TSource>
     /// <summary>Adds a field to the query.</summary>
     /// <param name="field">The field name.</param>
     /// <returns>The query.</returns>
-    public IQuery<TSource> AddField(string field)
+    public IGraphQLField<TSource> AddField(string field)
     {
-        RequiredArgument.NotNullOrEmpty(field, nameof(field));
+        GraphQLNameValidator.Validate(field, nameof(field));
 
         this.SelectList.Add(field);
 
@@ -96,9 +109,9 @@ public class Query<TSource> : IQuery<TSource>
     /// <param name="selector">The field selector.</param>
     /// <param name="build">The sub-object query building function.</param>
     /// <returns>The query.</returns>
-    public IQuery<TSource> AddField<TSubSource>(
+    public IGraphQLField<TSource> AddField<TSubSource>(
         Expression<Func<TSource, TSubSource>> selector,
-        Func<IQuery<TSubSource>, IQuery<TSubSource>> build)
+        Func<IGraphQLField<TSubSource>, IGraphQLField<TSubSource>> build)
         where TSubSource : class?
     {
         RequiredArgument.NotNull(selector, nameof(selector));
@@ -115,9 +128,9 @@ public class Query<TSource> : IQuery<TSource>
     /// <param name="selector">The field selector.</param>
     /// <param name="build">The sub-object query building function.</param>
     /// <returns>The query.</returns>
-    public IQuery<TSource> AddField<TSubSource>(
+    public IGraphQLField<TSource> AddField<TSubSource>(
         Expression<Func<TSource, IEnumerable<TSubSource>>> selector,
-        Func<IQuery<TSubSource>, IQuery<TSubSource>> build)
+        Func<IGraphQLField<TSubSource>, IGraphQLField<TSubSource>> build)
         where TSubSource : class?
     {
         RequiredArgument.NotNull(selector, nameof(selector));
@@ -134,18 +147,114 @@ public class Query<TSource> : IQuery<TSource>
     /// <param name="field">The field name.</param>
     /// <param name="build">The sub-object query building function.</param>
     /// <returns>The query.</returns>
-    public IQuery<TSource> AddField<TSubSource>(
+    public IGraphQLField<TSource> AddField<TSubSource>(
         string field,
-        Func<IQuery<TSubSource>, IQuery<TSubSource>> build)
+        Func<IGraphQLField<TSubSource>, IGraphQLField<TSubSource>> build)
         where TSubSource : class?
     {
-        RequiredArgument.NotNullOrEmpty(field, nameof(field));
+        GraphQLNameValidator.Validate(field, nameof(field));
         RequiredArgument.NotNull(build, nameof(build));
 
-        Query<TSubSource> query = new(field, this.options);
-        IQuery<TSubSource> subQuery = build.Invoke(query);
+        GraphQLField<TSubSource> query = new(field, this.options);
+        IGraphQLField<TSubSource> subQuery = build.Invoke(query);
+
+        RequiredArgument.NotNull(subQuery, nameof(build));
 
         this.SelectList.Add(subQuery);
+
+        return this;
+    }
+
+    /// <summary>Adds a field to the query with directives.</summary>
+    public IGraphQLField<TSource> AddField<TProperty>(Expression<Func<TSource, TProperty>> selector, params GraphQLDirective[] directives)
+    {
+        RequiredArgument.NotNull(selector, nameof(selector));
+
+        PropertyInfo property = GetPropertyInfo(selector);
+        string name = this.GetPropertyName(property);
+
+        return this.AddField(name, directives);
+    }
+
+    /// <summary>Adds a field to the query with directives.</summary>
+    public IGraphQLField<TSource> AddField(string field, params GraphQLDirective[] directives)
+    {
+        GraphQLNameValidator.Validate(field, nameof(field));
+        RequiredArgument.NotNull(directives, nameof(directives));
+
+        if (directives.Length > 0)
+        {
+            this.SelectList.Add(new DirectiveField(field, [.. directives]));
+        }
+        else
+        {
+            this.SelectList.Add(field);
+        }
+
+        return this;
+    }
+
+    /// <summary>Adds a sub-object field to the query with directives.</summary>
+    public IGraphQLField<TSource> AddField<TSubSource>(
+        Expression<Func<TSource, TSubSource>> selector,
+        Func<IGraphQLField<TSubSource>, IGraphQLField<TSubSource>> build,
+        params GraphQLDirective[] directives)
+        where TSubSource : class?
+    {
+        RequiredArgument.NotNull(selector, nameof(selector));
+        RequiredArgument.NotNull(build, nameof(build));
+
+        PropertyInfo property = GetPropertyInfo(selector);
+        string name = this.GetPropertyName(property);
+
+        return this.AddField(name, build, directives);
+    }
+
+    /// <summary>Adds a sub-list field to the query with directives.</summary>
+    public IGraphQLField<TSource> AddField<TSubSource>(
+        Expression<Func<TSource, IEnumerable<TSubSource>>> selector,
+        Func<IGraphQLField<TSubSource>, IGraphQLField<TSubSource>> build,
+        params GraphQLDirective[] directives)
+        where TSubSource : class?
+    {
+        RequiredArgument.NotNull(selector, nameof(selector));
+        RequiredArgument.NotNull(build, nameof(build));
+
+        PropertyInfo property = GetPropertyInfo(selector);
+        string name = this.GetPropertyName(property);
+
+        return this.AddField(name, build, directives);
+    }
+
+    /// <summary>Adds a sub-object field to the query with directives.</summary>
+    public IGraphQLField<TSource> AddField<TSubSource>(
+        string field,
+        Func<IGraphQLField<TSubSource>, IGraphQLField<TSubSource>> build,
+        params GraphQLDirective[] directives)
+        where TSubSource : class?
+    {
+        GraphQLNameValidator.Validate(field, nameof(field));
+        RequiredArgument.NotNull(build, nameof(build));
+        RequiredArgument.NotNull(directives, nameof(directives));
+
+        GraphQLField<TSubSource> query = new(field, this.options);
+        IGraphQLField<TSubSource> subQuery = build.Invoke(query);
+
+        RequiredArgument.NotNull(subQuery, nameof(build));
+
+        subQuery.Directives.AddRange(directives);
+
+        this.SelectList.Add(subQuery);
+
+        return this;
+    }
+
+    /// <summary>Adds a fragment spread to the query.</summary>
+    public IGraphQLField<TSource> AddFragment(GraphQLFragment fragment)
+    {
+        RequiredArgument.NotNull(fragment, nameof(fragment));
+
+        this.SelectList.Add(new FragmentSpread(fragment.Name));
 
         return this;
     }
@@ -155,16 +264,18 @@ public class Query<TSource> : IQuery<TSource>
     /// <param name="typeName">The union type name.</param>
     /// <param name="build">The union building function.</param>
     /// <returns>The query.</returns>
-    public IQuery<TSource> AddUnion<TUnionType>(
+    /// <exception cref="ArgumentException">The type name is not a valid GraphQL name.</exception>
+    public IGraphQLField<TSource> AddUnion<TUnionType>(
         string typeName,
-        Func<IQuery<TUnionType>, IQuery<TUnionType>> build)
+        Func<IGraphQLField<TUnionType>, IGraphQLField<TUnionType>> build)
         where TUnionType : class?, TSource
     {
-        RequiredArgument.NotNullOrEmpty(typeName, nameof(typeName));
         RequiredArgument.NotNull(build, nameof(build));
 
-        Query<TUnionType> query = new($"... on {typeName}", this.options);
-        IQuery<TUnionType> union = build.Invoke(query);
+        GraphQLField<TUnionType> query = GraphQLField<TUnionType>.InlineFragment(typeName, this.options);
+        IGraphQLField<TUnionType> union = build.Invoke(query);
+
+        RequiredArgument.NotNull(union, nameof(build));
 
         this.SelectList.Add(union);
 
@@ -175,8 +286,8 @@ public class Query<TSource> : IQuery<TSource>
     /// <typeparam name="TUnionType">The union type.</typeparam>
     /// <param name="build">The union building function.</param>
     /// <returns>The query.</returns>
-    public IQuery<TSource> AddUnion<TUnionType>(
-        Func<IQuery<TUnionType>, IQuery<TUnionType>> build)
+    public IGraphQLField<TSource> AddUnion<TUnionType>(
+        Func<IGraphQLField<TUnionType>, IGraphQLField<TUnionType>> build)
         where TUnionType : class?, TSource
     {
         RequiredArgument.NotNull(build, nameof(build));
@@ -188,11 +299,11 @@ public class Query<TSource> : IQuery<TSource>
     /// <param name="key">The argument name.</param>
     /// <param name="value">The value.</param>
     /// <returns>The query.</returns>
-    public IQuery<TSource> AddArgument(string key, object? value)
+    public IGraphQLField<TSource> AddArgument(string key, object? value)
     {
-        RequiredArgument.NotNullOrEmpty(key, nameof(key));
+        GraphQLNameValidator.Validate(key, nameof(key));
 
-        this.Arguments.Add(key, value);
+        this.Arguments[key] = value;
 
         return this;
     }
@@ -200,13 +311,14 @@ public class Query<TSource> : IQuery<TSource>
     /// <summary>Adds arguments to the query.</summary>
     /// <param name="arguments">the dictionary argument.</param>
     /// <returns>The query.</returns>
-    public IQuery<TSource> AddArguments(Dictionary<string, object?> arguments)
+    public IGraphQLField<TSource> AddArguments(Dictionary<string, object?> arguments)
     {
         RequiredArgument.NotNull(arguments, nameof(arguments));
 
         foreach (KeyValuePair<string, object?> argument in arguments)
         {
-            this.Arguments.Add(argument.Key, argument.Value);
+            GraphQLNameValidator.Validate(argument.Key, nameof(arguments));
+            this.Arguments[argument.Key] = argument.Value;
         }
 
         return this;
@@ -216,20 +328,15 @@ public class Query<TSource> : IQuery<TSource>
     /// <typeparam name="TArguments">The arguments object type.</typeparam>
     /// <param name="arguments">The arguments object.</param>
     /// <returns>The query.</returns>
-    public IQuery<TSource> AddArguments<TArguments>(TArguments arguments) where TArguments : class
+    public IGraphQLField<TSource> AddArguments<TArguments>(TArguments arguments) where TArguments : class
     {
         RequiredArgument.NotNull(arguments, nameof(arguments));
 
-        IEnumerable<PropertyInfo> properties = arguments
-            .GetType()
-            .GetProperties()
-            .Where(property => property.GetValue(arguments) != null)
-            .OrderBy(property => property.Name);
-        foreach (PropertyInfo property in properties)
+        QueryIgnoreCondition ignoreCondition = this.options?.DefaultIgnoreCondition ?? QueryIgnoreCondition.Never;
+
+        foreach (KeyValuePair<string, object?> kv in PropertyHelper.GetPropertyValues(arguments, ignoreCondition, this.options?.Formatter))
         {
-            this.Arguments.Add(
-                this.GetPropertyName(property),
-                property.GetValue(arguments));
+            this.Arguments[kv.Key] = kv.Value;
         }
 
         return this;
@@ -241,9 +348,35 @@ public class Query<TSource> : IQuery<TSource>
     /// <exception cref="ArgumentException">Must have a one or more 'Select' fields in the Query</exception>
     public string Build()
     {
-        this.QueryStringBuilder.Clear();
+        IQueryStringBuilder builder = this.CreateQueryStringBuilder();
 
-        return this.QueryStringBuilder.Build(this);
+        return builder.Build(this);
+    }
+
+    /// <summary>Builds the field selection set, without the enclosing braces.</summary>
+    /// <returns>The GraphQL selection set as string.</returns>
+    public string BuildSelectionSet()
+    {
+        IQueryStringBuilder builder = this.CreateQueryStringBuilder();
+
+        return builder.BuildSelectionSet(this);
+    }
+
+    /// <summary>Creates a new query string builder instance.</summary>
+    private IQueryStringBuilder CreateQueryStringBuilder()
+    {
+        if (this.options?.QueryStringBuilderFactory is not null)
+        {
+            IQueryStringBuilder builder = this.options.QueryStringBuilderFactory();
+
+            RequiredArgument.NotNull(builder, nameof(QueryOptions.QueryStringBuilderFactory));
+
+            return builder;
+        }
+
+        QueryIgnoreCondition ignoreCondition = this.options?.DefaultIgnoreCondition ?? QueryIgnoreCondition.Never;
+
+        return new QueryStringBuilder(this.options?.Formatter, ignoreCondition);
     }
 
     /// <summary>Gets property infos from lambda.</summary>

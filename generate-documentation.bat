@@ -1,4 +1,4 @@
 @echo off
 dotnet tool restore
 dotnet build ./src/GraphQL.Query.Builder/GraphQL.Query.Builder.csproj -c Release -o out/
-dotnet xmldoc2md out/GraphQL.Query.Builder.dll --output ./docs/api --github-pages --back-button
+dotnet xmldoc2md out/GraphQL.Query.Builder.dll --output ./docs/api --platform github-pages --back-button

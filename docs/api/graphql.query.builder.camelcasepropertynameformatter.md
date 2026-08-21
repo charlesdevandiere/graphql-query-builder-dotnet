@@ -1,3 +1,8 @@
+---
+layout: default
+title: CamelCasePropertyNameFormatter
+---
+
 [`< Back`](./)
 
 ---
@@ -12,7 +17,7 @@ The camel case property name formatter class.
 public static class CamelCasePropertyNameFormatter
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [CamelCasePropertyNameFormatter](./graphql.query.builder.camelcasepropertynameformatter)
+Inheritance [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object) → [CamelCasePropertyNameFormatter](./graphql.query.builder.camelcasepropertynameformatter)
 
 ## Fields
 

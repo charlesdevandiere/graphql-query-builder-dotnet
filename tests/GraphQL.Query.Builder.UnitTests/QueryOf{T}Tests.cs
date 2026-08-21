@@ -12,7 +12,7 @@ public class QueryOfTTests
         // Arrange
         const string name = "user";
 
-        Query<object> query = new(name);
+        GraphQLField<object> query = new(name);
 
         // Assert
         Assert.Equal(name, query.Name);
@@ -22,7 +22,7 @@ public class QueryOfTTests
     public void Query_name_required()
     {
 #nullable disable
-        Assert.Throws<ArgumentNullException>(() => new Query<object>(null));
+        Assert.Throws<ArgumentNullException>(() => new GraphQLField<object>(null));
 #nullable restore
     }
 
@@ -30,7 +30,7 @@ public class QueryOfTTests
     public void AddField_list()
     {
         // Arrange
-        Query<object> query = new("something");
+        GraphQLField<object> query = new("something");
 
         List<string> selectList = ["id", "name"];
 
@@ -48,7 +48,7 @@ public class QueryOfTTests
     public void AddField_string()
     {
         // Arrange
-        Query<object> query = new("something");
+        GraphQLField<object> query = new("something");
 
         const string select = "id";
 
@@ -63,7 +63,7 @@ public class QueryOfTTests
     public void AddField_chained()
     {
         // Arrange
-        Query<object> query = new("something");
+        GraphQLField<object> query = new("something");
 
         // Act
         query.AddField("some").AddField("thing").AddField("else");
@@ -82,7 +82,7 @@ public class QueryOfTTests
     public void AddField_array()
     {
         // Arrange
-        Query<object> query = new("something");
+        GraphQLField<object> query = new("something");
 
         string[] selects =
         {
@@ -109,7 +109,7 @@ public class QueryOfTTests
     public void AddArgument_string_number()
     {
         // Arrange
-        Query<object> query = new("something");
+        GraphQLField<object> query = new("something");
 
         // Act
         query.AddArgument("id", 1);
@@ -122,7 +122,7 @@ public class QueryOfTTests
     public void AddArgument_string_string()
     {
         // Arrange
-        Query<object> query = new("something");
+        GraphQLField<object> query = new("something");
 
         // Act
         query.AddArgument("name", "danny");
@@ -135,7 +135,7 @@ public class QueryOfTTests
     public void AddArgument_string_dictionary()
     {
         // Arrange
-        Query<object> query = new("something");
+        GraphQLField<object> query = new("something");
 
         Dictionary<string, int> dict = new()
         {
@@ -157,7 +157,7 @@ public class QueryOfTTests
     public void AddArguments_object()
     {
         // Arrange
-        Query<object> query = new("car");
+        GraphQLField<object> query = new("car");
 
         Car car = new()
         {
@@ -169,16 +169,18 @@ public class QueryOfTTests
         query.AddArguments(car);
 
         // Assert
-        Assert.Equal(2, query.Arguments.Count);
+        Assert.Equal(4, query.Arguments.Count);
         Assert.Equal("Bee", query.Arguments[nameof(Car.Name)]);
         Assert.Equal(10000m, query.Arguments[nameof(Car.Price)]);
+        Assert.Null(query.Arguments[nameof(Car.Color)]);
+        Assert.Null(query.Arguments[nameof(Car.Manufacturer)]);
     }
 
     [Fact]
     public void AddArguments_anonymous()
     {
         // Arrange
-        Query<object> query = new("something");
+        GraphQLField<object> query = new("something");
 
         var @object = new
         {
@@ -199,7 +201,7 @@ public class QueryOfTTests
     public void AddArguments_dictionary()
     {
         // Arrange
-        Query<object> query = new("something");
+        GraphQLField<object> query = new("something");
 
         Dictionary<string, object?> dictionary = new()
         {
@@ -220,7 +222,7 @@ public class QueryOfTTests
     public void AddArgument_chained()
     {
         // Arrange
-        Query<object> query = new("something");
+        GraphQLField<object> query = new("something");
 
         Dictionary<string, int> dict = new()
         {
@@ -247,7 +249,7 @@ public class QueryOfTTests
     [Fact]
     public void TestAddField()
     {
-        Query<Car> query = new("car");
+        GraphQLField<Car> query = new("car");
         query.AddField(c => c.Name);
 
         Assert.Equal(new List<string> { nameof(Car.Name) }, query.SelectList);
@@ -256,16 +258,16 @@ public class QueryOfTTests
     [Fact]
     public void TestAddField_subQuery()
     {
-        Query<Car> query = new("car");
+        GraphQLField<Car> query = new("car");
         query.AddField(c => c.Color, sq => sq);
 
-        Assert.Equal(nameof(Car.Color), (query.SelectList[0] as IQuery<Color>)?.Name);
+        Assert.Equal(nameof(Car.Color), (query.SelectList[0] as IGraphQLField<Color>)?.Name);
     }
 
     [Fact]
     public void TestAddField_customFormatter()
     {
-        Query<Car> query = new("car", options: new QueryOptions
+        GraphQLField<Car> query = new("car", options: new QueryOptions
         {
             Formatter = property => $"__{property.Name.ToLower()}"
         });
@@ -277,19 +279,19 @@ public class QueryOfTTests
     [Fact]
     public void TestAddField_subQuery_customFormatter()
     {
-        Query<Car> query = new("car", options: new QueryOptions
+        GraphQLField<Car> query = new("car", options: new QueryOptions
         {
             Formatter = property => $"__{property.Name.ToLower()}"
         });
         query.AddField(c => c.Color, sq => sq);
 
-        Assert.Equal("__color", (query.SelectList[0] as IQuery<Color>)?.Name);
+        Assert.Equal("__color", (query.SelectList[0] as IGraphQLField<Color>)?.Name);
     }
 
     [Fact]
     public void TestQuery()
     {
-        IQuery<Car>? query = new Query<Car>(nameof(Car))
+        IGraphQLField<Car>? query = new GraphQLField<Car>(nameof(Car))
             .AddField(car => car.Name)
             .AddField(car => car.Price)
             .AddField(
@@ -304,20 +306,20 @@ public class QueryOfTTests
         Assert.Equal(nameof(Car.Name), query.SelectList[0]);
         Assert.Equal(nameof(Car.Price), query.SelectList[1]);
 
-        Assert.Equal(nameof(Car.Color), (query.SelectList[2] as IQuery<Color>)?.Name);
+        Assert.Equal(nameof(Car.Color), (query.SelectList[2] as IGraphQLField<Color>)?.Name);
         List<string> expectedSubSelectList =
         [
             nameof(Color.Red),
             nameof(Color.Green),
             nameof(Color.Blue)
         ];
-        Assert.Equal(expectedSubSelectList, (query.SelectList[2] as IQuery<Color>)?.SelectList);
+        Assert.Equal(expectedSubSelectList, (query.SelectList[2] as IGraphQLField<Color>)?.SelectList);
     }
 
     [Fact]
     public void TestQuery_build()
     {
-        IQuery<Car>? query = new Query<Car>("car")
+        IGraphQLField<Car>? query = new GraphQLField<Car>("car")
             .AddArguments(new { id = "yk8h4vn0", km = 2100, imported = true, page = new { from = 1, to = 100 } })
             .AddField(car => car.Name)
             .AddField(car => car.Price)
@@ -336,7 +338,7 @@ public class QueryOfTTests
     [Fact]
     public void TestQueryWithUnion()
     {
-        IQuery<Vehicule>? query = new Query<Vehicule>("vehicule")
+        IGraphQLField<Vehicule>? query = new GraphQLField<Vehicule>("vehicule")
             .AddUnion<Car>(
                 union => union
                     .AddField(car => car.Name)
@@ -361,16 +363,148 @@ public class QueryOfTTests
     [Fact]
     public void TestSubSelectWithList()
     {
-        IQuery<ObjectWithList>? query = new Query<ObjectWithList>("object")
+        IGraphQLField<ObjectWithList>? query = new GraphQLField<ObjectWithList>("object")
             .AddField<SubObject>(c => c.IEnumerable!, sq => sq)
             .AddField<SubObject>(c => c.List!, sq => sq)
             .AddField<SubObject>(c => c.IQueryable!, sq => sq)
             .AddField<SubObject>(c => c.Array!, sq => sq);
 
-        Assert.Equal(typeof(Query<SubObject>), query.SelectList[0]?.GetType());
-        Assert.Equal(typeof(Query<SubObject>), query.SelectList[1]?.GetType());
-        Assert.Equal(typeof(Query<SubObject>), query.SelectList[2]?.GetType());
-        Assert.Equal(typeof(Query<SubObject>), query.SelectList[3]?.GetType());
+        Assert.Equal(typeof(GraphQLField<SubObject>), query.SelectList[0]?.GetType());
+        Assert.Equal(typeof(GraphQLField<SubObject>), query.SelectList[1]?.GetType());
+        Assert.Equal(typeof(GraphQLField<SubObject>), query.SelectList[2]?.GetType());
+        Assert.Equal(typeof(GraphQLField<SubObject>), query.SelectList[3]?.GetType());
+    }
+
+    [Fact]
+    public void AddArgument_DuplicateKey_OverwritesValue()
+    {
+        GraphQLField<object> query = new("test");
+        query.AddArgument("id", 1);
+        query.AddArgument("id", 2);
+
+        Assert.Single(query.Arguments);
+        Assert.Equal(2, query.Arguments["id"]);
+    }
+
+    [Fact]
+    public void AddArguments_DefaultIgnoreCondition_Never_IncludesNullProperties()
+    {
+        QueryOptions options = new() { DefaultIgnoreCondition = QueryIgnoreCondition.Never };
+        GraphQLField<object> query = new("test", options);
+        query.AddArguments(new { name = "Bob", age = (int?)null });
+
+        Assert.Equal(2, query.Arguments.Count);
+        Assert.Equal("Bob", query.Arguments["name"]);
+        Assert.Null(query.Arguments["age"]);
+    }
+
+    [Fact]
+    public void AddArguments_DefaultIgnoreCondition_WhenWritingNull_SkipsNullProperties()
+    {
+        QueryOptions options = new() { DefaultIgnoreCondition = QueryIgnoreCondition.WhenWritingNull };
+        GraphQLField<object> query = new("test", options);
+        query.AddArguments(new { name = "Bob", age = (int?)null });
+
+        Assert.Single(query.Arguments);
+        Assert.Equal("Bob", query.Arguments["name"]);
+    }
+
+    [Fact]
+    public void AddArguments_DefaultIgnoreCondition_WhenWritingDefault_SkipsDefaultProperties()
+    {
+        QueryOptions options = new() { DefaultIgnoreCondition = QueryIgnoreCondition.WhenWritingDefault };
+        GraphQLField<object> query = new("test", options);
+        query.AddArguments(new { name = "Bob", age = 0, active = false });
+
+        Assert.Single(query.Arguments);
+        Assert.Equal("Bob", query.Arguments["name"]);
+    }
+
+    [Fact]
+    public void AddArguments_DefaultIgnoreCondition_WhenWritingNull_KeepsDefaultValueTypes()
+    {
+        QueryOptions options = new() { DefaultIgnoreCondition = QueryIgnoreCondition.WhenWritingNull };
+        GraphQLField<object> query = new("test", options);
+        query.AddArguments(new { name = "Bob", age = 0, active = false });
+
+        Assert.Equal(3, query.Arguments.Count);
+        Assert.Equal("Bob", query.Arguments["name"]);
+        Assert.Equal(0, query.Arguments["age"]);
+        Assert.Equal(false, query.Arguments["active"]);
+    }
+
+    [Fact]
+    public void AddArguments_DefaultIgnoreCondition_WhenWritingDefault_KeepsNonDefaultValueTypes()
+    {
+        QueryOptions options = new() { DefaultIgnoreCondition = QueryIgnoreCondition.WhenWritingDefault };
+        GraphQLField<object> query = new("test", options);
+        query.AddArguments(new { name = "Bob", age = 5, active = true });
+
+        Assert.Equal(3, query.Arguments.Count);
+        Assert.Equal("Bob", query.Arguments["name"]);
+        Assert.Equal(5, query.Arguments["age"]);
+        Assert.Equal(true, query.Arguments["active"]);
+    }
+
+    [Fact]
+    public void Build_DefaultIgnoreCondition_Never_IncludesNullInOutput()
+    {
+        QueryOptions options = new() { DefaultIgnoreCondition = QueryIgnoreCondition.Never };
+        IGraphQLField<Customer> query = new GraphQLField<Customer>("customer", options)
+            .AddField(c => c.Name)
+            .AddArguments(new { name = "Bob", age = (int?)null });
+
+        string result = query.Build();
+
+        Assert.Equal("customer(age:null,name:\"Bob\"){Name}", result);
+    }
+
+    [Fact]
+    public void Build_DefaultIgnoreCondition_WhenWritingNull_ExcludesNullFromOutput()
+    {
+        QueryOptions options = new() { DefaultIgnoreCondition = QueryIgnoreCondition.WhenWritingNull };
+        IGraphQLField<Customer> query = new GraphQLField<Customer>("customer", options)
+            .AddField(c => c.Name)
+            .AddArguments(new { name = "Bob", age = (int?)null });
+
+        string result = query.Build();
+
+        Assert.Equal("customer(name:\"Bob\"){Name}", result);
+    }
+
+    [Theory]
+    [InlineData("id} mutation { deleteAll")]
+    [InlineData("field name")]
+    [InlineData("123field")]
+    [InlineData("field-name")]
+    [InlineData("")]
+    public void AddField_InvalidName_ThrowsArgumentException(string invalidName)
+    {
+        GraphQLField<object> query = new("test");
+        Assert.Throws<ArgumentException>(() => query.AddField(invalidName));
+    }
+
+    [Theory]
+    [InlineData("key} inject")]
+    [InlineData("123key")]
+    [InlineData("key-name")]
+    [InlineData("")]
+    public void AddArgument_InvalidKey_ThrowsArgumentException(string invalidKey)
+    {
+        GraphQLField<object> query = new("test");
+        Assert.Throws<ArgumentException>(() => query.AddArgument(invalidKey, "value"));
+    }
+
+    [Theory]
+    [InlineData("validName")]
+    [InlineData("_private")]
+    [InlineData("__typename")]
+    [InlineData("field123")]
+    public void AddField_ValidName_Succeeds(string validName)
+    {
+        GraphQLField<object> query = new("test");
+        query.AddField(validName);
+        Assert.Equal(validName, query.SelectList[0]);
     }
 
     class ObjectWithList
@@ -384,5 +518,33 @@ public class QueryOfTTests
     class SubObject
     {
         public byte Id { get; set; }
+    }
+
+    [Theory]
+    [InlineData("car{Name}")]
+    [InlineData("car(id:1)")]
+    [InlineData("my field")]
+    [InlineData("1car")]
+    public void Constructor_InvalidName_Throws(string name)
+    {
+        Assert.Throws<ArgumentException>(() => new GraphQLField<Car>(name));
+    }
+
+    [Theory]
+    [InlineData("first:car{Name} second")]
+    [InlineData("my alias")]
+    [InlineData("1first")]
+    public void Alias_InvalidName_Throws(string alias)
+    {
+        Assert.Throws<ArgumentException>(() => new GraphQLField<Car>("car").Alias(alias));
+    }
+
+    [Fact]
+    public void AddUnion_InvalidTypeName_Throws()
+    {
+        IGraphQLField<Vehicule> query = new GraphQLField<Vehicule>("vehicule");
+
+        Assert.Throws<ArgumentException>(
+            () => query.AddUnion<Car>("Car{Name} ... on Truck", sq => sq.AddField(c => c.Name)));
     }
 }

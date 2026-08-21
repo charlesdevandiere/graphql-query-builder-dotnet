@@ -6,6 +6,12 @@ namespace GraphQL.Query.Builder.UnitTests;
 
 public class QueryStringBuilderTests
 {
+    class SelfReferencing
+    {
+        public string? Name { get; set; }
+        public SelfReferencing? Self { get; set; }
+    }
+
     enum TestEnum
     {
         ENABLED,
@@ -33,6 +39,41 @@ public class QueryStringBuilderTests
         Assert.Equal(
             "\"{\\\"foo\\\":\\\"bar\\\",\\\"array\\\":[1,2]}\"",
             new QueryStringBuilder().FormatQueryParam(value));
+    }
+
+    [Fact]
+    public void TestFormatQueryParam_string_with_backslash()
+    {
+        string value = "path\\to\\file";
+        Assert.Equal("\"path\\\\to\\\\file\"", new QueryStringBuilder().FormatQueryParam(value));
+    }
+
+    [Fact]
+    public void TestFormatQueryParam_string_with_newline()
+    {
+        string value = "line1\nline2";
+        Assert.Equal("\"line1\\nline2\"", new QueryStringBuilder().FormatQueryParam(value));
+    }
+
+    [Fact]
+    public void TestFormatQueryParam_string_with_tab()
+    {
+        string value = "col1\tcol2";
+        Assert.Equal("\"col1\\tcol2\"", new QueryStringBuilder().FormatQueryParam(value));
+    }
+
+    [Fact]
+    public void TestFormatQueryParam_string_with_carriage_return()
+    {
+        string value = "line1\rline2";
+        Assert.Equal("\"line1\\rline2\"", new QueryStringBuilder().FormatQueryParam(value));
+    }
+
+    [Fact]
+    public void TestFormatQueryParam_string_injection_attempt()
+    {
+        string value = "hello\") { malicious } #";
+        Assert.Equal("\"hello\\\") { malicious } #\"", new QueryStringBuilder().FormatQueryParam(value));
     }
 
     [Fact]
@@ -178,6 +219,20 @@ public class QueryStringBuilderTests
     }
 
     [Fact]
+    public void TestFormatQueryParam_keyvaluepair_nullable()
+    {
+        KeyValuePair<string, object?> value = new("key", null);
+        Assert.Equal("key:null", new QueryStringBuilder().FormatQueryParam(value));
+    }
+
+    [Fact]
+    public void TestFormatQueryParam_keyvaluepair_typed()
+    {
+        KeyValuePair<string, int> value = new("count", 42);
+        Assert.Equal("count:42", new QueryStringBuilder().FormatQueryParam(value));
+    }
+
+    [Fact]
     public void TestFormatQueryParam_dictionary()
     {
         Dictionary<string, object?> value = new()
@@ -290,7 +345,7 @@ public class QueryStringBuilderTests
         };
 
         Assert.Equal(
-            "{Age:10,Name:\"Test\",Orders:[{Product:{Color:{Blue:83,Green:12,Red:45},Name:\"Bee\",Price:10000}}]}",
+            "{Age:10,Name:\"Test\",Orders:[{Product:{Color:{Blue:83,Green:12,Red:45},Manufacturer:null,Name:\"Bee\",Price:10000}}]}",
             new QueryStringBuilder().FormatQueryParam(@object));
 
         // with inner object with null property
@@ -313,7 +368,7 @@ public class QueryStringBuilderTests
         };
 
         Assert.Equal(
-            "{Age:10,Name:\"Test\",Orders:[{Product:{Name:\"Bee\",Price:10000}}]}",
+            "{Age:10,Name:\"Test\",Orders:[{Product:{Color:null,Manufacturer:null,Name:\"Bee\",Price:10000}}]}",
             new QueryStringBuilder().FormatQueryParam(@object));
     }
 
@@ -357,7 +412,7 @@ public class QueryStringBuilderTests
             { "map", fromToMap },
             { "name", TestEnum.HAYstack }
         };
-        IQuery<Car> query = new Query<Car>("test1")
+        IGraphQLField<Car> query = new GraphQLField<Car>("test1")
             .AddField("name")
             .AddArguments(nestedListMap);
 
@@ -386,7 +441,7 @@ public class QueryStringBuilderTests
             { "map", fromToMap },
             { "name", TestEnum.HAYstack }
         };
-        IQuery<object> query = new Query<object>("test1")
+        IGraphQLField<object> query = new GraphQLField<object>("test1")
             .AddField("name")
             .AddArguments(nestedListMap);
 
@@ -408,7 +463,7 @@ public class QueryStringBuilderTests
             { "__debug", TestEnum.DISABLED },
             { "SuperQuerySpeed", TestEnum.ENABLED }
         };
-        IQuery<object> query = new Query<object>("test1")
+        IGraphQLField<object> query = new GraphQLField<object>("test1")
             .AddField("more")
             .AddField("things")
             .AddField("in_a_select")
@@ -437,7 +492,7 @@ public class QueryStringBuilderTests
             { "__debug", TestEnum.DISABLED },
             { "SuperQuerySpeed", TestEnum.ENABLED }
         };
-        IQuery<object> query = new Query<object>("test1")
+        IGraphQLField<object> query = new GraphQLField<object>("test1")
             .Alias("test1Alias")
             .AddField("more")
             .AddField("things")
@@ -456,9 +511,96 @@ public class QueryStringBuilderTests
     [Fact]
     public void QueryWithoutField()
     {
-        Query<object> query = new("test");
+        GraphQLField<object> query = new("test");
 
         Assert.Equal("test", new QueryStringBuilder().Build(query));
+    }
+
+    [Fact]
+    public void TestFormatQueryParam_CircularReference_ThrowsInvalidOperationException()
+    {
+        SelfReferencing obj = new() { Name = "test" };
+        obj.Self = obj;
+
+        Assert.Throws<InvalidOperationException>(() => new QueryStringBuilder().FormatQueryParam(obj));
+    }
+
+    [Fact]
+    public void TestFormatQueryParam_Object_IgnoreNever_IncludesNullProperties()
+    {
+        Customer @object = new()
+        {
+            Name = "Test",
+            Age = 10
+        };
+
+        Assert.Equal(
+            "{Age:10,Name:\"Test\",Orders:null}",
+            new QueryStringBuilder().FormatQueryParam(@object));
+    }
+
+    [Fact]
+    public void TestFormatQueryParam_Object_IgnoreWhenWritingNull_SkipsNullProperties()
+    {
+        QueryStringBuilder builder = new(null, QueryIgnoreCondition.WhenWritingNull);
+
+        Customer @object = new()
+        {
+            Name = "Test",
+            Age = 10
+        };
+
+        Assert.Equal(
+            "{Age:10,Name:\"Test\"}",
+            builder.FormatQueryParam(@object));
+    }
+
+    [Fact]
+    public void TestFormatQueryParam_Object_IgnoreWhenWritingDefault_SkipsDefaultProperties()
+    {
+        QueryStringBuilder builder = new(null, QueryIgnoreCondition.WhenWritingDefault);
+
+        Customer @object = new()
+        {
+            Name = "Test",
+            Age = 0
+        };
+
+        Assert.Equal(
+            "{Name:\"Test\"}",
+            builder.FormatQueryParam(@object));
+    }
+
+    [Fact]
+    public void TestFormatQueryParam_Object_IgnoreWhenWritingNull_KeepsDefaultValueTypes()
+    {
+        QueryStringBuilder builder = new(null, QueryIgnoreCondition.WhenWritingNull);
+
+        Customer @object = new()
+        {
+            Name = "Test",
+            Age = 0
+        };
+
+        Assert.Equal(
+            "{Age:0,Name:\"Test\"}",
+            builder.FormatQueryParam(@object));
+    }
+
+    [Fact]
+    public void TestFormatQueryParam_Object_IgnoreWhenWritingDefault_KeepsNonDefaultValues()
+    {
+        QueryStringBuilder builder = new(null, QueryIgnoreCondition.WhenWritingDefault);
+
+        Customer @object = new()
+        {
+            Name = "Test",
+            Age = 5
+        };
+
+        Assert.Equal(
+            "{Age:5,Name:\"Test\"}",
+            builder.FormatQueryParam(@object));
     }
 
     [Fact]
@@ -470,5 +612,103 @@ public class QueryStringBuilderTests
         string param = builder.FormatQueryParam(new { Id = "urv7fe53", Name = "Bob" });
 
         Assert.Equal("{FIELD_Id:\"urv7fe53\",FIELD_Name:\"Bob\"}", param);
+    }
+
+    [Fact]
+    public void FormatQueryParam_DateTimeOffset_FormatsAsIso8601()
+    {
+        QueryStringBuilder builder = new();
+
+        string param = builder.FormatQueryParam(new DateTimeOffset(2024, 6, 15, 13, 45, 30, TimeSpan.FromHours(2)));
+
+        Assert.Equal("\"2024-06-15T13:45:30.0000000+02:00\"", param);
+    }
+
+    [Fact]
+    public void FormatQueryParam_Guid_FormatsAsString()
+    {
+        QueryStringBuilder builder = new();
+
+        string param = builder.FormatQueryParam(Guid.Parse("2c1e0e0a-0000-4000-8000-000000000001"));
+
+        Assert.Equal("\"2c1e0e0a-0000-4000-8000-000000000001\"", param);
+    }
+
+    [Fact]
+    public void FormatQueryParam_TimeSpan_FormatsAsString()
+    {
+        QueryStringBuilder builder = new();
+
+        string param = builder.FormatQueryParam(TimeSpan.FromMinutes(5));
+
+        Assert.Equal("\"00:05:00\"", param);
+    }
+
+    [Fact]
+    public void FormatQueryParam_Uri_FormatsAsString()
+    {
+        QueryStringBuilder builder = new();
+
+        string param = builder.FormatQueryParam(new Uri("https://example.com/a"));
+
+        Assert.Equal("\"https://example.com/a\"", param);
+    }
+
+    class WithStaticSelfProperty
+    {
+        public int Id { get; set; }
+        public static WithStaticSelfProperty Default { get; } = new();
+    }
+
+    [Fact]
+    public void FormatQueryParam_StaticProperties_AreIgnored()
+    {
+        QueryStringBuilder builder = new();
+
+        string param = builder.FormatQueryParam(new WithStaticSelfProperty { Id = 1 });
+
+        Assert.Equal("{Id:1}", param);
+    }
+
+    class WithIndexer
+    {
+        public int Id { get; set; }
+        public string this[int index] => index.ToString();
+    }
+
+    [Fact]
+    public void FormatQueryParam_Indexers_AreIgnored()
+    {
+        QueryStringBuilder builder = new();
+
+        string param = builder.FormatQueryParam(new WithIndexer { Id = 7 });
+
+        Assert.Equal("{Id:7}", param);
+    }
+
+    class WithWriteOnlyProperty
+    {
+        public int Id { get; set; }
+        public int Secret { set { } }
+    }
+
+    [Fact]
+    public void FormatQueryParam_WriteOnlyProperties_AreIgnored()
+    {
+        QueryStringBuilder builder = new();
+
+        string param = builder.FormatQueryParam(new WithWriteOnlyProperty { Id = 7 });
+
+        Assert.Equal("{Id:7}", param);
+    }
+
+    [Fact]
+    public void Build_SameBuilderTwice_DoesNotAccumulate()
+    {
+        QueryStringBuilder builder = new();
+        IGraphQLField<object> query = new GraphQLField<object>("user").AddField("name");
+
+        Assert.Equal("user{name}", builder.Build(query));
+        Assert.Equal("user{name}", builder.Build(query));
     }
 }

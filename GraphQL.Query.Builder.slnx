@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/sample/">
+    <Project Path="sample/Models/Models.csproj" />
+    <Project Path="sample/Pokedex/Pokedex.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/GraphQL.Query.Builder/GraphQL.Query.Builder.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/GraphQL.Query.Builder.UnitTests/GraphQL.Query.Builder.UnitTests.csproj" />
+  </Folder>
+</Solution>

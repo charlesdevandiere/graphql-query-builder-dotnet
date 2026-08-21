@@ -12,7 +12,7 @@ public class CustomQueryStringBuilderTests
         {
             QueryStringBuilderFactory = () => new ConstantCaseEnumQueryStringBuilder()
         };
-        string query = new Query<object>("something", options)
+        string query = new GraphQLField<object>("something", options)
             .AddArgument("case", Cases.ConstantCase)
             .AddField("some")
             .Build();
@@ -66,7 +66,7 @@ public class CustomQueryStringBuilderTests
         {
             Formatter = CamelCasePropertyNameFormatter.Format
         };
-        string query = new Query<object>("something", options)
+        string query = new GraphQLField<object>("something", options)
             .AddArguments(new
             {
                 SomeObject = new
@@ -78,5 +78,42 @@ public class CustomQueryStringBuilderTests
             .Build();
 
         Assert.Equal("something(someObject:{innerObjectField:\"camel case\"}){some}", query);
+    }
+
+    [Fact]
+    public void SharedBuilderFactory_DoesNotAccumulateBetweenBuilds()
+    {
+        QueryStringBuilder shared = new();
+        QueryOptions options = new() { QueryStringBuilderFactory = () => shared };
+
+        IGraphQLField<object> query = new GraphQLField<object>("user", options).AddField("name");
+
+        Assert.Equal("user{name}", query.Build());
+        Assert.Equal("user{name}", query.Build());
+        Assert.Equal("user{name}", query.Build());
+    }
+
+    [Fact]
+    public void SharedBuilderFactory_HandlesNestedFields()
+    {
+        QueryStringBuilder shared = new();
+        QueryOptions options = new() { QueryStringBuilderFactory = () => shared };
+
+        IGraphQLField<object> query = new GraphQLField<object>("car", options)
+            .AddField<object>("Color", sq => sq.AddField("Red").AddField("Green"))
+            .AddField("Name");
+
+        Assert.Equal("car{Color{Red Green} Name}", query.Build());
+        Assert.Equal("car{Color{Red Green} Name}", query.Build());
+    }
+
+    [Fact]
+    public void NullBuilderFactoryResult_Throws()
+    {
+        QueryOptions options = new() { QueryStringBuilderFactory = () => null! };
+
+        IGraphQLField<object> query = new GraphQLField<object>("user", options).AddField("name");
+
+        Assert.Throws<ArgumentNullException>(() => query.Build());
     }
 }

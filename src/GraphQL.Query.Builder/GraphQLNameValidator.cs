@@ -5,9 +5,12 @@ namespace GraphQL.Query.Builder;
 /// <summary>Validates GraphQL names against the specification.</summary>
 internal static class GraphQLNameValidator
 {
-    private static readonly Regex ValidNamePattern = new("^[a-zA-Z_][a-zA-Z0-9_]*$", RegexOptions.Compiled);
+    /// <summary>The maximum time a name or type validation match is allowed to run.</summary>
+    private static readonly TimeSpan MatchTimeout = TimeSpan.FromMilliseconds(100);
 
-    private static readonly Regex ValidTypePattern = new(@"^\[*[a-zA-Z_][a-zA-Z0-9_]*!?(\]!?)*$", RegexOptions.Compiled);
+    private static readonly Regex ValidNamePattern = new("^[a-zA-Z_][a-zA-Z0-9_]*$", RegexOptions.Compiled, MatchTimeout);
+
+    private static readonly Regex ValidTypePattern = new(@"^\[*[a-zA-Z_][a-zA-Z0-9_]*!?(\]!?)*$", RegexOptions.Compiled, MatchTimeout);
 
     /// <summary>Validates that the given name is a valid GraphQL identifier.</summary>
     /// <param name="name">The name to validate.</param>
